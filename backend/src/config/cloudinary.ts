@@ -12,16 +12,14 @@ cloudinary.config({
 // Configurar storage para Multer con Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
-    return {
-      folder: '9citas/profiles', // Carpeta en Cloudinary
-      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-      transformation: [
-        { width: 1000, height: 1000, crop: 'limit' }, // Limitar tamaño
-        { quality: 'auto' }, // Optimización automática
-      ],
-    }
-  },
+  params: {
+    folder: '9citas/profiles',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [
+      { width: 1000, height: 1000, crop: 'limit' },
+      { quality: 'auto' },
+    ],
+  } as any,
 })
 
 // Configurar Multer
