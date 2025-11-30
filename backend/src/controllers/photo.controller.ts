@@ -1,8 +1,7 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
-import fs from 'fs';
-import path from 'path';
+import cloudinary from '../config/cloudinary';
 
 const prisma = new PrismaClient();
 
@@ -30,25 +29,32 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
     // Límites: 1 cover, 3 public, 4 private
     const limits: any = { cover: 1, public: 3, private: 4 };
     if (existingPhotos.length >= limits[type]) {
-      // Eliminar archivo subido
-      fs.unlinkSync(req.file.path);
+      // Eliminar de Cloudinary
+      const publicId = (req.file as any).filename;
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
       return res.status(400).json({
         error: `Ya has alcanzado el límite de ${limits[type]} foto(s) de tipo ${type}`,
       });
     }
 
-    // Si es cover y ya existe una, eliminar la anterior
+    // Si es cover y ya existe una, eliminar la anterior de Cloudinary
     if (type === 'cover' && existingPhotos.length > 0) {
       const oldPhoto = existingPhotos[0];
-      fs.unlinkSync(path.join('uploads', path.basename(oldPhoto.url)));
+      // Extraer public_id de la URL de Cloudinary
+      const urlParts = oldPhoto.url.split('/');
+      const publicIdWithExt = urlParts[urlParts.length - 1];
+      const publicId = `9citas/profiles/${publicIdWithExt.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
       await prisma.photo.delete({ where: { id: oldPhoto.id } });
     }
 
-    // Guardar en base de datos
+    // Guardar en base de datos (Cloudinary ya subió la foto)
     const photo = await prisma.photo.create({
       data: {
         profileId: req.profileId!,
-        url: `/uploads/${req.file.filename}`,
+        url: (req.file as any).path, // URL de Cloudinary
         type,
       },
     });
@@ -81,11 +87,11 @@ export const deletePhoto = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'No tienes permiso para eliminar esta foto' });
     }
 
-    // Eliminar archivo físico
-    const filePath = path.join('uploads', path.basename(photo.url));
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    // Eliminar de Cloudinary
+    const urlParts = photo.url.split('/');
+    const publicIdWithExt = urlParts[urlParts.length - 1];
+    const publicId = `9citas/profiles/${publicIdWithExt.split('.')[0]}`;
+    await cloudinary.uploader.destroy(publicId);
 
     // Eliminar de base de datos
     await prisma.photo.delete({ where: { id } });
