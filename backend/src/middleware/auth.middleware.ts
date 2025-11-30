@@ -25,7 +25,7 @@ export const authenticateToken = async (
     }
 
     // Verificar token
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET!) as {
       userId: string;
     };
 
