@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapPin, Loader2 } from 'lucide-react'
+import { MapPin, Loader2, X } from 'lucide-react'
 import Modal from './Modal'
 
 interface LocationSelectorProps {

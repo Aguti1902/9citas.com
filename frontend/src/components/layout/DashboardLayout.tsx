@@ -18,7 +18,7 @@ export default function DashboardLayout() {
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [pendingRequests, setPendingRequests] = useState(0)
   const [showRoamSummary, setShowRoamSummary] = useState(false)
-  const [roamSummary, setRoamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
+  const [roamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
 
   const isActive = (path: string) => location.pathname.includes(path)
 
