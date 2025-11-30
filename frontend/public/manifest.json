@@ -1,0 +1,43 @@
+{
+  "name": "9citas - Encuentra tu conexión perfecta",
+  "short_name": "9citas",
+  "description": "La mejor app de citas para conocer gente cerca de ti",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#fc4d5c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["social", "lifestyle"],
+  "lang": "es",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
+
+

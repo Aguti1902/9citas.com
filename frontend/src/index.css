@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #000000;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Estilos personalizados */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity duration-200;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-black font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity duration-200;
+  }
+
+  .input-field {
+    @apply w-full bg-gray-900 text-white border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition-colors;
+  }
+
+  .card {
+    @apply bg-gray-900 rounded-xl overflow-hidden shadow-lg;
+  }
+
+  .profile-card {
+    @apply relative bg-gray-900 rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300;
+  }
+
+  .nav-bottom-item {
+    @apply flex flex-col items-center justify-center py-2 px-3 text-xs text-gray-400 hover:text-white transition-colors cursor-pointer;
+  }
+
+  .nav-bottom-item.active {
+    @apply text-primary;
+  }
+
+  .filter-pill {
+    @apply px-3 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer shadow-md;
+  }
+
+  @media (min-width: 640px) {
+    .filter-pill {
+      @apply px-4 py-2 text-sm;
+    }
+  }
+
+  .filter-pill.active {
+    @apply bg-primary text-white shadow-lg shadow-primary/50 scale-105;
+  }
+
+  .filter-pill.inactive {
+    @apply bg-gray-800 text-gray-300 hover:bg-gray-700 hover:scale-105;
+  }
+
+  .online-indicator {
+    @apply inline-block w-3 h-3 bg-success rounded-full;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Range Slider */
+.slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #fc4d5c;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider-thumb::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #fc4d5c;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.slider-thumb::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Ocultar scrollbar en elementos específicos */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading spinner */
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #fc4d5c;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Animación de scale-in para el modal de match */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+

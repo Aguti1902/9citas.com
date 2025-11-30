@@ -1,0 +1,274 @@
+// Prisma schema para 9citas.com
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Usuario - Autenticación
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  profile       Profile?
+  subscription  Subscription?
+  emailTokens   EmailVerificationToken[]
+  
+  @@map("users")
+}
+
+// Token de verificación de email
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+// Perfil de usuario
+model Profile {
+  id              String    @id @default(uuid())
+  userId          String?   @unique
+  user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Datos básicos
+  orientation     String    // 'hetero' | 'gay'
+  gender          String    @default("hombre") // 'hombre' | 'mujer' - para match correcto
+  title           String    // Máx 15 caracteres
+  aboutMe         String    @db.Text
+  lookingFor      String    @db.Text
+  age             Int
+  
+  // Nuevos campos
+  height          Int?      // Altura en cm
+  bodyType        String?   // delgado, atlético, promedio, robusto
+  relationshipStatus String? // soltero, complicado, abierto
+  languages       String[]  @default([]) // español, inglés, catalán, etc
+  hobbies         String[]  @default([]) // deportes, música, viajes, etc
+  occupation      String?   // Profesión/trabajo
+  education       String?   // Nivel educativo
+  smoking         String?   // no, ocasional, regular
+  drinking        String?   // no, ocasional, regular
+  children        String?   // no, si_vivo, si_no_vivo, quiero
+  pets            String?   // perro, gato, etc
+  zodiacSign      String?   // aries, tauro, etc
+  
+  // Ubicación
+  city            String
+  latitude        Float?
+  longitude       Float?
+  
+  // Estado
+  isOnline        Boolean   @default(false)
+  lastSeenAt      DateTime  @default(now())
+  
+  // Roam
+  isRoaming       Boolean   @default(false)
+  roamingUntil    DateTime?
+  
+  // Fake user flag
+  isFake          Boolean   @default(false)
+  
+  // Verificación
+  isVerified      Boolean   @default(false)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relaciones
+  photos          Photo[]
+  sentLikes       Like[]    @relation("SentLikes")
+  receivedLikes   Like[]    @relation("ReceivedLikes")
+  favorites       Favorite[] @relation("OwnerFavorites")
+  favoritedBy     Favorite[] @relation("TargetFavorites")
+  sentMessages    Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  blocksInitiated Block[]   @relation("BlockerProfile")
+  blocksReceived  Block[]   @relation("BlockedProfile")
+  photoAccessAsOwner   PrivatePhotoAccess[] @relation("PhotoAccessOwner")
+  photoAccessAsViewer  PrivatePhotoAccess[] @relation("PhotoAccessViewer")
+  roamSessions    RoamSession[]
+  
+  @@index([orientation])
+  @@index([city])
+  @@index([isOnline])
+  @@index([lastSeenAt])
+  @@map("profiles")
+}
+
+// Fotos del perfil
+model Photo {
+  id          String   @id @default(uuid())
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  url         String
+  type        String   // 'cover' | 'public' | 'private'
+  
+  createdAt   DateTime @default(now())
+  
+  messages    Message[]
+  
+  @@index([profileId])
+  @@index([type])
+  @@map("photos")
+}
+
+// Me gusta
+model Like {
+  id            String   @id @default(uuid())
+  fromProfileId String
+  toProfileId   String
+  
+  fromProfile   Profile  @relation("SentLikes", fields: [fromProfileId], references: [id], onDelete: Cascade)
+  toProfile     Profile  @relation("ReceivedLikes", fields: [toProfileId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime @default(now())
+  
+  @@unique([fromProfileId, toProfileId])
+  @@index([toProfileId])
+  @@map("likes")
+}
+
+// Favoritos
+model Favorite {
+  id              String   @id @default(uuid())
+  ownerProfileId  String
+  targetProfileId String
+  
+  ownerProfile    Profile  @relation("OwnerFavorites", fields: [ownerProfileId], references: [id], onDelete: Cascade)
+  targetProfile   Profile  @relation("TargetFavorites", fields: [targetProfileId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([ownerProfileId, targetProfileId])
+  @@index([ownerProfileId])
+  @@map("favorites")
+}
+
+// Mensajes
+model Message {
+  id            String   @id @default(uuid())
+  fromProfileId String
+  toProfileId   String
+  
+  fromProfile   Profile  @relation("SentMessages", fields: [fromProfileId], references: [id], onDelete: Cascade)
+  toProfile     Profile  @relation("ReceivedMessages", fields: [toProfileId], references: [id], onDelete: Cascade)
+  
+  text          String?  @db.Text
+  photoId       String?
+  photo         Photo?   @relation(fields: [photoId], references: [id], onDelete: SetNull)
+  
+  location      Json?    // {lat, lng, address}
+  
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  
+  @@index([fromProfileId])
+  @@index([toProfileId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// Bloqueos
+model Block {
+  id               String   @id @default(uuid())
+  blockerProfileId String
+  blockedProfileId String
+  
+  blockerProfile   Profile  @relation("BlockerProfile", fields: [blockerProfileId], references: [id], onDelete: Cascade)
+  blockedProfile   Profile  @relation("BlockedProfile", fields: [blockedProfileId], references: [id], onDelete: Cascade)
+  
+  createdAt        DateTime @default(now())
+  
+  @@unique([blockerProfileId, blockedProfileId])
+  @@index([blockerProfileId])
+  @@index([blockedProfileId])
+  @@map("blocks")
+}
+
+// Suscripciones
+model Subscription {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  plan      String    // '9plus'
+  isActive  Boolean   @default(false)
+  startDate DateTime?
+  endDate   DateTime?
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@map("subscriptions")
+}
+
+// Roam purchases (histórico)
+model RoamPurchase {
+  id          String   @id @default(uuid())
+  profileId   String
+  
+  duration    Int      // minutos
+  price       Float
+  startTime   DateTime
+  endTime     DateTime
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([profileId])
+  @@map("roam_purchases")
+}
+
+// Métricas de Roam
+model RoamSession {
+  id                String   @id @default(uuid())
+  profileId         String
+  profile           Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  startTime         DateTime
+  endTime           DateTime
+  
+  viewsBeforeRoam   Int      @default(0) // Vistas antes de activar Roam
+  viewsDuringRoam   Int      @default(0) // Vistas durante el Roam
+  likesBeforeRoam   Int      @default(0) // Likes antes de activar Roam
+  likesDuringRoam   Int      @default(0) // Likes durante el Roam
+  
+  isActive          Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([profileId])
+  @@index([isActive])
+  @@map("roam_sessions")
+}
+
+// Permiso para ver fotos privadas
+model PrivatePhotoAccess {
+  id                String   @id @default(uuid())
+  ownerProfileId    String   // Dueño de las fotos
+  viewerProfileId   String   // Quien solicita/tiene acceso
+  status            String   // 'pending', 'granted', 'rejected'
+  ownerProfile      Profile  @relation("PhotoAccessOwner", fields: [ownerProfileId], references: [id], onDelete: Cascade)
+  viewerProfile     Profile  @relation("PhotoAccessViewer", fields: [viewerProfileId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([ownerProfileId, viewerProfileId])
+  @@map("private_photo_access")
+}
+

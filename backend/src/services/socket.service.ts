@@ -1,0 +1,161 @@
+import { Server, Socket } from 'socket.io';
+import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+interface AuthenticatedSocket extends Socket {
+  userId?: string;
+  profileId?: string;
+}
+
+export const setupSocketHandlers = (io: Server) => {
+  // Middleware de autenticación para Socket.IO
+  io.use(async (socket: AuthenticatedSocket, next) => {
+    try {
+      const token = socket.handshake.auth.token;
+
+      if (!token) {
+        return next(new Error('Token requerido'));
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
+        userId: string;
+      };
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        include: { profile: true },
+      });
+
+      if (!user) {
+        return next(new Error('Usuario no encontrado'));
+      }
+
+      socket.userId = user.id;
+      socket.profileId = user.profile?.id;
+
+      next();
+    } catch (error) {
+      next(new Error('Token inválido'));
+    }
+  });
+
+  // Handlers de conexión
+  io.on('connection', async (socket: AuthenticatedSocket) => {
+    console.log(`Usuario conectado: ${socket.userId}`);
+
+    // Marcar como online
+    if (socket.profileId) {
+      await prisma.profile.update({
+        where: { id: socket.profileId },
+        data: {
+          isOnline: true,
+          lastSeenAt: new Date(),
+        },
+      });
+
+      // Unirse a sala personal
+      socket.join(`profile:${socket.profileId}`);
+    }
+
+    // Handler: Enviar mensaje
+    socket.on('send_message', async (data) => {
+      try {
+        const { toProfileId, text, photoId, location } = data;
+
+        if (!socket.profileId) return;
+
+        const message = await prisma.message.create({
+          data: {
+            fromProfileId: socket.profileId,
+            toProfileId,
+            text: text || null,
+            photoId: photoId || null,
+            location: location || null,
+          },
+          include: {
+            fromProfile: {
+              include: {
+                photos: {
+                  where: { type: 'cover' },
+                  take: 1,
+                },
+              },
+            },
+            photo: true,
+          },
+        });
+
+        // Enviar mensaje al destinatario
+        io.to(`profile:${toProfileId}`).emit('new_message', message);
+
+        // Confirmar al remitente
+        socket.emit('message_sent', message);
+      } catch (error) {
+        console.error('Error al enviar mensaje:', error);
+        socket.emit('error', { message: 'Error al enviar mensaje' });
+      }
+    });
+
+    // Handler: Usuario escribiendo
+    socket.on('typing', (data) => {
+      const { toProfileId } = data;
+      io.to(`profile:${toProfileId}`).emit('user_typing', {
+        fromProfileId: socket.profileId,
+      });
+    });
+
+    // Handler: Usuario dejó de escribir
+    socket.on('stop_typing', (data) => {
+      const { toProfileId } = data;
+      io.to(`profile:${toProfileId}`).emit('user_stop_typing', {
+        fromProfileId: socket.profileId,
+      });
+    });
+
+    // Handler: Marcar mensajes como leídos
+    socket.on('mark_as_read', async (data) => {
+      try {
+        const { fromProfileId } = data;
+
+        if (!socket.profileId) return;
+
+        await prisma.message.updateMany({
+          where: {
+            fromProfileId,
+            toProfileId: socket.profileId,
+            isRead: false,
+          },
+          data: {
+            isRead: true,
+          },
+        });
+
+        // Notificar al remitente
+        io.to(`profile:${fromProfileId}`).emit('messages_read', {
+          byProfileId: socket.profileId,
+        });
+      } catch (error) {
+        console.error('Error al marcar mensajes:', error);
+      }
+    });
+
+    // Handler: Desconexión
+    socket.on('disconnect', async () => {
+      console.log(`Usuario desconectado: ${socket.userId}`);
+
+      // Marcar como offline
+      if (socket.profileId) {
+        await prisma.profile.update({
+          where: { id: socket.profileId },
+          data: {
+            isOnline: false,
+            lastSeenAt: new Date(),
+          },
+        });
+      }
+    });
+  });
+};
+
