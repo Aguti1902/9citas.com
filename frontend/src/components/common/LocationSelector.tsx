@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react'
-import { MapPin, Loader2, X } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, Loader2 } from 'lucide-react'
 import Modal from './Modal'
-import Button from './Button'
-import { api } from '@/services/api'
 
 interface LocationSelectorProps {
   currentCity: string

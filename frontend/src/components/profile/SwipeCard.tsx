@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { Heart, X, Star, MapPin, Briefcase, Ruler } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Heart, X, MapPin, Briefcase, Ruler } from 'lucide-react'
 
 interface SwipeCardProps {
   profile: any
@@ -126,7 +126,7 @@ export default function SwipeCard({
           {/* Imagen */}
           <div 
             className="relative h-full"
-            onClick={(e) => {
+            onClick={() => {
               if (!isDragging && Math.abs(currentX) < 5) {
                 onProfileClick()
               }

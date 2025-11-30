@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, Wifi, Calendar, MapPin, Sparkles } from 'lucide-react'
+import { Users, Wifi, Calendar, MapPin, Sparkles, Star } from 'lucide-react'
 import Modal from './Modal'
 import RangeSlider from './RangeSlider'
 import Button from './Button'

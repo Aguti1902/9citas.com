@@ -133,7 +133,7 @@ export default function ChatPage() {
           setIsSending(false)
         }
       },
-      (error) => {
+      () => {
         alert('No se pudo obtener tu ubicación')
         setIsSending(false)
       }

@@ -13,11 +13,10 @@ import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Bell } from 'lu
 export default function DashboardLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { logout, user } = useAuthStore()
+  const { logout } = useAuthStore()
   const { toasts, removeToast } = useToastStore()
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [pendingRequests, setPendingRequests] = useState(0)
-  const [roamStatus, setRoamStatus] = useState<any>(null)
   const [showRoamSummary, setShowRoamSummary] = useState(false)
   const [roamSummary, setRoamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
 
@@ -44,22 +43,9 @@ export default function DashboardLayout() {
 
   const loadRoamStatus = async () => {
     try {
-      const response = await api.get('/roam/status')
-      setRoamStatus(response.data)
+      await api.get('/roam/status')
     } catch (error) {
       console.error('Error loading roam status:', error)
-    }
-  }
-
-  const handleRoamFinish = async () => {
-    try {
-      const response = await api.post('/roam/finish')
-      setRoamSummary(response.data.summary)
-      setShowRoamSummary(true)
-      setRoamStatus(null)
-      await loadRoamStatus()
-    } catch (error) {
-      console.error('Error finishing roam:', error)
     }
   }
 

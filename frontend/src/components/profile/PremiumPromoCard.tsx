@@ -1,4 +1,4 @@
-import { Crown, Check, Sparkles, Star, Zap } from 'lucide-react'
+import { Crown, Sparkles, Star, Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface PremiumPromoCardProps {

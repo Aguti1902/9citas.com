@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Modal from './Modal'
 import Button from './Button'
-import { Sliders, X } from 'lucide-react'
+import { Sliders } from 'lucide-react'
 
 interface AdvancedFiltersProps {
   isPremium: boolean
