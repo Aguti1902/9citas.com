@@ -34,8 +34,7 @@ const io = new Server(httpServer, {
       'http://localhost:3000',
       'https://9citas-com-fyij.vercel.app',
       'https://9citas-com-hev9.vercel.app',
-      process.env.FRONTEND_URL || ''
-    ].filter(Boolean),
+    ],
     credentials: true,
   },
 });
@@ -46,8 +45,7 @@ app.use(cors({
     'http://localhost:3000',
     'https://9citas-com-fyij.vercel.app',
     'https://9citas-com-hev9.vercel.app',
-    process.env.FRONTEND_URL || ''
-  ].filter(Boolean),
+  ],
   credentials: true,
 }));
 app.use(express.json());

@@ -7,7 +7,7 @@ export const generateVerificationToken = (): string => {
 
 // Enviar email de verificación (modo desarrollo - logs en consola)
 export const sendVerificationEmail = async (email: string, token: string): Promise<void> => {
-  const verificationUrl = `${process.env.FRONTEND_URL || 'https://9citas-com-hev9.vercel.app'}/verify-email/${token}`;
+  const verificationUrl = `https://9citas-com-hev9.vercel.app/verify-email/${token}`;
   
   console.log('\n============================================');
   console.log('📧 EMAIL DE VERIFICACIÓN');
