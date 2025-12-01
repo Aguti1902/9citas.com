@@ -178,7 +178,7 @@ export default function ChatPage() {
         }
       `}</style>
       
-      <div className="flex flex-col bg-dark h-screen overflow-hidden relative" style={{ height: '100vh', height: '100dvh' }}>
+      <div className="flex flex-col bg-dark h-screen overflow-hidden relative" style={{ height: '100dvh' }}>
       {/* Header del Chat - FIJO EN LA PARTE SUPERIOR - DEBAJO DEL HEADER GLOBAL */}
       <div 
         className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0"
