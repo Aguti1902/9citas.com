@@ -168,7 +168,8 @@ export default function DashboardLayout() {
           <div className="flex justify-around">
             {navItems.map((item) => {
               const Icon = item.Icon
-              const active = isActive(item.path) && location.pathname === item.path
+              // Solo activo si es exactamente la ruta (no incluye subrutas como /app/profile/:id)
+              const active = location.pathname === item.path || (item.path === '/app' && location.pathname === '/app')
               return (
                 <button
                   key={item.path}

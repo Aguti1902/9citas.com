@@ -17,6 +17,7 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    e.preventDefault()
     
     if (isLiking) return
     setIsLiking(true)
@@ -36,14 +37,25 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
     }
   }
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Solo navegar si el click no viene del botón de like
+    if ((e.target as HTMLElement).closest('button')) {
+      return
+    }
+    e.preventDefault()
+    e.stopPropagation()
+    navigate(`/app/profile/${profile.id}`)
+  }
+
   return (
     <div
       className="profile-card group cursor-pointer"
-      onClick={() => navigate(`/app/profile/${profile.id}`)}
+      onClick={handleCardClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
           navigate(`/app/profile/${profile.id}`)
         }
       }}
