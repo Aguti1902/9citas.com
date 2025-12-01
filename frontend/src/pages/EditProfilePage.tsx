@@ -19,6 +19,7 @@ export default function EditProfilePage() {
     aboutMe: '',
     lookingFor: '',
     age: '',
+    gender: '',
     city: '',
     height: '',
     bodyType: '',
@@ -53,6 +54,7 @@ export default function EditProfilePage() {
         aboutMe: profile.aboutMe,
         lookingFor: profile.lookingFor,
         age: profile.age.toString(),
+        gender: profile.gender || '',
         city: profile.city,
         height: profile.height?.toString() || '',
         bodyType: profile.bodyType || '',
@@ -275,6 +277,36 @@ export default function EditProfilePage() {
           min={18}
           max={99}
         />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Género *
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="gender"
+                value="hombre"
+                checked={formData.gender === 'hombre'}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                className="mr-2"
+              />
+              <span className="text-white">Hombre</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="gender"
+                value="mujer"
+                checked={formData.gender === 'mujer'}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                className="mr-2"
+              />
+              <span className="text-white">Mujer</span>
+            </label>
+          </div>
+        </div>
 
         <Input
           label="Ciudad"

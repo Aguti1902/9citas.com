@@ -101,7 +101,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-  const { title, aboutMe, lookingFor, age, city, latitude, longitude,
+  const { title, aboutMe, lookingFor, age, gender, city, latitude, longitude,
           height, bodyType, relationshipStatus, occupation, education, smoking, drinking,
           children, pets, zodiacSign, hobbies, languages } = req.body;
 
@@ -112,6 +112,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       ...(aboutMe && { aboutMe }),
       ...(lookingFor && { lookingFor }),
       ...(age && { age }),
+      ...(gender && { gender }),
       ...(city && { city }),
       ...(latitude !== undefined && { latitude }),
       ...(longitude !== undefined && { longitude }),
