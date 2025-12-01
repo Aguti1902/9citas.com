@@ -190,10 +190,14 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
 
     // Construir filtros base
     // Mostrar perfiles reales (no fake) - pueden tener o no personalidad
+    // Si isFake es null o undefined, también se consideran reales
     const whereClause: any = {
       id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] },
       orientation: myProfile.orientation, // Mismo orientation
-      isFake: false, // SOLO perfiles reales (no fake)
+      OR: [
+        { isFake: false },
+        { isFake: null },
+      ],
     };
 
     // Lógica de matching según orientación y género
@@ -234,24 +238,25 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     if (!isPlus) {
       if (myProfile.city) {
         // Buscar perfiles con la misma ciudad (case-insensitive)
-        const profilesInCity = await prisma.profile.findMany({
+        // Primero buscar todos los perfiles que coinciden con género y orientación
+        const allMatchingProfiles = await prisma.profile.findMany({
           where: {
-            orientation: whereClause.orientation,
-            gender: whereClause.gender,
+            ...whereClause,
           },
-          select: { city: true },
-          distinct: ['city'],
+          select: { city: true, id: true },
         });
         
         // Encontrar ciudades que coincidan (case-insensitive)
-        const matchingCities = profilesInCity
+        const matchingCities = allMatchingProfiles
           .map(p => p.city)
           .filter(c => c && c.toLowerCase() === myProfile.city?.toLowerCase());
         
         if (matchingCities.length > 0) {
           whereClause.city = { in: matchingCities };
         } else {
-          whereClause.city = myProfile.city;
+          // Si no hay perfiles en la misma ciudad, mostrar todos los perfiles que coinciden
+          // (esto permite que se vean perfiles aunque estén en ciudades diferentes)
+          console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden`);
         }
       }
     } else if (city) {
