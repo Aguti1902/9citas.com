@@ -16,6 +16,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Asegurar que el menú inferior nunca se mueva */
+nav[class*="fixed bottom-0"] {
+  position: fixed !important;
+  bottom: 0 !important;
+  transform: none !important;
+}
+
 /* Estilos personalizados */
 @layer components {
   .btn-primary {
