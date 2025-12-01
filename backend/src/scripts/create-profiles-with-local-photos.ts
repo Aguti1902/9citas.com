@@ -37,13 +37,14 @@ function getPhotosFromFolder(folderPath: string): string[] {
     .map(file => path.join(folderPath, file))
 }
 
-// Convertir ruta local a URL (para desarrollo local)
+// Convertir ruta local a URL
 function getPhotoUrl(localPath: string): string {
-  // En producción, esto debería ser una URL de Cloudinary
-  // Por ahora, usamos una ruta relativa que se servirá desde el backend
+  // Obtener la URL del backend desde la variable de entorno o usar localhost
+  const baseUrl = process.env.BACKEND_URL || process.env.RAILWAY_PUBLIC_DOMAIN || 'http://localhost:4000'
   const relativePath = path.relative(PHOTOS_DIR, localPath)
-  const baseUrl = process.env.BACKEND_URL || 'http://localhost:4000'
-  return `${baseUrl}/fake-photos/${relativePath.replace(/\\/g, '/')}`
+  // Asegurar que la ruta use barras normales
+  const cleanPath = relativePath.replace(/\\/g, '/')
+  return `${baseUrl}/fake-photos/${cleanPath}`
 }
 
 async function main() {
@@ -95,11 +96,14 @@ async function main() {
 
     console.log(`👤 Creando perfil para ${folderName} (${photos.length} fotos)...`)
 
-    // Datos aleatorios del perfil
+    // Datos aleatorios del perfil - SOLO MUJERES
     const city = faker.helpers.arrayElement(SPANISH_CITIES)
     const age = faker.number.int({ min: 22, max: 35 })
     const personality = faker.helpers.arrayElement(PERSONALITIES)
-    const name = folderName.charAt(0).toUpperCase() + folderName.slice(1)
+    
+    // Nombres de mujeres españolas
+    const femaleNames = ['Sofía', 'María', 'Laura', 'Carmen', 'Ana', 'Elena', 'Marta', 'Lucía', 'Paula', 'Sara', 'Cristina', 'Beatriz', 'Raquel', 'Natalia', 'Andrea', 'Julia', 'Alba', 'Irene', 'Carla', 'Nuria']
+    const name = faker.helpers.arrayElement(femaleNames)
 
     // Crear usuario fake
     const hashedPassword = crypto
@@ -115,11 +119,11 @@ async function main() {
       },
     })
 
-    // Crear perfil
+    // Crear perfil - SOLO MUJERES
     const profile = await prisma.profile.create({
       data: {
         userId: user.id,
-        title: name,
+        title: name, // Nombre de mujer
         orientation: 'hetero',
         gender: 'mujer',
         aboutMe: `Soy ${name}, una chica de ${age} años ${personality === 'coqueta' ? 'coqueta' : personality === 'divertida' ? 'divertida' : personality === 'picante' ? 'atrevida' : personality === 'romantica' ? 'romántica' : 'seria'}. Me encanta conocer gente nueva y pasar buenos momentos.`,
@@ -128,9 +132,9 @@ async function main() {
         city: city.name,
         latitude: city.lat + (Math.random() - 0.5) * 0.05,
         longitude: city.lng + (Math.random() - 0.5) * 0.05,
-        height: faker.number.int({ min: 160, max: 175 }),
-        bodyType: faker.helpers.arrayElement(['delgado', 'atlético', 'promedio']),
-        occupation: faker.helpers.arrayElement(['Marketing', 'Diseñadora', 'Enfermera', 'Profesora', 'Fotógrafa']),
+        height: faker.number.int({ min: 155, max: 175 }), // Altura típica de mujeres (155-175cm)
+        bodyType: faker.helpers.arrayElement(['delgado', 'atlético', 'promedio']), // Tipos de cuerpo femeninos
+        occupation: faker.helpers.arrayElement(['Marketing', 'Diseñadora', 'Enfermera', 'Profesora', 'Fotógrafa', 'Psicóloga', 'Veterinaria', 'Arquitecta']), // Solo profesiones femeninas
         hobbies: faker.helpers.arrayElements(HOBBIES_LIST, faker.number.int({ min: 3, max: 6 })),
         languages: ['Español', ...faker.helpers.arrayElements(['Inglés', 'Catalán'], faker.number.int({ min: 0, max: 2 }))],
         isOnline: Math.random() > 0.5,

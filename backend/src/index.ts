@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -59,8 +61,14 @@ app.use(cookieParser());
 // Servir archivos estáticos (uploads)
 app.use('/uploads', express.static('uploads'));
 
-// Servir fotos de perfiles falsos (solo desarrollo)
-app.use('/fake-photos', express.static('fake-profiles-photos'));
+// Servir fotos de perfiles falsos (desarrollo y producción)
+const fakePhotosPath = path.join(__dirname, '../fake-profiles-photos');
+if (fs.existsSync(fakePhotosPath)) {
+  app.use('/fake-photos', express.static(fakePhotosPath));
+  console.log('✅ Servidor de fotos falsas activado en /fake-photos');
+} else {
+  console.warn('⚠️  Carpeta fake-profiles-photos no encontrada');
+}
 
 // Rutas
 app.use('/api/auth', authRoutes);
