@@ -250,7 +250,12 @@ export const unlikeProfile = async (req: AuthRequest, res: Response) => {
 export const getSentLikes = async (req: AuthRequest, res: Response) => {
   try {
     const likes = await prisma.like.findMany({
-      where: { fromProfileId: req.profileId! },
+      where: { 
+        fromProfileId: req.profileId!,
+        toProfile: {
+          isFake: false, // EXCLUIR perfiles falsos
+        },
+      },
       include: {
         toProfile: {
           include: {
@@ -288,9 +293,14 @@ export const getReceivedLikes = async (req: AuthRequest, res: Response) => {
 
     const isPlus = myProfile?.user?.subscription?.isActive || false;
 
-    // Obtener likes
+    // Obtener likes (excluyendo perfiles falsos)
     const likesQuery = prisma.like.findMany({
-      where: { toProfileId: req.profileId! },
+      where: { 
+        toProfileId: req.profileId!,
+        fromProfile: {
+          isFake: false, // EXCLUIR perfiles falsos
+        },
+      },
       include: {
         fromProfile: {
           include: {
@@ -312,9 +322,14 @@ export const getReceivedLikes = async (req: AuthRequest, res: Response) => {
       likes = await likesQuery;
       totalCount = likes.length;
     } else {
-      // Gratis: NO mostrar perfiles, solo el contador
+      // Gratis: NO mostrar perfiles, solo el contador (excluyendo perfiles falsos)
       totalCount = await prisma.like.count({
-        where: { toProfileId: req.profileId! },
+        where: { 
+          toProfileId: req.profileId!,
+          fromProfile: {
+            isFake: false, // EXCLUIR perfiles falsos
+          },
+        },
       });
       // Devolver array vacío para que el frontend muestre "bloqueado"
       likes = [];

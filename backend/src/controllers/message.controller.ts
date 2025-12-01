@@ -218,11 +218,14 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
             ? message.toProfile
             : message.fromProfile;
 
-        conversationsMap.set(otherProfileId, {
-          profile: otherProfile,
-          lastMessage: message,
-          unreadCount: 0,
-        });
+        // EXCLUIR perfiles falsos de las conversaciones
+        if (otherProfile && !otherProfile.isFake) {
+          conversationsMap.set(otherProfileId, {
+            profile: otherProfile,
+            lastMessage: message,
+            unreadCount: 0,
+          });
+        }
       }
     });
 

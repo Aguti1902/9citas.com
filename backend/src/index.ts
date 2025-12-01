@@ -31,13 +31,18 @@ const app = express();
 const httpServer = createServer(app);
 
 // Configurar Socket.IO
-const io = new Server(httpServer, {
-  cors: {
-    origin: [
+// Obtener URLs del frontend desde variables de entorno o usar defaults
+const frontendUrls = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+  : [
       'http://localhost:3000',
       'https://9citas-com-fyij.vercel.app',
       'https://9citas-com-hev9.vercel.app',
-    ],
+    ];
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: frontendUrls,
     credentials: true,
   },
 });
@@ -45,13 +50,28 @@ const io = new Server(httpServer, {
 // Configurar instancia global de Socket.IO
 setIO(io);
 
-// Middleware
+// Middleware CORS
+// Obtener URLs del frontend desde variables de entorno o usar defaults
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+  : [
+      'http://localhost:3000',
+      'https://9citas-com-fyij.vercel.app',
+      'https://9citas-com-hev9.vercel.app',
+    ];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://9citas-com-fyij.vercel.app',
-    'https://9citas-com-hev9.vercel.app',
-  ],
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️  CORS bloqueado para: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());

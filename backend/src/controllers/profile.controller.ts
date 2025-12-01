@@ -443,6 +443,11 @@ export const getProfileById = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Perfil no encontrado' });
     }
 
+    // NO permitir ver perfiles falsos
+    if (profile.isFake) {
+      return res.status(404).json({ error: 'Perfil no encontrado' });
+    }
+
     // Verificar misma orientación
     const myProfile = await prisma.profile.findUnique({
       where: { id: req.profileId },
