@@ -42,7 +42,7 @@ export default function NavigatePage() {
     try {
       const queryParams: any = {}
       
-      // Convertir activeFilters a parámetros de búsqueda
+      // Determinar filtro principal
       if (activeFilters.includes('online')) {
         queryParams.filter = 'online'
       } else if (activeFilters.includes('new')) {
@@ -51,11 +51,17 @@ export default function NavigatePage() {
         queryParams.filter = 'all'
       }
       
-      // Añadir filtros de edad y distancia
-      queryParams.ageMin = ageRange.min
-      queryParams.ageMax = ageRange.max
-      queryParams.distanceMin = distanceRange.min
-      queryParams.distanceMax = distanceRange.max
+      // Añadir filtros de edad si está activo
+      if (activeFilters.includes('age')) {
+        queryParams.ageMin = ageRange.min
+        queryParams.ageMax = ageRange.max
+      }
+      
+      // Añadir filtros de distancia si está activo
+      if (activeFilters.includes('distance')) {
+        queryParams.distanceMin = distanceRange.min
+        queryParams.distanceMax = distanceRange.max
+      }
 
       const response = await api.get('/profile/search', {
         params: queryParams,

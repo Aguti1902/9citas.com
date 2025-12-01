@@ -69,11 +69,25 @@ export default function FilterBar({
 
   const handleApplyAge = () => {
     onAgeRangeChange?.(tempAgeMin, tempAgeMax)
+    
+    // Activar el filtro de edad
+    if (!activeFilters.includes('age')) {
+      const newFilters = [...activeFilters.filter(f => f !== 'all'), 'age']
+      onFilterChange(newFilters)
+    }
+    
     setShowAgeModal(false)
   }
 
   const handleApplyDistance = () => {
     onDistanceRangeChange?.(tempDistanceMin, tempDistanceMax)
+    
+    // Activar el filtro de distancia
+    if (!activeFilters.includes('distance')) {
+      const newFilters = [...activeFilters.filter(f => f !== 'all'), 'distance']
+      onFilterChange(newFilters)
+    }
+    
     setShowDistanceModal(false)
   }
 
