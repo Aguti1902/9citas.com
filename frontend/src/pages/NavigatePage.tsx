@@ -32,10 +32,81 @@ export default function NavigatePage() {
   const [swipeCount, setSwipeCount] = useState(0)
   const [showPromoCard, setShowPromoCard] = useState(false)
   const [currentCity, setCurrentCity] = useState(user?.profile?.city || 'Madrid')
+  const [detectedCity, setDetectedCity] = useState<string | null>(null)
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false)
   const [ageRange, setAgeRange] = useState({ min: 18, max: 99 })
   const [distanceRange, setDistanceRange] = useState({ min: 1, max: 50 })
 
   const isPremium = user?.subscription?.isActive || false
+
+  // Lista de ciudades españolas (misma que LocationSelector)
+  const SPANISH_CITIES = [
+    { name: 'Madrid', lat: 40.4168, lng: -3.7038 },
+    { name: 'Barcelona', lat: 41.3851, lng: 2.1734 },
+    { name: 'Valencia', lat: 39.4699, lng: -0.3763 },
+    { name: 'Sevilla', lat: 37.3891, lng: -5.9845 },
+    { name: 'Zaragoza', lat: 41.6488, lng: -0.8891 },
+    { name: 'Málaga', lat: 36.7213, lng: -4.4214 },
+    { name: 'Murcia', lat: 37.9922, lng: -1.1307 },
+    { name: 'Palma', lat: 39.5696, lng: 2.6502 },
+    { name: 'Las Palmas', lat: 28.1248, lng: -15.4300 },
+    { name: 'Bilbao', lat: 43.2630, lng: -2.9350 },
+    { name: 'Alicante', lat: 38.3452, lng: -0.4810 },
+    { name: 'Córdoba', lat: 37.8882, lng: -4.7794 },
+    { name: 'Valladolid', lat: 41.6523, lng: -4.7245 },
+    { name: 'Vigo', lat: 42.2406, lng: -8.7207 },
+    { name: 'Gijón', lat: 43.5450, lng: -5.6619 },
+    { name: 'Hospitalet de Llobregat', lat: 41.3598, lng: 2.0994 },
+    { name: 'A Coruña', lat: 43.3623, lng: -8.4115 },
+    { name: 'Granada', lat: 37.1773, lng: -3.5986 },
+    { name: 'Vitoria', lat: 42.8467, lng: -2.6716 },
+    { name: 'Elche', lat: 38.2699, lng: -0.6983 },
+    { name: 'Oviedo', lat: 43.3614, lng: -5.8593 },
+    { name: 'Santa Cruz de Tenerife', lat: 28.4698, lng: -16.2549 },
+    { name: 'Badalona', lat: 41.4502, lng: 2.2451 },
+    { name: 'Cartagena', lat: 37.6256, lng: -0.9960 },
+    { name: 'Terrassa', lat: 41.5633, lng: 2.0099 },
+    { name: 'Jerez', lat: 36.6862, lng: -6.1367 },
+    { name: 'Sabadell', lat: 41.5433, lng: 2.1092 },
+    { name: 'Móstoles', lat: 40.3230, lng: -3.8651 },
+    { name: 'Alcalá de Henares', lat: 40.4818, lng: -3.3634 },
+    { name: 'Pamplona', lat: 42.8125, lng: -1.6458 },
+  ]
+
+  // Detectar ubicación actual al cargar
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          
+          // Buscar la ciudad más cercana
+          let closestCity = SPANISH_CITIES[0]
+          let minDistance = Infinity
+
+          SPANISH_CITIES.forEach(city => {
+            const distance = Math.sqrt(
+              Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
+            )
+            if (distance < minDistance) {
+              minDistance = distance
+              closestCity = city
+            }
+          })
+
+          setDetectedCity(closestCity.name)
+        },
+        (error) => {
+          console.error('Error de geolocalización:', error)
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      )
+    }
+  }, [])
 
   const loadProfiles = async () => {
     setIsLoading(true)
@@ -103,6 +174,13 @@ export default function NavigatePage() {
   }
 
   const handleLocationChange = async (city: string, lat: number, lng: number) => {
+    // Si no es premium y la ciudad es diferente de la detectada, mostrar mensaje de 9Plus
+    if (!isPremium && detectedCity && city !== detectedCity) {
+      setShowPremiumModal(true)
+      showToast('Suscríbete a 9Plus para cambiar tu ubicación', 'info')
+      return
+    }
+
     setCurrentCity(city)
     // Actualizar ubicación en el backend
     try {
@@ -113,8 +191,10 @@ export default function NavigatePage() {
       })
       // Recargar perfiles con la nueva ubicación
       loadProfiles()
+      showToast(`Ubicación actualizada a ${city}`, 'success')
     } catch (error) {
       console.error('Error al actualizar ubicación:', error)
+      showToast('Error al actualizar ubicación', 'error')
     }
   }
 

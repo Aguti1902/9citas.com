@@ -91,8 +91,9 @@ export const generateFakeProfiles = async (count: number = 300) => {
     const gender = faker.helpers.arrayElement(['hombre', 'mujer']);
     
     // Variar coordenadas ligeramente para simular diferentes ubicaciones en la ciudad
-    const latitude = city.lat + (Math.random() - 0.5) * 0.1;
-    const longitude = city.lng + (Math.random() - 0.5) * 0.1;
+    // Reducir la variación para que estén más cerca (máximo 0.05 grados ≈ 5.5 km)
+    const latitude = city.lat + (Math.random() - 0.5) * 0.05;
+    const longitude = city.lng + (Math.random() - 0.5) * 0.05;
 
     // Estado online: 10-15% online, resto con lastSeenAt reciente
     const isOnline = Math.random() < 0.15;

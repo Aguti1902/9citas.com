@@ -39,14 +39,110 @@ export default function CreateProfilePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [photoPreview, setPhotoPreview] = useState<string[]>([])
+  const [isDetectingLocation, setIsDetectingLocation] = useState(true)
+  const [locationError, setLocationError] = useState('')
 
-  // Obtener orientación guardada
+  // Lista de ciudades españolas (misma que LocationSelector)
+  const SPANISH_CITIES = [
+    { name: 'Madrid', lat: 40.4168, lng: -3.7038 },
+    { name: 'Barcelona', lat: 41.3851, lng: 2.1734 },
+    { name: 'Valencia', lat: 39.4699, lng: -0.3763 },
+    { name: 'Sevilla', lat: 37.3891, lng: -5.9845 },
+    { name: 'Zaragoza', lat: 41.6488, lng: -0.8891 },
+    { name: 'Málaga', lat: 36.7213, lng: -4.4214 },
+    { name: 'Murcia', lat: 37.9922, lng: -1.1307 },
+    { name: 'Palma', lat: 39.5696, lng: 2.6502 },
+    { name: 'Las Palmas', lat: 28.1248, lng: -15.4300 },
+    { name: 'Bilbao', lat: 43.2630, lng: -2.9350 },
+    { name: 'Alicante', lat: 38.3452, lng: -0.4810 },
+    { name: 'Córdoba', lat: 37.8882, lng: -4.7794 },
+    { name: 'Valladolid', lat: 41.6523, lng: -4.7245 },
+    { name: 'Vigo', lat: 42.2406, lng: -8.7207 },
+    { name: 'Gijón', lat: 43.5450, lng: -5.6619 },
+    { name: 'Hospitalet de Llobregat', lat: 41.3598, lng: 2.0994 },
+    { name: 'A Coruña', lat: 43.3623, lng: -8.4115 },
+    { name: 'Granada', lat: 37.1773, lng: -3.5986 },
+    { name: 'Vitoria', lat: 42.8467, lng: -2.6716 },
+    { name: 'Elche', lat: 38.2699, lng: -0.6983 },
+    { name: 'Oviedo', lat: 43.3614, lng: -5.8593 },
+    { name: 'Santa Cruz de Tenerife', lat: 28.4698, lng: -16.2549 },
+    { name: 'Badalona', lat: 41.4502, lng: 2.2451 },
+    { name: 'Cartagena', lat: 37.6256, lng: -0.9960 },
+    { name: 'Terrassa', lat: 41.5633, lng: 2.0099 },
+    { name: 'Jerez', lat: 36.6862, lng: -6.1367 },
+    { name: 'Sabadell', lat: 41.5433, lng: 2.1092 },
+    { name: 'Móstoles', lat: 40.3230, lng: -3.8651 },
+    { name: 'Alcalá de Henares', lat: 40.4818, lng: -3.3634 },
+    { name: 'Pamplona', lat: 42.8125, lng: -1.6458 },
+  ]
+
+  // Obtener orientación guardada y detectar ubicación automáticamente
   useEffect(() => {
     const savedOrientation = localStorage.getItem('userOrientation')
     if (savedOrientation) {
       setFormData(prev => ({ ...prev, orientation: savedOrientation }))
       localStorage.removeItem('userOrientation') // Limpiar después de usar
     }
+
+    // Detectar ubicación automáticamente
+    if (!navigator.geolocation) {
+      setLocationError('Tu navegador no soporta geolocalización. Por favor, usa un dispositivo móvil.')
+      setIsDetectingLocation(false)
+      // Usar Madrid como fallback
+      setFormData(prev => ({
+        ...prev,
+        city: 'Madrid',
+        latitude: 40.4168,
+        longitude: -3.7038,
+      }))
+      return
+    }
+
+    setIsDetectingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords
+        
+        // Buscar la ciudad más cercana
+        let closestCity = SPANISH_CITIES[0]
+        let minDistance = Infinity
+
+        SPANISH_CITIES.forEach(city => {
+          const distance = Math.sqrt(
+            Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
+          )
+          if (distance < minDistance) {
+            minDistance = distance
+            closestCity = city
+          }
+        })
+
+        setFormData(prev => ({
+          ...prev,
+          city: closestCity.name,
+          latitude,
+          longitude,
+        }))
+        setIsDetectingLocation(false)
+      },
+      (error) => {
+        console.error('Error de geolocalización:', error)
+        setLocationError('No se pudo obtener tu ubicación. Por favor, permite el acceso a tu ubicación.')
+        setIsDetectingLocation(false)
+        // Usar Madrid como fallback
+        setFormData(prev => ({
+          ...prev,
+          city: 'Madrid',
+          latitude: 40.4168,
+          longitude: -3.7038,
+        }))
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
   }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,14 +378,33 @@ export default function CreateProfilePage() {
             </p>
           </div>
 
-          <Input
-            label="Ciudad"
-            type="text"
-            value={formData.city}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            required
-            placeholder="Ej: Barcelona, Madrid, Valencia..."
-          />
+          {/* Ubicación detectada automáticamente */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Ubicación
+            </label>
+            {isDetectingLocation ? (
+              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                <span className="text-gray-400">Detectando tu ubicación...</span>
+              </div>
+            ) : (
+              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="text-white font-medium">{formData.city}</span>
+                <span className="text-gray-400 text-sm ml-auto">Detectada automáticamente</span>
+              </div>
+            )}
+            {locationError && (
+              <p className="text-red-400 text-xs mt-1">{locationError}</p>
+            )}
+            <p className="text-gray-400 text-xs mt-1">
+              Tu ubicación se ha detectado automáticamente desde tu dispositivo
+            </p>
+          </div>
 
           {/* FOTOS */}
           <div className="bg-gray-800 rounded-lg p-4">
