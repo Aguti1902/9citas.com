@@ -1,8 +1,11 @@
-import { Users, Wifi, Sparkles } from 'lucide-react'
+import { useState } from 'react'
+import { Users, Wifi, Calendar, MapPin, Sparkles, Star } from 'lucide-react'
+import Modal from './Modal'
+import Button from './Button'
 
 interface FilterBarProps {
   activeFilters: string[]
-  onFilterChange: (filters: string[], params?: any) => void
+  onFilterChange: (filters: string[]) => void
   isPremium: boolean
   onPremiumRequired: () => void
   ageRange?: { min: number; max: number }
@@ -21,15 +24,34 @@ export default function FilterBar({
   onAgeRangeChange,
   onDistanceRangeChange,
 }: FilterBarProps) {
+  const [showAgeModal, setShowAgeModal] = useState(false)
+  const [showDistanceModal, setShowDistanceModal] = useState(false)
+  const [tempAgeMin, setTempAgeMin] = useState(ageRange.min)
+  const [tempAgeMax, setTempAgeMax] = useState(ageRange.max)
+  const [tempDistanceMin, setTempDistanceMin] = useState(distanceRange.min)
+  const [tempDistanceMax, setTempDistanceMax] = useState(distanceRange.max)
+
   const filters = [
     { id: 'all', label: 'TODOS', premium: false, Icon: Users },
     { id: 'online', label: 'ONLINE', premium: true, Icon: Wifi },
+    { id: 'age', label: 'EDAD', premium: true, Icon: Calendar, isModal: true },
+    { id: 'distance', label: 'DISTANCIA', premium: false, Icon: MapPin, isModal: true },
     { id: 'new', label: 'NUEVOS', premium: false, Icon: Sparkles },
   ]
 
-  const toggleFilter = (filterId: string, premium: boolean) => {
+  const toggleFilter = (filterId: string, premium: boolean, isModal?: boolean) => {
     if (premium && !isPremium) {
       onPremiumRequired()
+      return
+    }
+
+    // Si es un filtro modal, abrir el modal
+    if (isModal) {
+      if (filterId === 'age') {
+        setShowAgeModal(true)
+      } else if (filterId === 'distance') {
+        setShowDistanceModal(true)
+      }
       return
     }
 
@@ -45,27 +67,19 @@ export default function FilterBar({
     onFilterChange(newFilters.length === 0 ? ['all'] : newFilters)
   }
 
-  const handleAgeChange = (type: 'min' | 'max', value: string) => {
-    const numValue = parseInt(value)
-    if (type === 'min') {
-      onAgeRangeChange?.(numValue, ageRange.max)
-    } else {
-      onAgeRangeChange?.(ageRange.min, numValue)
-    }
+  const handleApplyAge = () => {
+    onAgeRangeChange?.(tempAgeMin, tempAgeMax)
+    setShowAgeModal(false)
   }
 
-  const handleDistanceChange = (type: 'min' | 'max', value: string) => {
-    const numValue = parseInt(value)
-    if (type === 'min') {
-      onDistanceRangeChange?.(numValue, distanceRange.max)
-    } else {
-      onDistanceRangeChange?.(distanceRange.min, numValue)
-    }
+  const handleApplyDistance = () => {
+    onDistanceRangeChange?.(tempDistanceMin, tempDistanceMax)
+    setShowDistanceModal(false)
   }
 
   return (
-    <div className="space-y-3">
-      {/* Filtros principales */}
+    <>
+      {/* Contenedor con scroll horizontal sin barra visible */}
       <div className="overflow-x-auto px-2 pb-2 scrollbar-hide">
         <div className="flex gap-2 min-w-min">
           {filters.map((filter) => {
@@ -74,7 +88,7 @@ export default function FilterBar({
             return (
               <button
                 key={filter.id}
-                onClick={() => toggleFilter(filter.id, filter.premium)}
+                onClick={() => toggleFilter(filter.id, filter.premium, filter.isModal)}
                 className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2 rounded-full transition-all flex-shrink-0 ${
                   isActive 
                     ? 'bg-primary text-white shadow-lg scale-105' 
@@ -83,77 +97,132 @@ export default function FilterBar({
               >
                 <Icon className="w-4 h-4" />
                 <span className="text-xs font-bold">{filter.label}</span>
+                {filter.premium && !isPremium && (
+                  <Star className="w-3 h-3 text-accent fill-accent ml-1" />
+                )}
               </button>
             )
           })}
         </div>
       </div>
 
-      {/* Filtros de Edad y Distancia */}
-      <div className="px-2 space-y-2">
-        {/* Edad */}
-        <div className="bg-gray-800 rounded-lg p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-300">EDAD</span>
-            {!isPremium && (
-              <span className="text-[10px] bg-accent text-black px-2 py-0.5 rounded-full font-bold">
-                9PLUS
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={ageRange.min}
-              onChange={(e) => handleAgeChange('min', e.target.value)}
-              disabled={!isPremium}
-              className="flex-1 bg-gray-900 text-white text-sm rounded px-2 py-1 disabled:opacity-50"
-            >
-              {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
-                <option key={age} value={age}>{age}</option>
-              ))}
-            </select>
-            <span className="text-gray-500 text-xs">-</span>
-            <select
-              value={ageRange.max}
-              onChange={(e) => handleAgeChange('max', e.target.value)}
-              disabled={!isPremium}
-              className="flex-1 bg-gray-900 text-white text-sm rounded px-2 py-1 disabled:opacity-50"
-            >
-              {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
-                <option key={age} value={age}>{age}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+      {/* Modal Filtro de Edad */}
+      <Modal
+        isOpen={showAgeModal}
+        onClose={() => setShowAgeModal(false)}
+        title="Filtrar por edad"
+        maxWidth="sm"
+      >
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                Desde
+              </label>
+              <select
+                value={tempAgeMin}
+                onChange={(e) => setTempAgeMin(parseInt(e.target.value))}
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+              >
+                {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
+                  <option key={age} value={age}>{age} años</option>
+                ))}
+              </select>
+            </div>
 
-        {/* Distancia */}
-        <div className="bg-gray-800 rounded-lg p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-300">DISTANCIA (KM)</span>
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                Hasta
+              </label>
+              <select
+                value={tempAgeMax}
+                onChange={(e) => setTempAgeMax(parseInt(e.target.value))}
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+              >
+                {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
+                  <option key={age} value={age}>{age} años</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={distanceRange.min}
-              onChange={(e) => handleDistanceChange('min', e.target.value)}
-              className="flex-1 bg-gray-900 text-white text-sm rounded px-2 py-1"
+
+          <div className="flex gap-3">
+            <Button
+              fullWidth
+              variant="outline"
+              onClick={() => setShowAgeModal(false)}
             >
-              {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
-                <option key={km} value={km}>{km}</option>
-              ))}
-            </select>
-            <span className="text-gray-500 text-xs">-</span>
-            <select
-              value={distanceRange.max}
-              onChange={(e) => handleDistanceChange('max', e.target.value)}
-              className="flex-1 bg-gray-900 text-white text-sm rounded px-2 py-1"
+              Cancelar
+            </Button>
+            <Button
+              fullWidth
+              variant="primary"
+              onClick={handleApplyAge}
             >
-              {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
-                <option key={km} value={km}>{km}</option>
-              ))}
-            </select>
+              Aplicar
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </Modal>
+
+      {/* Modal Filtro de Distancia */}
+      <Modal
+        isOpen={showDistanceModal}
+        onClose={() => setShowDistanceModal(false)}
+        title="Filtrar por distancia"
+        maxWidth="sm"
+      >
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                Desde
+              </label>
+              <select
+                value={tempDistanceMin}
+                onChange={(e) => setTempDistanceMin(parseInt(e.target.value))}
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+              >
+                {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
+                  <option key={km} value={km}>{km} km</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                Hasta
+              </label>
+              <select
+                value={tempDistanceMax}
+                onChange={(e) => setTempDistanceMax(parseInt(e.target.value))}
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+              >
+                {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
+                  <option key={km} value={km}>{km} km</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              fullWidth
+              variant="outline"
+              onClick={() => setShowDistanceModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              fullWidth
+              variant="primary"
+              onClick={handleApplyDistance}
+            >
+              Aplicar
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </>
   )
 }
