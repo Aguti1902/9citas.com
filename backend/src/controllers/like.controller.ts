@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { getIO } from '../services/socket.io';
-import { normalizeProfilesPhotos } from '../utils/photo.utils';
+import { normalizeProfilePhotos } from '../utils/photo.utils';
 
 const prisma = new PrismaClient();
 
