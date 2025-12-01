@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { getIO } from '../services/socket.io';
+import { normalizeProfilesPhotos } from '../utils/photo.utils';
 
 const prisma = new PrismaClient();
 
@@ -269,7 +270,13 @@ export const getSentLikes = async (req: AuthRequest, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    res.json({ likes });
+    // Normalizar URLs de fotos antes de enviar
+    const normalizedLikes = likes.map(like => ({
+      ...like,
+      toProfile: like.toProfile ? normalizeProfilePhotos(like.toProfile) : like.toProfile,
+    }));
+
+    res.json({ likes: normalizedLikes });
   } catch (error) {
     console.error('Error al obtener likes enviados:', error);
     res.status(500).json({ error: 'Error al obtener likes' });

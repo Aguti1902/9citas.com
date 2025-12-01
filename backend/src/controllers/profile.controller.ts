@@ -396,8 +396,11 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       console.log(`   Primeros perfiles encontrados:`, finalProfiles.slice(0, 3).map(p => ({ id: p.id, title: p.title, gender: p.gender, orientation: p.orientation, city: p.city })));
     }
 
+    // Normalizar URLs de fotos antes de enviar
+    const normalizedProfiles = normalizeProfilesPhotos(finalProfiles);
+
     res.json({
-      profiles: finalProfiles,
+      profiles: normalizedProfiles,
       hasMore: finalUniqueProfiles.length > finalProfiles.length,
       isPlus,
     });

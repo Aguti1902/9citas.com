@@ -86,7 +86,7 @@ const PROFILES_DATA = [
   },
 ];
 
-async function loadPhotosFromFolder(folderPath: string): Promise<string[]> {
+async function loadPhotosFromFolder(folderPath: string, folderName: string): Promise<string[]> {
   const photos: string[] = [];
   
   if (!fs.existsSync(folderPath)) {
@@ -101,11 +101,8 @@ async function loadPhotosFromFolder(folderPath: string): Promise<string[]> {
     const ext = path.extname(file).toLowerCase();
     if (imageExtensions.includes(ext)) {
       // URL relativa para servir desde /fake-photos
-      const relativePath = path.relative(
-        path.join(__dirname, '../../fake-profiles-photos'),
-        path.join(folderPath, file)
-      );
-      photos.push(`/fake-photos/${relativePath.replace(/\\/g, '/')}`);
+      // Formato: /fake-photos/chica1/foto1.jpeg
+      photos.push(`/fake-photos/${folderName}/${file}`);
     }
   });
 
@@ -144,35 +141,63 @@ async function main() {
 
   console.log(`📁 Encontradas ${folders.length} carpetas de chicas\n`);
 
-  // Eliminar TODOS los perfiles fake existentes
-  console.log('🗑️  Eliminando todos los perfiles fake existentes...');
-  await prisma.photo.deleteMany({
+  // Eliminar TODOS los perfiles fake existentes y los perfiles con personalidad
+  console.log('🗑️  Eliminando todos los perfiles fake y automáticos existentes...');
+  
+  // Eliminar fotos de perfiles fake o con personalidad
+  const profilesToDelete = await prisma.profile.findMany({
     where: {
-      profile: {
-        isFake: true,
+      OR: [
+        { isFake: true },
+        { personality: { not: null } },
+      ],
+    },
+    select: { id: true },
+  });
+  
+  const profileIds = profilesToDelete.map(p => p.id);
+  
+  if (profileIds.length > 0) {
+    await prisma.photo.deleteMany({
+      where: { profileId: { in: profileIds } },
+    });
+    await prisma.like.deleteMany({
+      where: {
+        OR: [
+          { fromProfileId: { in: profileIds } },
+          { toProfileId: { in: profileIds } },
+        ],
       },
-    },
-  });
-  await prisma.like.deleteMany({
-    where: {
-      OR: [
-        { fromProfile: { isFake: true } },
-        { toProfile: { isFake: true } },
-      ],
-    },
-  });
-  await prisma.message.deleteMany({
-    where: {
-      OR: [
-        { fromProfile: { isFake: true } },
-        { toProfile: { isFake: true } },
-      ],
-    },
-  });
-  await prisma.profile.deleteMany({
-    where: { isFake: true },
-  });
-  console.log('✅ Perfiles fake eliminados\n');
+    });
+    await prisma.message.deleteMany({
+      where: {
+        OR: [
+          { fromProfileId: { in: profileIds } },
+          { toProfileId: { in: profileIds } },
+        ],
+      },
+    });
+    
+    // Eliminar usuarios asociados
+    const usersToDelete = await prisma.user.findMany({
+      where: {
+        profile: {
+          id: { in: profileIds },
+        },
+      },
+      select: { id: true },
+    });
+    
+    await prisma.profile.deleteMany({
+      where: { id: { in: profileIds } },
+    });
+    
+    await prisma.user.deleteMany({
+      where: { id: { in: usersToDelete.map(u => u.id) } },
+    });
+  }
+  
+  console.log(`✅ ${profileIds.length} perfiles eliminados\n`);
 
   // Crear perfiles REALES
   for (let i = 0; i < Math.min(folders.length, PROFILES_DATA.length); i++) {
@@ -183,7 +208,7 @@ async function main() {
     console.log(`📸 Procesando ${folderName} - ${profileData.name}...`);
     
     // Cargar fotos de la carpeta
-    const photos = await loadPhotosFromFolder(folderPath);
+    const photos = await loadPhotosFromFolder(folderPath, folderName);
     
     if (photos.length === 0) {
       console.warn(`⚠️  No se encontraron fotos en ${folderName}, saltando...`);
