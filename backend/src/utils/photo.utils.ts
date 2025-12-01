@@ -14,12 +14,23 @@ export function normalizePhotoUrl(url: string | null | undefined): string {
   if (url.startsWith('/fake-photos/')) {
     // En producción, usar la URL del backend desde Railway
     // En desarrollo, usar localhost
-    const backendUrl = process.env.BACKEND_URL 
-      || process.env.RAILWAY_PUBLIC_DOMAIN 
-      || (process.env.NODE_ENV === 'production' ? 'https://9citascom-production.up.railway.app' : 'http://localhost:4000');
+    let backendUrl = process.env.BACKEND_URL 
+      || process.env.RAILWAY_PUBLIC_DOMAIN;
+    
+    // Si no hay variable de entorno, detectar por NODE_ENV
+    if (!backendUrl) {
+      if (process.env.NODE_ENV === 'production') {
+        backendUrl = 'https://9citascom-production.up.railway.app';
+      } else {
+        backendUrl = 'http://localhost:4000';
+      }
+    }
+    
     // Eliminar /api si está presente
     const baseUrl = backendUrl.replace(/\/api$/, '');
-    return `${baseUrl}${url}`;
+    const normalizedUrl = `${baseUrl}${url}`;
+    console.log(`🖼️  Normalizando foto: ${url} → ${normalizedUrl}`);
+    return normalizedUrl;
   }
   
   // Si es una URL relativa que empieza con /uploads/, convertirla a URL absoluta

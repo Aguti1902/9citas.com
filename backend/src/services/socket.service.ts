@@ -19,7 +19,13 @@ export const setupSocketHandlers = (io: Server) => {
         return next(new Error('Token requerido'));
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
+      const secret = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET;
+      if (!secret) {
+        console.error('❌ JWT_ACCESS_SECRET o JWT_SECRET no está configurado');
+        return next(new Error('Configuración del servidor incorrecta'));
+      }
+
+      const decoded = jwt.verify(token, secret) as {
         userId: string;
       };
 
