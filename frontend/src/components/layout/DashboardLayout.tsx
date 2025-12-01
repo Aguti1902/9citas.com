@@ -32,6 +32,16 @@ export default function DashboardLayout() {
     return () => clearInterval(interval)
   }, [])
 
+  // Forzar que el menú inferior siempre esté fijo
+  useEffect(() => {
+    const nav = document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement
+    if (nav) {
+      nav.style.position = 'fixed'
+      nav.style.bottom = '0'
+      nav.style.transform = 'none'
+    }
+  }, [location.pathname])
+
   const loadPendingRequests = async () => {
     try {
       const response = await api.get('/private-photos/requests/received')
