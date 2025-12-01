@@ -183,7 +183,7 @@ export default function NavigatePage() {
   const currentProfile = profiles[currentProfileIndex]
 
   return (
-    <div className="pb-4 overflow-hidden -mt-20">
+    <div className="pb-4 overflow-hidden -mt-4">
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
       <div className="bg-gray-900 sticky top-14 z-30">
         {/* Fila 1: Ubicación y botones */}
@@ -285,7 +285,7 @@ export default function NavigatePage() {
           </div>
         ) : viewMode === 'swipe' ? (
           // Vista Swipe tipo Tinder
-          <div className="relative max-w-md mx-auto h-[calc(100vh-250px)]">
+          <div className="relative max-w-md mx-auto h-[calc(100vh-280px)]">
             {showPromoCard ? (
               // Card promocional de 9Plus
               <PremiumPromoCard onClose={handleClosePromoCard} />
