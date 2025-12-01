@@ -22,8 +22,6 @@ export default function DashboardLayout() {
   const [showRoamSummary, setShowRoamSummary] = useState(false)
   const [roamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
 
-  const isActive = (path: string) => location.pathname.includes(path)
-
   // Conectar Socket.IO cuando hay token
   useEffect(() => {
     if (accessToken) {

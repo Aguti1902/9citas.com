@@ -33,13 +33,24 @@ export default function ProfileDetailPage() {
   }, [id])
 
   const loadProfile = async () => {
+    if (!id) {
+      console.error('❌ No hay ID de perfil')
+      navigate('/app')
+      return
+    }
+    
     try {
+      console.log('📥 Cargando perfil:', id)
       const response = await api.get(`/profile/${id}`)
+      console.log('✅ Perfil cargado:', response.data)
       setProfile(response.data)
       setIsLiked(response.data.isLiked || false)
-    } catch (error) {
-      console.error('Error al cargar perfil:', error)
-      navigate('/app')
+    } catch (error: any) {
+      console.error('❌ Error al cargar perfil:', error)
+      console.error('Error response:', error.response?.data)
+      showToast('Error al cargar el perfil', 'error')
+      // No redirigir automáticamente, dejar que el usuario vea el error
+      // navigate('/app')
     } finally {
       setIsLoading(false)
     }
