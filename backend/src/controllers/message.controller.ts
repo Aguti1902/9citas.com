@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { generateChatbotResponse } from '../services/chatbot.service';
+import { normalizeProfilePhotos } from '../utils/photo.utils';
 
 const prisma = new PrismaClient();
 
@@ -243,7 +244,13 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
 
     const conversations = Array.from(conversationsMap.values());
 
-    res.json({ conversations });
+    // Normalizar URLs de fotos antes de enviar
+    const normalizedConversations = conversations.map(conv => ({
+      ...conv,
+      profile: conv.profile ? normalizeProfilePhotos(conv.profile) : conv.profile,
+    }));
+
+    res.json({ conversations: normalizedConversations });
   } catch (error) {
     console.error('Error al obtener conversaciones:', error);
     res.status(500).json({ error: 'Error al obtener conversaciones' });

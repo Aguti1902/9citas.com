@@ -342,8 +342,14 @@ export const getReceivedLikes = async (req: AuthRequest, res: Response) => {
       likes = [];
     }
 
+    // Normalizar URLs de fotos antes de enviar
+    const normalizedLikes = likes.map(like => ({
+      ...like,
+      fromProfile: like.fromProfile ? normalizeProfilePhotos(like.fromProfile) : like.fromProfile,
+    }));
+
     res.json({
-      likes,
+      likes: normalizedLikes,
       isPlus,
       total: totalCount,
       // Para FREE: mostrar solo los últimos 5 (pero sin perfiles visibles)

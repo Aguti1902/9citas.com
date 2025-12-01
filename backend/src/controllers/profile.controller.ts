@@ -486,12 +486,15 @@ export const getProfileById = async (req: AuthRequest, res: Response) => {
           )
         : null;
 
-    res.json({
+    // Normalizar URLs de fotos antes de enviar
+    const normalizedProfile = normalizeProfilePhotos({
       ...profile,
       distance,
       isLiked: profile.receivedLikes.length > 0,
       receivedLikes: undefined,
     });
+
+    res.json(normalizedProfile);
   } catch (error) {
     console.error('Error al obtener perfil:', error);
     res.status(500).json({ error: 'Error al obtener perfil' });
