@@ -23,6 +23,10 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Scroll al inicio de la página
+    window.scrollTo(0, 0)
+    document.body.scrollTop = 0
+    
     loadProfile()
     loadMessages()
     loadMyPhotos()
@@ -162,6 +166,11 @@ export default function ChatPage() {
         nav[class*="fixed bottom-0"] {
           display: none;
         }
+        body, html {
+          overflow: hidden !important;
+          position: fixed !important;
+          width: 100% !important;
+        }
         main {
           padding: 0 !important;
           overflow: hidden !important;
@@ -169,7 +178,7 @@ export default function ChatPage() {
         }
       `}</style>
       
-      <div className="flex flex-col bg-dark h-[calc(100vh-56px)] overflow-hidden -mt-14 pt-14">
+      <div className="flex flex-col bg-dark h-[calc(100vh-56px)] overflow-hidden">
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <button
