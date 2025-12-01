@@ -201,11 +201,29 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         whereClause.gender = 'mujer'; // Hombres heteros ven mujeres
       } else if (myProfile.gender === 'mujer') {
         whereClause.gender = 'hombre'; // Mujeres heteras ven hombres
+      } else {
+        // Si no tiene género definido, no mostrar nada (o mostrar ambos)
+        // Por seguridad, no mostrar nada si no está definido
+        console.warn(`⚠️  Perfil ${myProfile.id} no tiene género definido. Orientation: ${myProfile.orientation}`);
+        whereClause.gender = null; // Esto no mostrará ningún perfil
       }
     } else if (myProfile.orientation === 'gay') {
       // Gays solo ven del mismo género
-      whereClause.gender = myProfile.gender;
+      if (myProfile.gender) {
+        whereClause.gender = myProfile.gender;
+      } else {
+        console.warn(`⚠️  Perfil ${myProfile.id} (gay) no tiene género definido`);
+        whereClause.gender = null; // Esto no mostrará ningún perfil
+      }
     }
+    
+    // Debug: Log para verificar la lógica
+    console.log(`🔍 Buscando perfiles para usuario ${myProfile.id}:`, {
+      orientation: myProfile.orientation,
+      gender: myProfile.gender,
+      city: myProfile.city,
+      whereClause: JSON.stringify(whereClause),
+    });
 
     // Filtro por ciudad (si no es Plus, solo puede ver su ciudad)
     if (!isPlus) {
