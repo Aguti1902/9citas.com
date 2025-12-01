@@ -136,7 +136,13 @@ export default function NavigatePage() {
       const response = await api.get('/profile/search', {
         params: queryParams,
       })
-      setProfiles(response.data.profiles)
+      
+      // Eliminar duplicados por ID (asegurar que cada perfil aparece solo una vez)
+      const uniqueProfiles = response.data.profiles.filter((profile: any, index: number, self: any[]) =>
+        index === self.findIndex(p => p.id === profile.id)
+      )
+      
+      setProfiles(uniqueProfiles)
     } catch (error: any) {
       if (error.response?.data?.requiresPremium) {
         setShowPremiumModal(true)
@@ -337,8 +343,8 @@ export default function NavigatePage() {
           </div>
         </div>
 
-        {/* Fila 2: Filtros */}
-        <div className="px-2 pb-2">
+        {/* Fila 2: Filtros - Mejorado visualmente */}
+        <div className="px-2 pb-2 border-t border-gray-800 pt-2">
           <FilterBar
             activeFilters={activeFilters}
             onFilterChange={handleFilterChange}

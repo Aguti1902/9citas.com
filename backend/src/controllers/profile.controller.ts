@@ -179,9 +179,16 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       b.blockerProfileId === req.profileId ? b.blockedProfileId : b.blockerProfileId
     );
 
+    // Obtener IDs de perfiles a los que ya se ha dado like (para no mostrarlos)
+    const sentLikes = await prisma.like.findMany({
+      where: { fromProfileId: req.profileId! },
+      select: { toProfileId: true },
+    });
+    const likedProfileIds = sentLikes.map(like => like.toProfileId);
+
     // Construir filtros base
     const whereClause: any = {
-      id: { notIn: [req.profileId!, ...blockedIds] },
+      id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] },
       orientation: myProfile.orientation, // Mismo orientation
     };
 
@@ -242,9 +249,16 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       };
     }
 
-    // Obtener perfiles
+    // Obtener perfiles (solo los que tienen al menos una foto de portada)
     let profiles = await prisma.profile.findMany({
-      where: whereClause,
+      where: {
+        ...whereClause,
+        photos: {
+          some: {
+            type: 'cover',
+          },
+        },
+      },
       include: {
         photos: {
           where: { type: 'cover' },
@@ -261,17 +275,25 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       skip: (Number(page) - 1) * Number(limit),
       take: isPlus ? Number(limit) * 3 : Math.min(Number(limit) * 3, 150), // Obtener más para filtrar por distancia
     });
+    
+    // Filtrar perfiles que no tienen foto de portada (por si acaso)
+    profiles = profiles.filter(profile => profile.photos && profile.photos.length > 0);
 
-    // BOOST 10X PARA PERFILES CON ROAM ACTIVO
-    // Duplicar perfiles con Roam activo para que aparezcan más frecuentemente
-    const roamingProfiles = profiles.filter(p => p.isRoaming && p.roamingUntil && new Date(p.roamingUntil) > new Date());
-    const nonRoamingProfiles = profiles.filter(p => !p.isRoaming || !p.roamingUntil || new Date(p.roamingUntil) <= new Date());
+    // Ordenar perfiles: Roam activo primero, luego por fecha
+    profiles.sort((a, b) => {
+      const aRoaming = a.isRoaming && a.roamingUntil && new Date(a.roamingUntil) > new Date();
+      const bRoaming = b.isRoaming && b.roamingUntil && new Date(b.roamingUntil) > new Date();
+      
+      if (aRoaming && !bRoaming) return -1;
+      if (!aRoaming && bRoaming) return 1;
+      return new Date(b.lastSeenAt).getTime() - new Date(a.lastSeenAt).getTime();
+    });
     
-    // Crear 10 copias de cada perfil con Roam para aumentar su probabilidad de aparecer
-    const boostedRoamingProfiles = roamingProfiles.flatMap(p => Array(10).fill(p));
-    
-    // Mezclar perfiles con Roam boosteados + perfiles normales
-    profiles = [...boostedRoamingProfiles, ...nonRoamingProfiles];
+    // Eliminar duplicados por ID (asegurar que cada perfil aparece solo una vez)
+    const uniqueProfiles = profiles.filter((profile, index, self) =>
+      index === self.findIndex(p => p.id === profile.id)
+    );
+    profiles = uniqueProfiles;
 
     // Calcular distancia y filtrar por rango de distancia (solo 9Plus)
     const profilesWithDistance = profiles.map(profile => {
@@ -318,12 +340,17 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       filteredProfiles = profilesWithDistance;
     }
 
+    // Eliminar duplicados finales (por si acaso)
+    const finalUniqueProfiles = filteredProfiles.filter((profile, index, self) =>
+      index === self.findIndex(p => p.id === profile.id)
+    );
+
     // Limitar resultados finales
-    const finalProfiles = filteredProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), 50));
+    const finalProfiles = finalUniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), 50));
 
     res.json({
       profiles: finalProfiles,
-      hasMore: filteredProfiles.length > finalProfiles.length,
+      hasMore: finalUniqueProfiles.length > finalProfiles.length,
       isPlus,
     });
   } catch (error) {

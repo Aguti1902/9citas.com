@@ -93,8 +93,8 @@ export default function FilterBar({
 
   return (
     <>
-      {/* Contenedor con scroll horizontal sin barra visible */}
-      <div className="overflow-x-auto px-2 pb-2 scrollbar-hide">
+      {/* Contenedor con scroll horizontal sin barra visible - Mejorado */}
+      <div className="overflow-x-auto px-2 pb-1 scrollbar-hide">
         <div className="flex gap-2 min-w-min">
           {filters.map((filter) => {
             const Icon = filter.Icon
