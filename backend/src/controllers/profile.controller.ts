@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { validationResult } from 'express-validator';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { calculateDistance } from '../utils/distance.utils';
+import { normalizeProfilesPhotos, normalizeProfilePhotos } from '../utils/photo.utils';
 
 const prisma = new PrismaClient();
 
