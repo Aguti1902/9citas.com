@@ -39,12 +39,16 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Solo navegar si el click no viene del botón de like
-    if ((e.target as HTMLElement).closest('button')) {
+    const clickedButton = (e.target as HTMLElement).closest('button')
+    if (clickedButton) {
       return
     }
+    
     e.preventDefault()
     e.stopPropagation()
-    navigate(`/app/profile/${profile.id}`)
+    
+    console.log('🖱️ Click en ProfileCard, navegando a:', `/app/profile/${profile.id}`)
+    navigate(`/app/profile/${profile.id}`, { replace: false })
   }
 
   return (
