@@ -114,18 +114,31 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Generar tokens
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+    let accessToken: string;
+    let refreshToken: string;
+    
+    try {
+      accessToken = generateAccessToken(user.id);
+      refreshToken = generateRefreshToken(user.id);
+    } catch (tokenError: any) {
+      console.error('Error al generar tokens:', tokenError);
+      return res.status(500).json({ 
+        error: 'Error de configuración del servidor',
+        details: process.env.NODE_ENV === 'development' ? tokenError.message : undefined
+      });
+    }
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -149,9 +162,13 @@ export const login = async (req: Request, res: Response) => {
       accessToken,
       refreshToken,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error en login:', error);
-    res.status(500).json({ error: 'Error al iniciar sesión' });
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Error al iniciar sesión',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 

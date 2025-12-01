@@ -1,17 +1,25 @@
 import jwt from 'jsonwebtoken';
 
 export const generateAccessToken = (userId: string): string => {
+  const secret = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_ACCESS_SECRET o JWT_SECRET no está configurado');
+  }
   return jwt.sign(
     { userId },
-    process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET!,
+    secret,
     { expiresIn: '15m' }
   );
 };
 
 export const generateRefreshToken = (userId: string): string => {
+  const secret = process.env.JWT_REFRESH_SECRET;
+  if (!secret) {
+    throw new Error('JWT_REFRESH_SECRET no está configurado');
+  }
   return jwt.sign(
     { userId },
-    process.env.JWT_REFRESH_SECRET!,
+    secret,
     { expiresIn: '7d' }
   );
 };
