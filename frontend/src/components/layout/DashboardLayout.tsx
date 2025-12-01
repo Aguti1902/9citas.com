@@ -27,11 +27,20 @@ export default function DashboardLayout() {
   // Conectar Socket.IO cuando hay token
   useEffect(() => {
     if (accessToken) {
-      connectSocket(accessToken)
+      try {
+        connectSocket(accessToken)
+      } catch (error) {
+        // No bloquear la app si Socket.IO falla
+        console.error('Error al conectar Socket.IO:', error)
+      }
     }
 
     return () => {
-      disconnectSocket()
+      try {
+        disconnectSocket()
+      } catch (error) {
+        console.error('Error al desconectar Socket.IO:', error)
+      }
     }
   }, [accessToken])
 
