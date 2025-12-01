@@ -238,17 +238,31 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     // Normalizar comparación de ciudades (case-insensitive)
     if (!isPlus) {
       if (myProfile.city) {
-        // Buscar perfiles con la misma ciudad (case-insensitive)
+        // Para usuarios gratis, buscar perfiles en la misma ciudad
         // Primero buscar todos los perfiles que coinciden con género y orientación
         const allMatchingProfiles = await prisma.profile.findMany({
           where: {
-            ...whereClause,
+            orientation: myProfile.orientation,
+            OR: [
+              { isFake: false },
+              { isFake: null },
+            ],
           },
-          select: { city: true, id: true },
+          select: { city: true, id: true, gender: true },
         });
         
+        // Aplicar filtro de género según orientación
+        let genderFilter = allMatchingProfiles;
+        if (myProfile.orientation === 'hetero') {
+          if (myProfile.gender === 'hombre') {
+            genderFilter = allMatchingProfiles.filter(p => p.gender === 'mujer');
+          } else if (myProfile.gender === 'mujer') {
+            genderFilter = allMatchingProfiles.filter(p => p.gender === 'hombre');
+          }
+        }
+        
         // Encontrar ciudades que coincidan (case-insensitive)
-        const matchingCities = allMatchingProfiles
+        const matchingCities = genderFilter
           .map(p => p.city)
           .filter(c => c && c.toLowerCase() === myProfile.city?.toLowerCase());
         
@@ -258,6 +272,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
           // Si no hay perfiles en la misma ciudad, mostrar todos los perfiles que coinciden
           // (esto permite que se vean perfiles aunque estén en ciudades diferentes)
           console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden`);
+          // No aplicar filtro de ciudad
         }
       }
     } else if (city) {
