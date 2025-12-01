@@ -55,10 +55,11 @@ async function main() {
     process.exit(1)
   }
 
-  // Leer todas las carpetas
-  const folders = fs.readdirSync(PHOTOS_DIR, { withFileTypes: true })
+  // Leer todas las carpetas y ordenarlas (chica1, chica2, etc.)
+  let folders = fs.readdirSync(PHOTOS_DIR, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name)
+    .sort() // Ordenar alfabéticamente para asegurar chica1, chica2, etc.
 
   if (folders.length === 0) {
     console.error('❌ No se encontraron carpetas con fotos')
@@ -66,25 +67,78 @@ async function main() {
   }
 
   console.log(`📁 Encontradas ${folders.length} carpetas\n`)
+  
+  // LIMITAR A SOLO 7 PERFILES (las carpetas chica1 a chica7)
+  if (folders.length > 7) {
+    console.log(`⚠️  Se encontraron ${folders.length} carpetas, pero solo se crearán 7 perfiles`)
+    folders = folders.slice(0, 7)
+  }
 
-  // Eliminar perfiles falsos existentes
-  console.log('🗑️  Eliminando perfiles falsos existentes...')
-  await prisma.photo.deleteMany({
-    where: {
-      profile: {
-        isFake: true,
+  // Eliminar TODOS los perfiles falsos existentes (incluyendo los generados por seedHelpers)
+  console.log('🗑️  Eliminando TODOS los perfiles falsos existentes...')
+  
+  // Primero eliminar todas las fotos de perfiles falsos
+  const fakeProfiles = await prisma.profile.findMany({
+    where: { isFake: true },
+    select: { id: true },
+  })
+  
+  if (fakeProfiles.length > 0) {
+    const fakeProfileIds = fakeProfiles.map(p => p.id)
+    await prisma.photo.deleteMany({
+      where: {
+        profileId: { in: fakeProfileIds },
       },
-    },
-  })
-  await prisma.profile.deleteMany({
-    where: {
-      isFake: true,
-    },
-  })
-  console.log('✅ Perfiles falsos eliminados\n')
+    })
+    
+    // Eliminar likes y otros datos relacionados
+    await prisma.like.deleteMany({
+      where: {
+        OR: [
+          { fromProfileId: { in: fakeProfileIds } },
+          { toProfileId: { in: fakeProfileIds } },
+        ],
+      },
+    })
+    
+    await prisma.message.deleteMany({
+      where: {
+        OR: [
+          { fromProfileId: { in: fakeProfileIds } },
+          { toProfileId: { in: fakeProfileIds } },
+        ],
+      },
+    })
+    
+    // Eliminar usuarios asociados
+    const fakeUsers = await prisma.user.findMany({
+      where: {
+        profile: {
+          isFake: true,
+        },
+      },
+      select: { id: true },
+    })
+    
+    await prisma.profile.deleteMany({
+      where: { isFake: true },
+    })
+    
+    await prisma.user.deleteMany({
+      where: {
+        id: { in: fakeUsers.map(u => u.id) },
+      },
+    })
+  }
+  
+  console.log('✅ Todos los perfiles falsos eliminados\n')
 
-  // Crear perfiles para cada carpeta
-  for (let i = 0; i < folders.length; i++) {
+  // Nombres de mujeres españolas - ASIGNAR UNO POR PERFIL (sin repetir)
+  const femaleNames = ['Sofía', 'María', 'Laura', 'Carmen', 'Ana', 'Elena', 'Marta']
+  const usedNames: string[] = []
+
+  // Crear perfiles para cada carpeta (SOLO 7)
+  for (let i = 0; i < folders.length && i < 7; i++) {
     const folderName = folders[i]
     const folderPath = path.join(PHOTOS_DIR, folderName)
     const photos = getPhotosFromFolder(folderPath)
@@ -101,9 +155,12 @@ async function main() {
     const age = faker.number.int({ min: 22, max: 35 })
     const personality = faker.helpers.arrayElement(PERSONALITIES)
     
-    // Nombres de mujeres españolas
-    const femaleNames = ['Sofía', 'María', 'Laura', 'Carmen', 'Ana', 'Elena', 'Marta', 'Lucía', 'Paula', 'Sara', 'Cristina', 'Beatriz', 'Raquel', 'Natalia', 'Andrea', 'Julia', 'Alba', 'Irene', 'Carla', 'Nuria']
-    const name = faker.helpers.arrayElement(femaleNames)
+    // Asignar nombre único (sin repetir)
+    let name: string
+    do {
+      name = faker.helpers.arrayElement(femaleNames)
+    } while (usedNames.includes(name))
+    usedNames.push(name)
 
     // Crear usuario fake
     const hashedPassword = crypto
