@@ -66,7 +66,7 @@ export default function DashboardLayout() {
     <div className="min-h-screen bg-dark flex flex-col">
       {/* Header */}
       <header className="bg-gray-900 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-3 py-2 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 py-1.5 flex items-center justify-between">
           <div className="flex-shrink-0">
             {/* Logo pequeño SOLO en el header interno */}
             <Logo size="sm" className="h-7 sm:h-8 w-auto object-contain" />
