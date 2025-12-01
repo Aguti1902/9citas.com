@@ -183,7 +183,7 @@ export default function NavigatePage() {
   const currentProfile = profiles[currentProfileIndex]
 
   return (
-    <div className="pb-4 overflow-hidden -mt-14 h-screen touch-none">
+    <div className={`pb-4 -mt-14 ${viewMode === 'swipe' ? 'overflow-hidden h-screen touch-none' : 'overflow-y-auto h-auto'}`}>
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
       <div className="bg-gray-900 sticky top-14 z-30 border-t border-gray-800">
         {/* Fila 1: Ubicación y botones */}
