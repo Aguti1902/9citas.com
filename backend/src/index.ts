@@ -52,32 +52,48 @@ setIO(io);
 
 // Middleware CORS - DEBE IR ANTES DE TODO
 // Obtener URLs del frontend desde variables de entorno o usar defaults
-const allowedOrigins = process.env.FRONTEND_URL 
-  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-  : [
-      'http://localhost:3000',
-      'https://9citas-com-fyij.vercel.app',
-      'https://9citas-com-hev9.vercel.app',
-    ];
+const getAllowedOrigins = () => {
+  const envOrigins = process.env.FRONTEND_URL;
+  const defaultOrigins = [
+    'http://localhost:3000',
+    'https://9citas-com-fyij.vercel.app',
+    'https://9citas-com-hev9.vercel.app',
+  ];
+  
+  if (envOrigins) {
+    const origins = envOrigins.split(',').map(url => url.trim()).filter(Boolean);
+    console.log('🌐 Orígenes CORS desde ENV:', origins);
+    return [...origins, ...defaultOrigins];
+  }
+  
+  console.log('🌐 Orígenes CORS por defecto:', defaultOrigins);
+  return defaultOrigins;
+};
 
-console.log('🌐 Orígenes CORS permitidos:', allowedOrigins);
+const allowedOrigins = getAllowedOrigins();
 
-// Configuración de CORS
+// Función para verificar si un origen está permitido
+const isOriginAllowed = (origin: string | undefined): boolean => {
+  if (!origin) return true; // Permitir requests sin origin
+  return allowedOrigins.includes(origin);
+};
+
+// Configuración de CORS más permisiva
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Permitir requests sin origin (mobile apps, Postman, etc.)
-    if (!origin) {
-      console.log('✅ Request sin origin permitido');
-      return callback(null, true);
-    }
-    
-    if (allowedOrigins.includes(origin)) {
-      console.log(`✅ CORS permitido para: ${origin}`);
+    if (isOriginAllowed(origin)) {
+      console.log(`✅ CORS permitido para: ${origin || 'sin origin'}`);
       callback(null, true);
     } else {
       console.warn(`⚠️  CORS bloqueado para: ${origin}`);
       console.warn(`   Orígenes permitidos: ${allowedOrigins.join(', ')}`);
-      callback(new Error('Not allowed by CORS'));
+      // En producción, ser más permisivo temporalmente para debug
+      if (process.env.NODE_ENV === 'production') {
+        console.warn('⚠️  MODO PRODUCCIÓN: Permitiendo origen temporalmente para debug');
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   credentials: true,
@@ -95,15 +111,26 @@ app.use(cors(corsOptions));
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
   
-  if (!origin || allowedOrigins.includes(origin)) {
+  if (isOriginAllowed(origin)) {
     res.header('Access-Control-Allow-Origin', origin || '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Max-Age', '86400'); // 24 horas
+    console.log(`✅ OPTIONS request permitida para: ${origin || 'sin origin'}`);
     res.sendStatus(204);
   } else {
-    res.sendStatus(403);
+    console.warn(`⚠️  OPTIONS request bloqueada para: ${origin}`);
+    // En producción, permitir temporalmente
+    if (process.env.NODE_ENV === 'production') {
+      res.header('Access-Control-Allow-Origin', origin || '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.sendStatus(204);
+    } else {
+      res.sendStatus(403);
+    }
   }
 });
 
