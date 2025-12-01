@@ -274,7 +274,7 @@ export default function NavigatePage() {
       </div>
 
       {/* Contenido */}
-      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden' : 'pt-8 pb-6 overflow-y-auto'}`}>
+      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden' : 'pt-16 pb-6 overflow-y-auto'}`}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (
