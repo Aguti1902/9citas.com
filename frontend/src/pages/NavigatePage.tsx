@@ -272,9 +272,20 @@ export default function NavigatePage() {
   const currentProfile = profiles[currentProfileIndex]
 
   return (
-    <div className={`pb-4 -mt-14 ${viewMode === 'swipe' ? 'overflow-hidden h-screen touch-none' : 'overflow-y-auto h-auto'}`}>
-      {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
-      <div className="bg-gray-900 sticky top-14 z-30 border-t border-gray-800">
+    <div className={`pb-4 ${viewMode === 'swipe' ? 'overflow-hidden h-screen touch-none' : 'overflow-y-auto h-auto'}`}>
+      {/* Ubicación + Botones especiales - SIEMPRE FIJO */}
+      <div 
+        className="bg-gray-900 fixed left-0 right-0 z-30 border-t border-gray-800" 
+        style={{ 
+          position: 'fixed', 
+          top: '56px', 
+          left: 0, 
+          right: 0, 
+          zIndex: 30,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+        }}
+      >
         {/* Fila 1: Ubicación y botones */}
         <div className="flex items-center justify-between px-3 py-2 gap-2">
           {/* Selector de ubicación */}
@@ -362,8 +373,8 @@ export default function NavigatePage() {
         </div>
       </div>
 
-      {/* Contenido */}
-      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden' : 'pt-16 pb-6 overflow-y-auto'}`}>
+      {/* Contenido - Ajustado para filtro fijo */}
+      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden pt-32' : 'pt-32 pb-6 overflow-y-auto'}`}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (
@@ -374,7 +385,7 @@ export default function NavigatePage() {
           </div>
         ) : viewMode === 'swipe' ? (
           // Vista Swipe tipo Tinder
-          <div className="relative max-w-md mx-auto h-[calc(100vh-240px)] pt-20 overflow-hidden">
+          <div className="relative max-w-md mx-auto h-[calc(100vh-280px)] pt-0 overflow-hidden">
             {showPromoCard ? (
               // Card promocional de 9Plus
               <PremiumPromoCard onClose={handleClosePromoCard} />

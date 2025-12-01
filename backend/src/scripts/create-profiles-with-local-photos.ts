@@ -226,9 +226,13 @@ async function main() {
     console.log(`  ✅ Perfil creado: ${name} (${personality})`)
   }
 
-  console.log(`\n✅ ${folders.length} perfiles falsos creados exitosamente`)
-  console.log(`\n📝 NOTA: Las fotos están usando rutas locales.`)
-  console.log(`   Para producción, sube las fotos a Cloudinary y actualiza las URLs.`)
+  const createdCount = folders.filter((_, i) => i < 7).length
+  console.log(`\n✅ ${createdCount} perfiles falsos creados exitosamente (SOLO MUJERES)`)
+  console.log(`\n📝 NOTA IMPORTANTE:`)
+  console.log(`   - Solo se han creado ${createdCount} perfiles con fotos`)
+  console.log(`   - Todos los perfiles son MUJERES con nombres únicos`)
+  console.log(`   - Las fotos se sirven desde: ${process.env.BACKEND_URL || process.env.RAILWAY_PUBLIC_DOMAIN || 'http://localhost:4000'}/fake-photos/`)
+  console.log(`   - Asegúrate de que la carpeta fake-profiles-photos esté disponible en producción`)
 }
 
 main()
