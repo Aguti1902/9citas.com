@@ -37,7 +37,7 @@ export default function Modal({
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+    <div className="fixed inset-0 z-[10000] flex items-start justify-center p-4 pt-24 animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black bg-opacity-80"
@@ -46,7 +46,7 @@ export default function Modal({
       />
 
       {/* Modal content */}
-      <div className={`relative bg-gray-900 rounded-xl p-6 w-full ${maxWidths[maxWidth]} max-h-[85vh] overflow-y-auto shadow-2xl z-10`} style={{ position: 'relative', zIndex: 10 }}>
+      <div className={`relative bg-gray-900 rounded-xl p-6 w-full ${maxWidths[maxWidth]} max-h-[70vh] overflow-y-auto shadow-2xl z-10 mt-4`} style={{ position: 'relative', zIndex: 10 }}>
         {title && (
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-white">{title}</h2>

@@ -38,8 +38,15 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
 
   return (
     <div
-      className="profile-card group"
+      className="profile-card group cursor-pointer"
       onClick={() => navigate(`/app/profile/${profile.id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          navigate(`/app/profile/${profile.id}`)
+        }
+      }}
     >
       {/* Imagen */}
       <div className="relative aspect-[3/4] bg-gray-800 overflow-hidden">

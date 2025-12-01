@@ -272,7 +272,7 @@ export default function NavigatePage() {
   const currentProfile = profiles[currentProfileIndex]
 
   return (
-    <div className={`pb-4 ${viewMode === 'swipe' ? 'overflow-hidden h-screen touch-none' : 'overflow-y-auto h-auto'}`}>
+    <div className={`pb-4 ${viewMode === 'swipe' ? 'overflow-hidden h-screen touch-none' : 'overflow-y-auto h-auto'}`} style={{ pointerEvents: 'auto' }}>
       {/* Ubicación + Botones especiales - SIEMPRE FIJO */}
       <div 
         className="bg-gray-900 fixed left-0 right-0 z-30 border-t border-gray-800" 
