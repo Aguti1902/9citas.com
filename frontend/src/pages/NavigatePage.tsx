@@ -183,11 +183,11 @@ export default function NavigatePage() {
   const currentProfile = profiles[currentProfileIndex]
 
   return (
-    <div className="pb-4 h-[calc(100vh-57px-80px)] overflow-hidden">
+    <div className="pb-4 overflow-hidden">
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
-      <div className="bg-gray-900 sticky top-[56px] z-30">
+      <div className="bg-gray-900 sticky top-[56px] z-30 -mt-14">
         {/* Fila 1: Ubicación y botones */}
-        <div className="flex items-center justify-between px-3 pt-0 pb-2 gap-2">
+        <div className="flex items-center justify-between px-3 py-2 gap-2">
           {/* Selector de ubicación */}
           <LocationSelector
             currentCity={currentCity}
