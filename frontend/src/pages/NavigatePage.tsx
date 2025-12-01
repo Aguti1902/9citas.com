@@ -185,7 +185,7 @@ export default function NavigatePage() {
   return (
     <div className="pb-4 overflow-hidden">
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
-      <div className="bg-gray-900 sticky top-[56px] z-30 -mt-[56px]">
+      <div className="bg-gray-900 sticky top-14 z-30">
         {/* Fila 1: Ubicación y botones */}
         <div className="flex items-center justify-between px-3 py-2 gap-2">
           {/* Selector de ubicación */}
