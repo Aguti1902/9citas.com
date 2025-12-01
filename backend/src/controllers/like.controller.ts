@@ -191,7 +191,7 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
 
           const io = getIO();
           
-          // Emitir evento de match
+          // Emitir evento de match a la sala del usuario
           io.to(`profile:${req.profileId!}`).emit('new_match', {
             matchProfile: {
               id: fakeProfile?.id,
@@ -204,8 +204,11 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
               title: myProfile?.title,
             },
           });
+          
+          // También emitir a todas las salas por si acaso (para debugging)
+          console.log(`📢 Emitiendo notificación de match a profile:${req.profileId!}`);
 
-          console.log(`✅ Auto-like creado: ${targetProfile.title} → ${myProfile?.title}`);
+          console.log(`✅ Auto-like creado y match notificado: ${targetProfile.title} → ${myProfile?.title}`);
         } catch (error) {
           console.error('Error al crear auto-like:', error);
         }
