@@ -19,7 +19,7 @@ export default function NavigatePage() {
   const { user, logout } = useAuthStore()
   const [profiles, setProfiles] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeFilter, setActiveFilter] = useState('all')
+  const [activeFilters, setActiveFilters] = useState<string[]>(['all'])
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
@@ -34,25 +34,28 @@ export default function NavigatePage() {
   const [currentCity, setCurrentCity] = useState(user?.profile?.city || 'Madrid')
   const [ageRange, setAgeRange] = useState({ min: 18, max: 99 })
   const [distanceRange, setDistanceRange] = useState({ min: 1, max: 50 })
-  const [filterParams, setFilterParams] = useState<any>({})
 
   const isPremium = user?.subscription?.isActive || false
 
-  const loadProfiles = async (filter: string = 'all', params: any = {}) => {
+  const loadProfiles = async () => {
     setIsLoading(true)
     try {
-      const queryParams: any = { filter }
+      const queryParams: any = {}
       
-      // Añadir parámetros de filtros si existen
-      if (params.ageMin || params.ageMax) {
-        queryParams.ageMin = params.ageMin
-        queryParams.ageMax = params.ageMax
+      // Convertir activeFilters a parámetros de búsqueda
+      if (activeFilters.includes('online')) {
+        queryParams.filter = 'online'
+      } else if (activeFilters.includes('new')) {
+        queryParams.filter = 'new'
+      } else {
+        queryParams.filter = 'all'
       }
       
-      if (params.distanceMin || params.distanceMax) {
-        queryParams.distanceMin = params.distanceMin
-        queryParams.distanceMax = params.distanceMax
-      }
+      // Añadir filtros de edad y distancia
+      queryParams.ageMin = ageRange.min
+      queryParams.ageMax = ageRange.max
+      queryParams.distanceMin = distanceRange.min
+      queryParams.distanceMax = distanceRange.max
 
       const response = await api.get('/profile/search', {
         params: queryParams,
@@ -70,11 +73,11 @@ export default function NavigatePage() {
   }
 
   useEffect(() => {
-    loadProfiles(activeFilter, filterParams)
+    loadProfiles()
     loadRoamStatus()
     const interval = setInterval(loadRoamStatus, 30000) // Check every 30s
     return () => clearInterval(interval)
-  }, [activeFilter, filterParams])
+  }, [activeFilters, ageRange, distanceRange])
 
   const loadRoamStatus = async () => {
     try {
@@ -85,13 +88,8 @@ export default function NavigatePage() {
     }
   }
 
-  const handleFilterChange = (filter: string, params?: any) => {
-    setActiveFilter(filter)
-    if (params) {
-      setFilterParams(params)
-    } else {
-      setFilterParams({})
-    }
+  const handleFilterChange = (filters: string[], params?: any) => {
+    setActiveFilters(filters)
   }
 
   const handlePremiumRequired = () => {
@@ -257,7 +255,7 @@ export default function NavigatePage() {
         {/* Fila 2: Filtros */}
         <div className="px-2 pb-2">
           <FilterBar
-            activeFilter={activeFilter}
+            activeFilters={activeFilters}
             onFilterChange={handleFilterChange}
             isPremium={isPremium}
             onPremiumRequired={handlePremiumRequired}
