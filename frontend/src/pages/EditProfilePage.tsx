@@ -169,6 +169,11 @@ export default function EditProfilePage() {
       return
     }
 
+    if (!formData.gender) {
+      setError('Debes seleccionar tu género')
+      return
+    }
+
     setIsSaving(true)
 
     try {
