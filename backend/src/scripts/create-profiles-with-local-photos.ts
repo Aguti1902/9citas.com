@@ -77,22 +77,27 @@ async function main() {
   // Eliminar TODOS los perfiles falsos existentes (incluyendo los generados por seedHelpers)
   console.log('🗑️  Eliminando TODOS los perfiles falsos existentes...')
   
-  // Primero eliminar todas las fotos de perfiles falsos
+  // Obtener TODOS los perfiles falsos
   const fakeProfiles = await prisma.profile.findMany({
     where: { isFake: true },
     select: { id: true },
   })
   
+  console.log(`   Encontrados ${fakeProfiles.length} perfiles falsos para eliminar`)
+  
   if (fakeProfiles.length > 0) {
     const fakeProfileIds = fakeProfiles.map(p => p.id)
-    await prisma.photo.deleteMany({
+    
+    // Eliminar todas las fotos
+    const deletedPhotos = await prisma.photo.deleteMany({
       where: {
         profileId: { in: fakeProfileIds },
       },
     })
+    console.log(`   Eliminadas ${deletedPhotos.count} fotos`)
     
-    // Eliminar likes y otros datos relacionados
-    await prisma.like.deleteMany({
+    // Eliminar likes
+    const deletedLikes = await prisma.like.deleteMany({
       where: {
         OR: [
           { fromProfileId: { in: fakeProfileIds } },
@@ -100,8 +105,10 @@ async function main() {
         ],
       },
     })
+    console.log(`   Eliminados ${deletedLikes.count} likes`)
     
-    await prisma.message.deleteMany({
+    // Eliminar mensajes
+    const deletedMessages = await prisma.message.deleteMany({
       where: {
         OR: [
           { fromProfileId: { in: fakeProfileIds } },
@@ -109,26 +116,30 @@ async function main() {
         ],
       },
     })
+    console.log(`   Eliminados ${deletedMessages.count} mensajes`)
+    
+    // Eliminar perfiles
+    const deletedProfiles = await prisma.profile.deleteMany({
+      where: { isFake: true },
+    })
+    console.log(`   Eliminados ${deletedProfiles.count} perfiles`)
     
     // Eliminar usuarios asociados
     const fakeUsers = await prisma.user.findMany({
       where: {
-        profile: {
-          isFake: true,
+        email: {
+          contains: '@fake.9citas.com',
         },
       },
       select: { id: true },
     })
     
-    await prisma.profile.deleteMany({
-      where: { isFake: true },
-    })
-    
-    await prisma.user.deleteMany({
+    const deletedUsers = await prisma.user.deleteMany({
       where: {
         id: { in: fakeUsers.map(u => u.id) },
       },
     })
+    console.log(`   Eliminados ${deletedUsers.count} usuarios fake`)
   }
   
   console.log('✅ Todos los perfiles falsos eliminados\n')
