@@ -147,7 +147,7 @@ export default function NavigatePage() {
       setCurrentProfileIndex(prev => prev + 1)
     } else {
       // Cargar más perfiles
-      await loadProfiles(activeFilter)
+      await loadProfiles()
       setCurrentProfileIndex(0)
     }
   }
@@ -325,7 +325,7 @@ export default function NavigatePage() {
               <ProfileCard
                 key={profile.id}
                 profile={profile}
-                onLikeToggle={() => loadProfiles(activeFilter)}
+                onLikeToggle={() => loadProfiles()}
               />
             ))}
           </div>
