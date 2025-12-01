@@ -20,6 +20,28 @@ export default function EmailSentPage() {
     }
   }, [orientation])
 
+  // Polling para detectar cuando se verifica el email
+  useEffect(() => {
+    const checkVerification = async () => {
+      const token = localStorage.getItem('accessToken')
+      if (token) {
+        try {
+          const response = await api.get('/auth/me')
+          if (response.data.emailVerified) {
+            // Email verificado, redirigir a crear perfil
+            navigate('/create-profile')
+          }
+        } catch (error) {
+          // Ignorar errores, seguir esperando
+        }
+      }
+    }
+
+    // Verificar cada 3 segundos
+    const interval = setInterval(checkVerification, 3000)
+    return () => clearInterval(interval)
+  }, [navigate])
+
   const handleResend = async () => {
     setIsResending(true)
     setResendSuccess(false)
