@@ -120,13 +120,13 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Si el perfil es falso y NO hay match aún, programar auto-like
-    // Los perfiles falsos SIEMPRE devuelven el like
-    if (targetProfile.isFake && !isMatch) {
+    // Si el perfil tiene personalidad (perfiles automáticos) y NO hay match aún, programar auto-like
+    // Estos perfiles SIEMPRE devuelven el like automáticamente
+    if (targetProfile.personality && !isMatch) {
       // Delay aleatorio entre 60-120 segundos (1-2 minutos) para simular respuesta real
       const delay = Math.floor(Math.random() * 60000) + 60000;
       
-      console.log(`🤖 Perfil falso ${targetProfile.title} (${profileId}) devolverá like a ${req.profileId} en ${delay/1000}s`);
+      console.log(`🤖 Perfil automático ${targetProfile.title} (${profileId}) devolverá like a ${req.profileId} en ${delay/1000}s`);
       
       setTimeout(async () => {
         try {
@@ -166,7 +166,7 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
             },
           });
           
-          console.log(`💚 Perfil falso ${targetProfile.title} devolvió el like - MATCH creado!`);
+          console.log(`💚 Perfil automático ${targetProfile.title} devolvió el like - MATCH creado!`);
 
           // Obtener perfiles completos para la notificación
           const myProfile = await prisma.profile.findUnique({

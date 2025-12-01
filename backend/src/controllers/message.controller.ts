@@ -116,8 +116,8 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
 
     // TODO: Emitir evento de Socket.IO para enviar mensaje en tiempo real
 
-    // Si el destinatario es un perfil falso, generar respuesta automática
-    if (toProfile.isFake && text) {
+    // Si el destinatario tiene personalidad (perfil automático), generar respuesta automática
+    if (toProfile.personality && text) {
       setTimeout(async () => {
         try {
           // Obtener historial de conversación
