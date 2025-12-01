@@ -184,19 +184,19 @@ export default function DashboardLayout() {
         id="bottom-nav-fixed"
         className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50"
         style={{ 
-          position: 'fixed !important',
-          bottom: '0 !important',
-          left: '0 !important',
-          right: '0 !important',
-          top: 'auto !important',
-          zIndex: '9999 !important',
-          transform: 'translateZ(0) !important',
-          willChange: 'transform !important',
-          marginTop: '0 !important',
-          marginBottom: '0 !important',
-          marginLeft: '0 !important',
-          marginRight: '0 !important',
-        }}
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          top: 'auto',
+          zIndex: 9999,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+          marginTop: 0,
+          marginBottom: 0,
+          marginLeft: 0,
+          marginRight: 0,
+        } as React.CSSProperties}
       >
         <div className="max-w-7xl mx-auto px-2">
           <div className="flex justify-around">
