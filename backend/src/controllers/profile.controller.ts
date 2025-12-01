@@ -226,8 +226,30 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     });
 
     // Filtro por ciudad (si no es Plus, solo puede ver su ciudad)
+    // Normalizar comparación de ciudades (case-insensitive)
     if (!isPlus) {
-      whereClause.city = myProfile.city;
+      if (myProfile.city) {
+        // Buscar perfiles con la misma ciudad (case-insensitive)
+        const profilesInCity = await prisma.profile.findMany({
+          where: {
+            orientation: whereClause.orientation,
+            gender: whereClause.gender,
+          },
+          select: { city: true },
+          distinct: ['city'],
+        });
+        
+        // Encontrar ciudades que coincidan (case-insensitive)
+        const matchingCities = profilesInCity
+          .map(p => p.city)
+          .filter(c => c && c.toLowerCase() === myProfile.city?.toLowerCase());
+        
+        if (matchingCities.length > 0) {
+          whereClause.city = { in: matchingCities };
+        } else {
+          whereClause.city = myProfile.city;
+        }
+      }
     } else if (city) {
       whereClause.city = city;
     }
@@ -365,6 +387,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
 
     // Limitar resultados finales
     const finalProfiles = finalUniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), 50));
+
+    // Debug: Log de resultados
+    console.log(`✅ Encontrados ${finalProfiles.length} perfiles para usuario ${myProfile.id} (${myProfile.orientation}, ${myProfile.gender})`);
+    if (finalProfiles.length > 0) {
+      console.log(`   Primeros perfiles encontrados:`, finalProfiles.slice(0, 3).map(p => ({ id: p.id, title: p.title, gender: p.gender, orientation: p.orientation, city: p.city })));
+    }
 
     res.json({
       profiles: finalProfiles,
