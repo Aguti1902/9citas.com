@@ -54,13 +54,21 @@ export default function DashboardLayout() {
     return () => clearInterval(interval)
   }, [])
 
-  // Forzar que el menú inferior siempre esté fijo
+  // Forzar que el menú inferior siempre esté fijo - MEJORADO
   useEffect(() => {
     const nav = document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement
     if (nav) {
       nav.style.position = 'fixed'
       nav.style.bottom = '0'
-      nav.style.transform = 'none'
+      nav.style.left = '0'
+      nav.style.right = '0'
+      nav.style.zIndex = '50'
+      nav.style.transform = 'translateZ(0)'
+      nav.style.willChange = 'transform'
+      // Prevenir que cualquier otro CSS lo mueva
+      nav.style.top = 'auto'
+      nav.style.marginTop = '0'
+      nav.style.marginBottom = '0'
     }
   }, [location.pathname])
 
@@ -143,8 +151,19 @@ export default function DashboardLayout() {
         <Outlet />
       </main>
 
-      {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50" style={{ position: 'fixed' }}>
+      {/* Bottom navigation - SIEMPRE FIJO */}
+      <nav 
+        className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50"
+        style={{ 
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          transform: 'translateZ(0)', // Forzar aceleración de hardware
+          willChange: 'transform', // Optimización
+        }}
+      >
         <div className="max-w-7xl mx-auto px-2">
           <div className="flex justify-around">
             {navItems.map((item) => {

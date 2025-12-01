@@ -16,11 +16,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Asegurar que el menú inferior nunca se mueva */
-nav[class*="fixed bottom-0"] {
+/* Asegurar que el menú inferior nunca se mueva - FORZADO */
+nav[class*="fixed bottom-0"],
+nav.fixed.bottom-0 {
   position: fixed !important;
   bottom: 0 !important;
-  transform: none !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  z-index: 50 !important;
+  -webkit-transform: translateZ(0) !important;
+  -moz-transform: translateZ(0) !important;
+  -ms-transform: translateZ(0) !important;
+  -o-transform: translateZ(0) !important;
 }
 
 /* Estilos personalizados */
