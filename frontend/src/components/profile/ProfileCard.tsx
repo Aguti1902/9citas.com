@@ -47,7 +47,6 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
     e.preventDefault()
     e.stopPropagation()
     
-    console.log('🖱️ Click en ProfileCard, navegando a:', `/app/profile/${profile.id}`)
     navigate(`/app/profile/${profile.id}`, { replace: false })
   }
 
