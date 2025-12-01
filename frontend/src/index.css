@@ -32,20 +32,31 @@ header.bg-gray-900 {
   -o-transform: translateZ(0) !important;
 }
 
-/* Asegurar que el menú inferior nunca se mueva - FORZADO */
+/* Asegurar que el menú inferior nunca se mueva - FORZADO ABSOLUTAMENTE */
 nav[class*="fixed bottom-0"],
-nav.fixed.bottom-0 {
+nav.fixed.bottom-0,
+nav#bottom-nav-fixed,
+nav[id="bottom-nav-fixed"] {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
+  top: auto !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
-  z-index: 50 !important;
+  z-index: 9999 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   -webkit-transform: translateZ(0) !important;
   -moz-transform: translateZ(0) !important;
   -ms-transform: translateZ(0) !important;
   -o-transform: translateZ(0) !important;
+  -webkit-position: fixed !important;
+  -moz-position: fixed !important;
+  -ms-position: fixed !important;
+  -o-position: fixed !important;
 }
 
 /* Asegurar que la sección de filtros esté siempre fija */

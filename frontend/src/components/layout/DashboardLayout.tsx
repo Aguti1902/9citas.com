@@ -52,21 +52,40 @@ export default function DashboardLayout() {
     return () => clearInterval(interval)
   }, [])
 
-  // Forzar que el menú inferior siempre esté fijo - MEJORADO
+  // Forzar que el menú inferior siempre esté fijo - ABSOLUTAMENTE FIJO
   useEffect(() => {
-    const nav = document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement
+    const nav = document.getElementById('bottom-nav-fixed') || document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement
     if (nav) {
-      nav.style.position = 'fixed'
-      nav.style.bottom = '0'
-      nav.style.left = '0'
-      nav.style.right = '0'
-      nav.style.zIndex = '50'
-      nav.style.transform = 'translateZ(0)'
-      nav.style.willChange = 'transform'
-      // Prevenir que cualquier otro CSS lo mueva
-      nav.style.top = 'auto'
-      nav.style.marginTop = '0'
-      nav.style.marginBottom = '0'
+      // Forzar estilos inline con !important usando setProperty
+      nav.style.setProperty('position', 'fixed', 'important')
+      nav.style.setProperty('bottom', '0', 'important')
+      nav.style.setProperty('left', '0', 'important')
+      nav.style.setProperty('right', '0', 'important')
+      nav.style.setProperty('top', 'auto', 'important')
+      nav.style.setProperty('z-index', '9999', 'important')
+      nav.style.setProperty('transform', 'translateZ(0)', 'important')
+      nav.style.setProperty('will-change', 'transform', 'important')
+      nav.style.setProperty('margin-top', '0', 'important')
+      nav.style.setProperty('margin-bottom', '0', 'important')
+      nav.style.setProperty('margin-left', '0', 'important')
+      nav.style.setProperty('margin-right', '0', 'important')
+      
+      // Prevenir cualquier movimiento
+      const observer = new MutationObserver(() => {
+        if (nav.style.position !== 'fixed') {
+          nav.style.setProperty('position', 'fixed', 'important')
+        }
+        if (nav.style.bottom !== '0px') {
+          nav.style.setProperty('bottom', '0', 'important')
+        }
+      })
+      
+      observer.observe(nav, {
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+      })
+      
+      return () => observer.disconnect()
     }
   }, [location.pathname])
 
@@ -160,17 +179,23 @@ export default function DashboardLayout() {
         <Outlet />
       </main>
 
-      {/* Bottom navigation - SIEMPRE FIJO */}
+      {/* Bottom navigation - SIEMPRE FIJO - NO SE MUEVE */}
       <nav 
+        id="bottom-nav-fixed"
         className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50"
         style={{ 
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          transform: 'translateZ(0)', // Forzar aceleración de hardware
-          willChange: 'transform', // Optimización
+          position: 'fixed !important',
+          bottom: '0 !important',
+          left: '0 !important',
+          right: '0 !important',
+          top: 'auto !important',
+          zIndex: '9999 !important',
+          transform: 'translateZ(0) !important',
+          willChange: 'transform !important',
+          marginTop: '0 !important',
+          marginBottom: '0 !important',
+          marginLeft: '0 !important',
+          marginRight: '0 !important',
         }}
       >
         <div className="max-w-7xl mx-auto px-2">
