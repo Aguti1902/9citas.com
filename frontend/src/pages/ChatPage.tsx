@@ -162,9 +162,12 @@ export default function ChatPage() {
         nav[class*="fixed bottom-0"] {
           display: none;
         }
+        main {
+          padding-bottom: 0 !important;
+        }
       `}</style>
       
-      <div className="fixed inset-0 top-14 flex flex-col bg-dark z-30 overflow-hidden">
+      <div className="flex flex-col bg-dark h-screen overflow-hidden">
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <button
