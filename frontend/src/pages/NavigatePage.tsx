@@ -183,7 +183,7 @@ export default function NavigatePage() {
   const currentProfile = profiles[currentProfileIndex]
 
   return (
-    <div className="pb-4 overflow-hidden">
+    <div className="pb-4 overflow-hidden -mt-20">
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
       <div className="bg-gray-900 sticky top-14 z-30">
         {/* Fila 1: Ubicación y botones */}
