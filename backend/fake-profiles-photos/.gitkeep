@@ -1,0 +1,13 @@
+# Esta carpeta contiene las fotos de los perfiles falsos
+# 
+# Estructura esperada:
+# fake-profiles-photos/
+# ├── chica1/
+# │   ├── foto1.jpg
+# │   ├── foto2.jpg
+# │   └── foto3.jpg
+# ├── chica2/
+# │   ├── foto1.jpg
+# │   └── foto2.jpg
+# etc...
+
