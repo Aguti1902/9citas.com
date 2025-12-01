@@ -188,9 +188,11 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     const likedProfileIds = sentLikes.map(like => like.toProfileId);
 
     // Construir filtros base
+    // SOLO mostrar perfiles con personalidad (los 7 reales)
     const whereClause: any = {
       id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] },
       orientation: myProfile.orientation, // Mismo orientation
+      personality: { not: null }, // SOLO perfiles reales con personalidad
     };
 
     // Lógica de matching según orientación y género

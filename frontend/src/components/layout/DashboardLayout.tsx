@@ -102,8 +102,19 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-dark flex flex-col">
-      {/* Header */}
-      <header className="bg-gray-900 sticky top-0 z-40">
+      {/* Header - SIEMPRE FIJO */}
+      <header 
+        className="bg-gray-900 z-40"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 40,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-3 flex items-center justify-between h-14">
           <div className="flex-shrink-0">
             {/* Logo pequeño SOLO en el header interno */}
@@ -144,8 +155,8 @@ export default function DashboardLayout() {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 pb-20">
+      {/* Main content - Con padding para header y footer fijos */}
+      <main className="flex-1 pb-20 pt-14">
         <Outlet />
       </main>
 
