@@ -178,12 +178,21 @@ export default function ChatPage() {
         }
       `}</style>
       
-      <div className="flex flex-col bg-dark h-[calc(100vh-56px)] overflow-hidden">
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
+      <div className="flex flex-col bg-dark h-screen overflow-hidden">
+      {/* Header del Chat - FIJO EN LA PARTE SUPERIOR */}
+      <div 
+        className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0"
+        style={{
+          position: 'fixed',
+          top: '56px', // Debajo del header global
+          left: 0,
+          right: 0,
+          zIndex: 45,
+        }}
+      >
         <button
           onClick={() => navigate('/app/inbox')}
-          className="text-gray-400 hover:text-white"
+          className="text-gray-400 hover:text-white transition-colors"
         >
           ← Volver
         </button>
@@ -221,13 +230,14 @@ export default function ChatPage() {
         <button
           onClick={() => setShowDeleteModal(true)}
           className="text-gray-400 hover:text-red-500 transition-colors"
+          title="Eliminar conversación"
         >
           🗑️
         </button>
       </div>
 
-      {/* Mensajes */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* Mensajes - Con padding para header del chat */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 pt-24">
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400">No hay mensajes aún</p>
