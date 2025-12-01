@@ -92,8 +92,7 @@ async function createFemaleProfiles() {
       const user = await prisma.user.create({
         data: {
           email: `${profileData.name.toLowerCase()}@fake.9citas.com`,
-          password: hashedPassword,
-          orientation: 'hetero',
+          passwordHash: hashedPassword,
           emailVerified: true,
         },
       })

@@ -133,7 +133,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
           });
 
           const conversationHistory = previousMessages.map(msg => ({
-            role: msg.fromProfileId === req.profileId! ? 'user' : 'assistant',
+            role: (msg.fromProfileId === req.profileId! ? 'user' : 'assistant') as 'user' | 'assistant',
             content: msg.text || '',
           }));
 
