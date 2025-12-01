@@ -215,6 +215,11 @@ export default function SwipeCard({
               </div>
             )}
 
+            {/* Contador de fotos */}
+            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold z-10">
+              {currentPhotoIndex + 1} / {photos.length}
+            </div>
+
             {/* Info del perfil - PADDING AUMENTADO ABAJO */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent p-6 pt-12 pb-36">
               <h2 className="text-white font-bold text-3xl mb-2">
