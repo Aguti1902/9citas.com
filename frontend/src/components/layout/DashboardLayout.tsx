@@ -3,17 +3,19 @@ import Logo from '../common/Logo'
 import InstallPWA from '../common/InstallPWA'
 import RoamSummaryModal from '../common/RoamSummaryModal'
 import Toast from '../common/Toast'
+import MatchNotification from '../common/MatchNotification'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useState, useEffect } from 'react'
 import Modal from '../common/Modal'
 import { api } from '@/services/api'
+import { connectSocket, disconnectSocket } from '@/services/socket'
 import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Bell } from 'lucide-react'
 
 export default function DashboardLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { logout } = useAuthStore()
+  const { logout, accessToken } = useAuthStore()
   const { toasts, removeToast } = useToastStore()
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [pendingRequests, setPendingRequests] = useState(0)
@@ -21,6 +23,17 @@ export default function DashboardLayout() {
   const [roamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
 
   const isActive = (path: string) => location.pathname.includes(path)
+
+  // Conectar Socket.IO cuando hay token
+  useEffect(() => {
+    if (accessToken) {
+      connectSocket(accessToken)
+    }
+
+    return () => {
+      disconnectSocket()
+    }
+  }, [accessToken])
 
   useEffect(() => {
     loadPendingRequests()
@@ -189,6 +202,9 @@ export default function DashboardLayout() {
           duration={toast.duration}
         />
       ))}
+
+      {/* Notificación de Match */}
+      <MatchNotification />
     </div>
   )
 }

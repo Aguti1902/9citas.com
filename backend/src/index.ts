@@ -23,6 +23,7 @@ import privatePhotoRoutes from './routes/privatePhoto.routes';
 
 // Importar servicios
 import { setupSocketHandlers } from './services/socket.service';
+import { setIO } from './services/socket.io';
 
 const app = express();
 const httpServer = createServer(app);
@@ -38,6 +39,9 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
+
+// Configurar instancia global de Socket.IO
+setIO(io);
 
 // Middleware
 app.use(cors({

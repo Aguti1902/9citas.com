@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { getIO } from '../services/socket.io';
 
 const prisma = new PrismaClient();
 
@@ -16,6 +17,12 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
     // Verificar que el perfil existe
     const targetProfile = await prisma.profile.findUnique({
       where: { id: profileId },
+      include: {
+        photos: {
+          where: { type: 'cover' },
+          take: 1,
+        },
+      },
     });
 
     if (!targetProfile) {
@@ -69,6 +76,134 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
     });
 
     const isMatch = !!theirLike;
+
+    // Si hay match, emitir notificación por Socket.IO
+    if (isMatch) {
+      const io = getIO();
+      
+      // Obtener perfil completo del usuario que hizo match
+      const myProfile = await prisma.profile.findUnique({
+        where: { id: req.profileId! },
+        include: {
+          photos: {
+            where: { type: 'cover' },
+            take: 1,
+          },
+        },
+      });
+
+      // Emitir evento de match a ambos usuarios
+      io.to(`profile:${req.profileId!}`).emit('new_match', {
+        matchProfile: {
+          id: targetProfile.id,
+          title: targetProfile.title,
+          age: targetProfile.age,
+          photos: targetProfile.photos || [],
+        },
+        myProfile: {
+          id: myProfile?.id,
+          title: myProfile?.title,
+        },
+      });
+
+      io.to(`profile:${profileId}`).emit('new_match', {
+        matchProfile: {
+          id: myProfile?.id,
+          title: myProfile?.title,
+          age: myProfile?.age,
+          photos: myProfile?.photos || [],
+        },
+        myProfile: {
+          id: targetProfile.id,
+          title: targetProfile.title,
+        },
+      });
+    }
+
+    // Si el perfil es falso y NO hay match aún, programar auto-like
+    if (targetProfile.isFake && !isMatch) {
+      // Delay aleatorio entre 60-120 segundos (1-2 minutos)
+      const delay = Math.floor(Math.random() * 60000) + 60000;
+      
+      setTimeout(async () => {
+        try {
+          // Verificar que aún no haya match (por si el usuario eliminó el like)
+          const existingLike = await prisma.like.findFirst({
+            where: {
+              fromProfileId: req.profileId!,
+              toProfileId: profileId,
+            },
+          });
+
+          if (!existingLike) {
+            // El usuario eliminó el like, no hacer nada
+            return;
+          }
+
+          // Verificar que no haya match ya
+          const existingMatch = await prisma.like.findFirst({
+            where: {
+              fromProfileId: profileId,
+              toProfileId: req.profileId!,
+            },
+          });
+
+          if (existingMatch) {
+            // Ya hay match, no hacer nada
+            return;
+          }
+
+          // Crear like del perfil falso hacia el usuario
+          await prisma.like.create({
+            data: {
+              fromProfileId: profileId,
+              toProfileId: req.profileId!,
+            },
+          });
+
+          // Obtener perfiles completos para la notificación
+          const myProfile = await prisma.profile.findUnique({
+            where: { id: req.profileId! },
+            include: {
+              photos: {
+                where: { type: 'cover' },
+                take: 1,
+              },
+            },
+          });
+
+          const fakeProfile = await prisma.profile.findUnique({
+            where: { id: profileId },
+            include: {
+              photos: {
+                where: { type: 'cover' },
+                take: 1,
+              },
+            },
+          });
+
+          const io = getIO();
+          
+          // Emitir evento de match
+          io.to(`profile:${req.profileId!}`).emit('new_match', {
+            matchProfile: {
+              id: fakeProfile?.id,
+              title: fakeProfile?.title,
+              age: fakeProfile?.age,
+              photos: fakeProfile?.photos || [],
+            },
+            myProfile: {
+              id: myProfile?.id,
+              title: myProfile?.title,
+            },
+          });
+
+          console.log(`✅ Auto-like creado: ${targetProfile.title} → ${myProfile?.title}`);
+        } catch (error) {
+          console.error('Error al crear auto-like:', error);
+        }
+      }, delay);
+    }
 
     res.status(201).json({
       message: isMatch ? '¡MATCH! 💕' : 'Like enviado',
