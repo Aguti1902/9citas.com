@@ -50,7 +50,7 @@ const io = new Server(httpServer, {
 // Configurar instancia global de Socket.IO
 setIO(io);
 
-// Middleware CORS
+// Middleware CORS - DEBE IR ANTES DE TODO
 // Obtener URLs del frontend desde variables de entorno o usar defaults
 const allowedOrigins = process.env.FRONTEND_URL 
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
@@ -62,8 +62,9 @@ const allowedOrigins = process.env.FRONTEND_URL
 
 console.log('🌐 Orígenes CORS permitidos:', allowedOrigins);
 
-app.use(cors({
-  origin: (origin, callback) => {
+// Configuración de CORS
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Permitir requests sin origin (mobile apps, Postman, etc.)
     if (!origin) {
       console.log('✅ Request sin origin permitido');
@@ -81,9 +82,18 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-}));
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+// Aplicar CORS
+app.use(cors(corsOptions));
+
+// Manejar preflight OPTIONS requests explícitamente
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -99,26 +109,6 @@ if (fs.existsSync(fakePhotosPath)) {
 } else {
   console.warn('⚠️  Carpeta fake-profiles-photos no encontrada');
 }
-
-// Manejar preflight OPTIONS requests
-app.options('*', cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    const allowedOrigins = process.env.FRONTEND_URL 
-      ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-      : [
-          'http://localhost:3000',
-          'https://9citas-com-fyij.vercel.app',
-          'https://9citas-com-hev9.vercel.app',
-        ];
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
 
 // Rutas
 app.use('/api/auth', authRoutes);
