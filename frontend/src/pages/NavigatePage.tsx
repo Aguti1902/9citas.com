@@ -422,7 +422,7 @@ export default function NavigatePage() {
           </div>
         ) : (
           // Vista Grid (original)
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" style={{ pointerEvents: 'auto' }}>
             {profiles.map((profile) => (
               <ProfileCard
                 key={profile.id}
