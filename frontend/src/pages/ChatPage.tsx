@@ -164,7 +164,7 @@ export default function ChatPage() {
         }
       `}</style>
       
-      <div className="fixed inset-0 top-[57px] flex flex-col bg-dark z-30">
+      <div className="fixed inset-0 top-0 flex flex-col bg-dark z-30 overflow-hidden">
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <button
@@ -272,8 +272,8 @@ export default function ChatPage() {
       </div>
 
       {/* Input de mensaje */}
-      <form onSubmit={handleSendMessage} className="bg-gray-900 border-t border-gray-800 p-4">
-        <div className="flex gap-2 items-center">
+      <form onSubmit={handleSendMessage} className="bg-gray-900 border-t border-gray-800 p-4 flex-shrink-0">
+        <div className="flex gap-2 items-center max-w-full">
           {/* Botón de fotos */}
           <button
             type="button"
