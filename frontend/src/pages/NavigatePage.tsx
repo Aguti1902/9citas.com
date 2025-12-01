@@ -187,7 +187,7 @@ export default function NavigatePage() {
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
       <div className="bg-gray-900 sticky top-[56px] z-30">
         {/* Fila 1: Ubicación y botones */}
-        <div className="flex items-center justify-between px-3 py-2 gap-2">
+        <div className="flex items-center justify-between px-3 pb-2 gap-2">
           {/* Selector de ubicación */}
           <LocationSelector
             currentCity={currentCity}
