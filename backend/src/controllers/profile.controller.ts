@@ -226,11 +226,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     }
     
     // Debug: Log para verificar la lógica
-    console.log(`🔍 Buscando perfiles para usuario ${myProfile.id}:`, {
+    console.log(`🔍 Buscando perfiles para usuario ${myProfile.id} (${myProfile.title}):`, {
       orientation: myProfile.orientation,
       gender: myProfile.gender,
       city: myProfile.city,
-      whereClause: JSON.stringify(whereClause),
+      isPlus,
+      whereClause: JSON.stringify(whereClause, null, 2),
     });
 
     // Filtro por ciudad (si no es Plus, solo puede ver su ciudad)
