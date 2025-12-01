@@ -127,7 +127,7 @@ export default function FilterBar({
         title="Filtrar por edad"
         maxWidth="sm"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 pb-2">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">
@@ -136,7 +136,7 @@ export default function FilterBar({
               <select
                 value={tempAgeMin}
                 onChange={(e) => setTempAgeMin(parseInt(e.target.value))}
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
                 {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
                   <option key={age} value={age}>{age} años</option>
@@ -151,7 +151,7 @@ export default function FilterBar({
               <select
                 value={tempAgeMax}
                 onChange={(e) => setTempAgeMax(parseInt(e.target.value))}
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
                 {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
                   <option key={age} value={age}>{age} años</option>
@@ -160,7 +160,7 @@ export default function FilterBar({
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <Button
               fullWidth
               variant="outline"
@@ -186,7 +186,7 @@ export default function FilterBar({
         title="Filtrar por distancia"
         maxWidth="sm"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 pb-2">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">
@@ -195,7 +195,7 @@ export default function FilterBar({
               <select
                 value={tempDistanceMin}
                 onChange={(e) => setTempDistanceMin(parseInt(e.target.value))}
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
                 {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
                   <option key={km} value={km}>{km} km</option>
@@ -210,7 +210,7 @@ export default function FilterBar({
               <select
                 value={tempDistanceMax}
                 onChange={(e) => setTempDistanceMax(parseInt(e.target.value))}
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-lg"
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
                 {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
                   <option key={km} value={km}>{km} km</option>
@@ -219,7 +219,7 @@ export default function FilterBar({
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <Button
               fullWidth
               variant="outline"

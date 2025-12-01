@@ -289,11 +289,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       };
     }
 
-    // Obtener perfiles (solo los que tienen al menos una foto de portada y NO son falsos)
+    // Obtener perfiles (solo los que tienen al menos una foto de portada)
+    // PERMITIR perfiles falsos (los 7 perfiles de mujeres que creamos)
     let profiles = await prisma.profile.findMany({
       where: {
         ...whereClause,
-        isFake: false, // EXCLUIR perfiles falsos
+        // Permitir perfiles falsos (los 7 perfiles de mujeres)
         photos: {
           some: {
             type: 'cover',
