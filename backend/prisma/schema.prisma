@@ -81,6 +81,7 @@ model Profile {
   
   // Fake user flag
   isFake          Boolean   @default(false)
+  personality     String?   // Para perfiles falsos: 'coqueta', 'seria', 'divertida', 'picante', 'romantica'
   
   // Verificación
   isVerified      Boolean   @default(false)

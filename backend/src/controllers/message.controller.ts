@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { generateChatbotResponse } from '../services/chatbot.service';
 
 const prisma = new PrismaClient();
 
@@ -114,6 +115,51 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
     });
 
     // TODO: Emitir evento de Socket.IO para enviar mensaje en tiempo real
+
+    // Si el destinatario es un perfil falso, generar respuesta automática
+    if (toProfile.isFake && text) {
+      setTimeout(async () => {
+        try {
+          // Obtener historial de conversación
+          const previousMessages = await prisma.message.findMany({
+            where: {
+              OR: [
+                { fromProfileId: req.profileId!, toProfileId },
+                { fromProfileId: toProfileId, toProfileId: req.profileId! },
+              ],
+            },
+            orderBy: { createdAt: 'asc' },
+            take: 10, // Últimos 10 mensajes
+          });
+
+          const conversationHistory = previousMessages.map(msg => ({
+            role: msg.fromProfileId === req.profileId! ? 'user' : 'assistant',
+            content: msg.text || '',
+          }));
+
+          // Generar respuesta con IA
+          const botResponse = await generateChatbotResponse({
+            profileName: toProfile.title,
+            profileAge: toProfile.age,
+            profilePersonality: toProfile.personality || 'divertida',
+            profileBio: toProfile.aboutMe,
+            userMessage: text,
+            conversationHistory,
+          });
+
+          // Crear mensaje de respuesta
+          await prisma.message.create({
+            data: {
+              fromProfileId: toProfileId,
+              toProfileId: req.profileId!,
+              text: botResponse,
+            },
+          });
+        } catch (error) {
+          console.error('Error al generar respuesta del bot:', error);
+        }
+      }, Math.floor(Math.random() * 15000) + 5000); // Responder entre 5-20 segundos
+    }
 
     res.status(201).json({
       message: 'Mensaje enviado',
