@@ -185,9 +185,9 @@ export default function NavigatePage() {
   return (
     <div className="pb-4 h-[calc(100vh-57px-80px)] overflow-hidden">
       {/* Ubicación + Botones especiales - OPTIMIZADO MÓVIL */}
-      <div className="bg-gray-900 sticky top-[57px] z-30">
+      <div className="bg-gray-900 sticky top-[57px] z-30 -mt-2">
         {/* Fila 1: Ubicación y botones */}
-        <div className="flex items-center justify-between px-3 gap-2">
+        <div className="flex items-center justify-between px-3 py-2 gap-2">
           {/* Selector de ubicación */}
           <LocationSelector
             currentCity={currentCity}
@@ -255,7 +255,7 @@ export default function NavigatePage() {
         </div>
 
         {/* Fila 2: Filtros */}
-        <div className="px-2">
+        <div className="px-2 pb-2">
           <FilterBar
             activeFilter={activeFilter}
             onFilterChange={handleFilterChange}
