@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Users, Wifi, Sparkles } from 'lucide-react'
 
 interface FilterBarProps {

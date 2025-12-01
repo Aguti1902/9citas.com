@@ -88,7 +88,7 @@ export default function NavigatePage() {
     }
   }
 
-  const handleFilterChange = (filters: string[], params?: any) => {
+  const handleFilterChange = (filters: string[]) => {
     setActiveFilters(filters)
   }
 
@@ -106,7 +106,7 @@ export default function NavigatePage() {
         longitude: lng,
       })
       // Recargar perfiles con la nueva ubicación
-      loadProfiles(activeFilter)
+      loadProfiles()
     } catch (error) {
       console.error('Error al actualizar ubicación:', error)
     }
@@ -173,7 +173,7 @@ export default function NavigatePage() {
     if (currentProfileIndex < profiles.length - 1) {
       setCurrentProfileIndex(prev => prev + 1)
     } else {
-      loadProfiles(activeFilter)
+      loadProfiles()
       setCurrentProfileIndex(0)
     }
   }
@@ -310,7 +310,7 @@ export default function NavigatePage() {
                   variant="primary"
                   onClick={() => {
                     setCurrentProfileIndex(0)
-                    loadProfiles(activeFilter)
+                    loadProfiles()
                   }}
                 >
                   Recargar perfiles
