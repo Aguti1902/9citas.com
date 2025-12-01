@@ -60,19 +60,29 @@ const allowedOrigins = process.env.FRONTEND_URL
       'https://9citas-com-hev9.vercel.app',
     ];
 
+console.log('🌐 Orígenes CORS permitidos:', allowedOrigins);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Permitir requests sin origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('✅ Request sin origin permitido');
+      return callback(null, true);
+    }
     
     if (allowedOrigins.includes(origin)) {
+      console.log(`✅ CORS permitido para: ${origin}`);
       callback(null, true);
     } else {
       console.warn(`⚠️  CORS bloqueado para: ${origin}`);
+      console.warn(`   Orígenes permitidos: ${allowedOrigins.join(', ')}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -89,6 +99,26 @@ if (fs.existsSync(fakePhotosPath)) {
 } else {
   console.warn('⚠️  Carpeta fake-profiles-photos no encontrada');
 }
+
+// Manejar preflight OPTIONS requests
+app.options('*', cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const allowedOrigins = process.env.FRONTEND_URL 
+      ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+      : [
+          'http://localhost:3000',
+          'https://9citas-com-fyij.vercel.app',
+          'https://9citas-com-hev9.vercel.app',
+        ];
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 
 // Rutas
 app.use('/api/auth', authRoutes);
