@@ -12,7 +12,11 @@ export function normalizePhotoUrl(url: string | null | undefined): string {
   
   // Si es una URL relativa que empieza con /fake-photos/, convertirla a URL absoluta
   if (url.startsWith('/fake-photos/')) {
-    const backendUrl = process.env.BACKEND_URL || process.env.API_URL || 'http://localhost:4000';
+    // En producción, usar la URL del backend desde Railway
+    // En desarrollo, usar localhost
+    const backendUrl = process.env.BACKEND_URL 
+      || process.env.RAILWAY_PUBLIC_DOMAIN 
+      || (process.env.NODE_ENV === 'production' ? 'https://9citascom-production.up.railway.app' : 'http://localhost:4000');
     // Eliminar /api si está presente
     const baseUrl = backendUrl.replace(/\/api$/, '');
     return `${baseUrl}${url}`;
@@ -20,7 +24,10 @@ export function normalizePhotoUrl(url: string | null | undefined): string {
   
   // Si es una URL relativa que empieza con /uploads/, convertirla a URL absoluta
   if (url.startsWith('/uploads/')) {
-    const backendUrl = process.env.BACKEND_URL || process.env.API_URL || 'http://localhost:4000';
+    // En producción, usar la URL del backend desde Railway
+    const backendUrl = process.env.BACKEND_URL 
+      || process.env.RAILWAY_PUBLIC_DOMAIN 
+      || (process.env.NODE_ENV === 'production' ? 'https://9citascom-production.up.railway.app' : 'http://localhost:4000');
     const baseUrl = backendUrl.replace(/\/api$/, '');
     return `${baseUrl}${url}`;
   }
