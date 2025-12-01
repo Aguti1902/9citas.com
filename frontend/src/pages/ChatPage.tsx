@@ -178,16 +178,17 @@ export default function ChatPage() {
         }
       `}</style>
       
-      <div className="flex flex-col bg-dark h-screen overflow-hidden">
-      {/* Header del Chat - FIJO EN LA PARTE SUPERIOR */}
+      <div className="flex flex-col bg-dark h-screen overflow-hidden relative">
+      {/* Header del Chat - FIJO EN LA PARTE SUPERIOR - DEBAJO DEL HEADER GLOBAL */}
       <div 
         className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0"
         style={{
           position: 'fixed',
-          top: '56px', // Debajo del header global
+          top: '56px', // Debajo del header global (56px de altura)
           left: 0,
           right: 0,
           zIndex: 45,
+          height: '64px',
         }}
       >
         <button
@@ -236,8 +237,8 @@ export default function ChatPage() {
         </button>
       </div>
 
-      {/* Mensajes - Con padding para header del chat */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 pt-24">
+      {/* Mensajes - Con padding para header global + header del chat */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400">No hay mensajes aún</p>
