@@ -50,48 +50,54 @@ const io = new Server(httpServer, {
 // Configurar instancia global de Socket.IO
 setIO(io);
 
-// Middleware CORS - DEBE IR ANTES DE TODO
-// Obtener URLs del frontend desde variables de entorno o usar defaults
-const getAllowedOrigins = () => {
-  const envOrigins = process.env.FRONTEND_URL;
-  const defaultOrigins = [
-    'http://localhost:3000',
-    'https://9citas-com-fyij.vercel.app',
-    'https://9citas-com-hev9.vercel.app',
-  ];
-  
-  if (envOrigins) {
-    const origins = envOrigins.split(',').map(url => url.trim()).filter(Boolean);
-    console.log('🌐 Orígenes CORS desde ENV:', origins);
-    return [...origins, ...defaultOrigins];
-  }
-  
-  console.log('🌐 Orígenes CORS por defecto:', defaultOrigins);
-  return defaultOrigins;
-};
+// Middleware CORS - Configuración simplificada y permisiva
+// Permitir todos los orígenes de Vercel y localhost
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://9citas-com-fyij.vercel.app',
+  'https://9citas-com-hev9.vercel.app',
+  // Añadir cualquier origen de Vercel
+  /^https:\/\/.*\.vercel\.app$/,
+];
 
-const allowedOrigins = getAllowedOrigins();
+// Si hay variable de entorno, añadir esos orígenes también
+if (process.env.FRONTEND_URL) {
+  const envOrigins = process.env.FRONTEND_URL.split(',').map(url => url.trim()).filter(Boolean);
+  allowedOrigins.push(...envOrigins);
+  console.log('🌐 Orígenes CORS desde ENV:', envOrigins);
+}
 
-// Función para verificar si un origen está permitido
-const isOriginAllowed = (origin: string | undefined): boolean => {
-  if (!origin) return true; // Permitir requests sin origin
-  return allowedOrigins.includes(origin);
-};
+console.log('🌐 Configuración CORS activa');
 
-// Configuración de CORS más permisiva
-const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (isOriginAllowed(origin)) {
-      console.log(`✅ CORS permitido para: ${origin || 'sin origin'}`);
+// Configuración de CORS permisiva
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permitir requests sin origin
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Verificar si el origen está permitido
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (typeof allowed === 'string') {
+        return origin === allowed;
+      }
+      if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
+      console.log(`✅ CORS permitido para: ${origin}`);
       callback(null, true);
     } else {
-      console.warn(`⚠️  CORS bloqueado para: ${origin}`);
-      console.warn(`   Orígenes permitidos: ${allowedOrigins.join(', ')}`);
-      // En producción, ser más permisivo temporalmente para debug
-      if (process.env.NODE_ENV === 'production') {
-        console.warn('⚠️  MODO PRODUCCIÓN: Permitiendo origen temporalmente para debug');
+      // En producción, permitir temporalmente cualquier origen de Vercel
+      if (process.env.NODE_ENV === 'production' && origin.includes('vercel.app')) {
+        console.log(`⚠️  Permitiendo origen de Vercel temporalmente: ${origin}`);
         callback(null, true);
       } else {
+        console.warn(`⚠️  CORS bloqueado para: ${origin}`);
         callback(new Error('Not allowed by CORS'));
       }
     }
@@ -102,36 +108,19 @@ const corsOptions = {
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
   preflightContinue: false,
   optionsSuccessStatus: 204,
-};
+}));
 
-// Aplicar CORS
-app.use(cors(corsOptions));
-
-// Manejar preflight OPTIONS requests explícitamente ANTES de otros middlewares
+// Manejar preflight OPTIONS requests explícitamente
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
   
-  if (isOriginAllowed(origin)) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400'); // 24 horas
-    console.log(`✅ OPTIONS request permitida para: ${origin || 'sin origin'}`);
-    res.sendStatus(204);
-  } else {
-    console.warn(`⚠️  OPTIONS request bloqueada para: ${origin}`);
-    // En producción, permitir temporalmente
-    if (process.env.NODE_ENV === 'production') {
-      res.header('Access-Control-Allow-Origin', origin || '*');
-      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-      res.header('Access-Control-Allow-Credentials', 'true');
-      res.sendStatus(204);
-    } else {
-      res.sendStatus(403);
-    }
-  }
+  res.header('Access-Control-Allow-Origin', origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400');
+  console.log(`✅ OPTIONS request respondida para: ${origin || 'sin origin'}`);
+  res.sendStatus(204);
 });
 
 app.use(express.json());
