@@ -178,7 +178,7 @@ export default function ChatPage() {
         }
       `}</style>
       
-      <div className="flex flex-col bg-dark h-screen overflow-hidden relative">
+      <div className="flex flex-col bg-dark h-screen overflow-hidden relative" style={{ height: '100vh', height: '100dvh' }}>
       {/* Header del Chat - FIJO EN LA PARTE SUPERIOR - DEBAJO DEL HEADER GLOBAL */}
       <div 
         className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0"
@@ -237,8 +237,8 @@ export default function ChatPage() {
         </button>
       </div>
 
-      {/* Mensajes - Con padding para header global + header del chat */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+      {/* Mensajes - Con padding para header global + header del chat + input */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingTop: '120px', paddingBottom: '100px' }}>
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400">No hay mensajes aún</p>
@@ -296,8 +296,19 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input de mensaje */}
-      <form onSubmit={handleSendMessage} className="bg-gray-900 border-t border-gray-800 p-4 flex-shrink-0">
+      {/* Input de mensaje - FIJO EN LA PARTE INFERIOR */}
+      <form 
+        onSubmit={handleSendMessage} 
+        className="bg-gray-900 border-t border-gray-800 p-4 flex-shrink-0"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 45,
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))', // Safe area para iOS
+        }}
+      >
         <div className="flex gap-2 items-center max-w-full">
           {/* Botón de fotos */}
           <button
