@@ -274,7 +274,7 @@ export default function NavigatePage() {
       </div>
 
       {/* Contenido */}
-      <div className="max-w-7xl mx-auto px-4 pt-4 h-full">
+      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden' : 'pt-6 pb-6 overflow-y-auto'}`}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (
@@ -285,7 +285,7 @@ export default function NavigatePage() {
           </div>
         ) : viewMode === 'swipe' ? (
           // Vista Swipe tipo Tinder
-          <div className="relative max-w-md mx-auto h-[calc(100vh-240px)] pt-14">
+          <div className="relative max-w-md mx-auto h-[calc(100vh-240px)] pt-14 overflow-hidden">
             {showPromoCard ? (
               // Card promocional de 9Plus
               <PremiumPromoCard onClose={handleClosePromoCard} />
