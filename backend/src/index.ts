@@ -55,6 +55,9 @@ app.use(cookieParser());
 // Servir archivos estáticos (uploads)
 app.use('/uploads', express.static('uploads'));
 
+// Servir fotos de perfiles falsos (solo desarrollo)
+app.use('/fake-photos', express.static('fake-profiles-photos'));
+
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
