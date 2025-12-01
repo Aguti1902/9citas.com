@@ -29,7 +29,7 @@ export default function PlusPage() {
   const handleCancel = async () => {
     setIsCanceling(true)
     try {
-      await api.delete('/subscriptions/cancel')
+      await api.post('/subscriptions/cancel')
       await refreshUserData()
       setShowCancelModal(false)
       alert('Suscripción cancelada. Puedes seguir disfrutando de 9Plus hasta el final del periodo de facturación.')
