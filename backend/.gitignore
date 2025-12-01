@@ -10,4 +10,6 @@ uploads/
 .DS_Store
 prisma/*.db
 prisma/*.db-journal
+fake-profiles-photos-urls.json
+fake-profiles-photos/
 

@@ -1,7 +1,38 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const prisma = new PrismaClient();
+
+// Interfaz para las fotos subidas
+interface PhotoSet {
+  folderName: string;
+  photos: {
+    cover: string;
+    public: string[];
+  };
+}
+
+// Cargar fotos reales si existen
+function loadRealPhotos(): PhotoSet[] | null {
+  const photosFile = path.join(__dirname, '../../fake-profiles-photos-urls.json');
+  
+  if (!fs.existsSync(photosFile)) {
+    console.log('ℹ️  No se encontró archivo de fotos reales. Usando fotos de Picsum.');
+    return null;
+  }
+
+  try {
+    const content = fs.readFileSync(photosFile, 'utf-8');
+    const photoSets: PhotoSet[] = JSON.parse(content);
+    console.log(`✅ Cargadas ${photoSets.length} sets de fotos reales`);
+    return photoSets;
+  } catch (error) {
+    console.error('❌ Error leyendo archivo de fotos:', error);
+    return null;
+  }
+}
 
 // Ciudades de España con coordenadas aproximadas
 const SPANISH_CITIES = [
@@ -76,6 +107,10 @@ const LANGUAGES_LIST = ['Español', 'Inglés', 'Catalán', 'Francés', 'Alemán'
 // Generar perfiles falsos
 export const generateFakeProfiles = async (count: number = 300) => {
   console.log(`Generando ${count} perfiles falsos...`);
+
+  // Cargar fotos reales si existen
+  const realPhotos = loadRealPhotos();
+  let photoSetIndex = 0;
 
   const profiles: any[] = [];
 
@@ -159,24 +194,50 @@ export const generateFakeProfiles = async (count: number = 300) => {
           data: profileData,
         });
 
-        // Crear fotos para cada perfil (1 cover + 1-3 públicas)
-        const photoCount = faker.number.int({ min: 2, max: 4 });
+        // Crear fotos para cada perfil
         const photos: any[] = [];
 
-        // Foto de portada
-        photos.push({
-          profileId: profile.id,
-          url: `https://picsum.photos/400/600?random=${profile.id}-cover`,
-          type: 'cover',
-        });
-
-        // Fotos adicionales públicas
-        for (let j = 1; j < photoCount; j++) {
+        // Usar fotos reales si están disponibles, sino usar Picsum
+        if (realPhotos && photoSetIndex < realPhotos.length) {
+          const photoSet = realPhotos[photoSetIndex];
+          
+          // Foto de portada
           photos.push({
             profileId: profile.id,
-            url: `https://picsum.photos/400/600?random=${profile.id}-${j}`,
-            type: 'public',
+            url: photoSet.photos.cover,
+            type: 'cover',
           });
+
+          // Fotos públicas (máximo 3)
+          const publicPhotos = photoSet.photos.public.slice(0, 3);
+          publicPhotos.forEach((url) => {
+            photos.push({
+              profileId: profile.id,
+              url: url,
+              type: 'public',
+            });
+          });
+
+          photoSetIndex++;
+        } else {
+          // Fallback: usar fotos de Picsum
+          const photoCount = faker.number.int({ min: 2, max: 4 });
+          
+          // Foto de portada
+          photos.push({
+            profileId: profile.id,
+            url: `https://picsum.photos/400/600?random=${profile.id}-cover`,
+            type: 'cover',
+          });
+
+          // Fotos adicionales públicas
+          for (let j = 1; j < photoCount; j++) {
+            photos.push({
+              profileId: profile.id,
+              url: `https://picsum.photos/400/600?random=${profile.id}-${j}`,
+              type: 'public',
+            });
+          }
         }
 
         await prisma.photo.createMany({
