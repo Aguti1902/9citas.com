@@ -33,7 +33,6 @@ export default function NavigatePage() {
   const [showPromoCard, setShowPromoCard] = useState(false)
   const [currentCity, setCurrentCity] = useState(user?.profile?.city || 'Madrid')
   const [detectedCity, setDetectedCity] = useState<string | null>(null)
-  const [isDetectingLocation, setIsDetectingLocation] = useState(false)
   const [ageRange, setAgeRange] = useState({ min: 18, max: 99 })
   const [distanceRange, setDistanceRange] = useState({ min: 1, max: 50 })
 
