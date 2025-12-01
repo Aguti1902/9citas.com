@@ -164,10 +164,11 @@ export default function ChatPage() {
         }
         main {
           padding-bottom: 0 !important;
+          overflow: hidden !important;
         }
       `}</style>
       
-      <div className="flex flex-col bg-dark h-screen overflow-hidden">
+      <div className="flex flex-col bg-dark h-[calc(100vh-56px)] overflow-hidden">
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <button
