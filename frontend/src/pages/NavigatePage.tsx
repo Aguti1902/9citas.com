@@ -285,7 +285,7 @@ export default function NavigatePage() {
           </div>
         ) : viewMode === 'swipe' ? (
           // Vista Swipe tipo Tinder
-          <div className="relative max-w-md mx-auto h-[calc(100vh-260px)] pt-8">
+          <div className="relative max-w-md mx-auto h-[calc(100vh-240px)] pt-10">
             {showPromoCard ? (
               // Card promocional de 9Plus
               <PremiumPromoCard onClose={handleClosePromoCard} />
