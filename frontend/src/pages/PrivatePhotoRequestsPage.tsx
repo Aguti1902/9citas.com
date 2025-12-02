@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '@/services/api'
 import { useNavigate } from 'react-router-dom'
-import Button from '@/components/common/Button'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import { Lock, Check, X } from 'lucide-react'
 
