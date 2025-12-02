@@ -106,38 +106,63 @@ export default function DashboardLayout() {
 
   // Forzar que el menú inferior siempre esté fijo - ABSOLUTAMENTE FIJO
   useEffect(() => {
+    const forceFooterFixed = () => {
+      const nav = document.getElementById('bottom-nav-fixed') || document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement
+      if (nav) {
+        // Forzar estilos inline con !important usando setProperty
+        nav.style.setProperty('position', 'fixed', 'important')
+        nav.style.setProperty('bottom', '0', 'important')
+        nav.style.setProperty('left', '0', 'important')
+        nav.style.setProperty('right', '0', 'important')
+        nav.style.setProperty('top', 'auto', 'important')
+        nav.style.setProperty('z-index', '9999', 'important')
+        nav.style.setProperty('transform', 'translateZ(0)', 'important')
+        nav.style.setProperty('will-change', 'transform', 'important')
+        nav.style.setProperty('margin-top', '0', 'important')
+        nav.style.setProperty('margin-bottom', '0', 'important')
+        nav.style.setProperty('margin-left', '0', 'important')
+        nav.style.setProperty('margin-right', '0', 'important')
+        nav.style.setProperty('width', '100%', 'important')
+        nav.style.setProperty('max-width', '100%', 'important')
+        nav.style.setProperty('backface-visibility', 'hidden', 'important')
+      }
+    }
+
+    // Ejecutar inmediatamente
+    forceFooterFixed()
+
+    // Prevenir cualquier movimiento con observer más agresivo
     const nav = document.getElementById('bottom-nav-fixed') || document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement
     if (nav) {
-      // Forzar estilos inline con !important usando setProperty
-      nav.style.setProperty('position', 'fixed', 'important')
-      nav.style.setProperty('bottom', '0', 'important')
-      nav.style.setProperty('left', '0', 'important')
-      nav.style.setProperty('right', '0', 'important')
-      nav.style.setProperty('top', 'auto', 'important')
-      nav.style.setProperty('z-index', '9999', 'important')
-      nav.style.setProperty('transform', 'translateZ(0)', 'important')
-      nav.style.setProperty('will-change', 'transform', 'important')
-      nav.style.setProperty('margin-top', '0', 'important')
-      nav.style.setProperty('margin-bottom', '0', 'important')
-      nav.style.setProperty('margin-left', '0', 'important')
-      nav.style.setProperty('margin-right', '0', 'important')
-      
-      // Prevenir cualquier movimiento
       const observer = new MutationObserver(() => {
-        if (nav.style.position !== 'fixed') {
-          nav.style.setProperty('position', 'fixed', 'important')
-        }
-        if (nav.style.bottom !== '0px') {
-          nav.style.setProperty('bottom', '0', 'important')
-        }
+        forceFooterFixed()
       })
       
       observer.observe(nav, {
         attributes: true,
         attributeFilter: ['style', 'class'],
+        childList: false,
+        subtree: false,
       })
+
+      // También observar cambios en el DOM cada 100ms como backup
+      const interval = setInterval(() => {
+        forceFooterFixed()
+      }, 100)
+
+      // Forzar en eventos de scroll
+      const handleScroll = () => {
+        forceFooterFixed()
+      }
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      window.addEventListener('touchmove', handleScroll, { passive: true })
       
-      return () => observer.disconnect()
+      return () => {
+        observer.disconnect()
+        clearInterval(interval)
+        window.removeEventListener('scroll', handleScroll)
+        window.removeEventListener('touchmove', handleScroll)
+      }
     }
   }, [location.pathname])
 
@@ -234,7 +259,7 @@ export default function DashboardLayout() {
       {/* Bottom navigation - SIEMPRE FIJO - NO SE MUEVE */}
       <nav 
         id="bottom-nav-fixed"
-        className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50"
+        className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800"
         style={{ 
           position: 'fixed',
           bottom: 0,
@@ -248,6 +273,9 @@ export default function DashboardLayout() {
           marginBottom: 0,
           marginLeft: 0,
           marginRight: 0,
+          width: '100%',
+          maxWidth: '100%',
+          backfaceVisibility: 'hidden',
         } as React.CSSProperties}
       >
         <div className="max-w-7xl mx-auto px-2">
