@@ -271,10 +271,10 @@ export default function DashboardLayout() {
                   onClick={() => navigate(item.path)}
                   className={`nav-bottom-item relative ${active ? 'active' : ''}`}
                 >
-                  <div className="relative">
+                  <div className="relative inline-block">
                     <Icon className={`w-6 h-6 mb-1 ${active ? 'text-primary' : ''}`} />
                     {badgeCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      <span className="absolute top-0 right-0 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2 border-2 border-gray-900">
                         {badgeCount > 9 ? '9+' : badgeCount}
                       </span>
                     )}
