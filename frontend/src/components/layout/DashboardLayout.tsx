@@ -6,17 +6,19 @@ import Toast from '../common/Toast'
 import MatchNotification from '../common/MatchNotification'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
+import { useNotificationStore } from '@/store/notificationStore'
 import { useState, useEffect } from 'react'
 import Modal from '../common/Modal'
 import { api } from '@/services/api'
-import { connectSocket, disconnectSocket } from '@/services/socket'
+import { connectSocket, disconnectSocket, getSocket } from '@/services/socket'
 import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Bell } from 'lucide-react'
 
 export default function DashboardLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const { logout, accessToken } = useAuthStore()
-  const { toasts, removeToast } = useToastStore()
+  const { toasts, removeToast, addToast } = useToastStore()
+  const { likesCount, unreadMessagesCount, setLikesCount, setUnreadMessagesCount, incrementLikesCount, incrementUnreadMessagesCount } = useNotificationStore()
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [pendingRequests, setPendingRequests] = useState(0)
   const [showRoamSummary, setShowRoamSummary] = useState(false)
@@ -45,12 +47,62 @@ export default function DashboardLayout() {
   useEffect(() => {
     loadPendingRequests()
     loadRoamStatus()
+    loadNotifications()
     const interval = setInterval(() => {
       loadPendingRequests()
       loadRoamStatus()
+      loadNotifications()
     }, 30000) // Check every 30s
     return () => clearInterval(interval)
   }, [])
+
+  // Escuchar eventos de Socket.IO para notificaciones en tiempo real
+  useEffect(() => {
+    const socket = getSocket()
+    if (!socket) return
+
+    // Escuchar nuevos likes
+    const handleNewLike = (data: any) => {
+      incrementLikesCount()
+      addToast(`¡${data.fromProfile.title} te ha dado like! 💕`, 'success', 5000)
+    }
+
+    // Escuchar nuevos mensajes
+    const handleNewMessage = (message: any) => {
+      // Solo incrementar si no estamos en la página de chat con ese usuario
+      const currentPath = location.pathname
+      const isInChat = currentPath.includes(`/app/chat/${message.fromProfileId}`)
+      if (!isInChat) {
+        incrementUnreadMessagesCount()
+        addToast(`Nuevo mensaje de ${message.fromProfile.title}`, 'info', 4000)
+      }
+    }
+
+    socket.on('new_like', handleNewLike)
+    socket.on('new_message', handleNewMessage)
+
+    return () => {
+      socket.off('new_like', handleNewLike)
+      socket.off('new_message', handleNewMessage)
+    }
+  }, [location.pathname, incrementLikesCount, incrementUnreadMessagesCount, addToast])
+
+  const loadNotifications = async () => {
+    try {
+      // Cargar likes recibidos
+      const likesResponse = await api.get('/likes/received')
+      const likesTotal = likesResponse.data.total || 0
+      setLikesCount(likesTotal)
+
+      // Cargar mensajes no leídos
+      const conversationsResponse = await api.get('/messages/conversations')
+      const conversations = conversationsResponse.data.conversations || []
+      const totalUnread = conversations.reduce((sum: number, conv: any) => sum + (conv.unreadCount || 0), 0)
+      setUnreadMessagesCount(totalUnread)
+    } catch (error) {
+      console.error('Error loading notifications:', error)
+    }
+  }
 
   // Forzar que el menú inferior siempre esté fijo - ABSOLUTAMENTE FIJO
   useEffect(() => {
@@ -204,13 +256,29 @@ export default function DashboardLayout() {
               const Icon = item.Icon
               // Solo activo si es exactamente la ruta (no incluye subrutas como /app/profile/:id)
               const active = location.pathname === item.path || (item.path === '/app' && location.pathname === '/app')
+              
+              // Determinar si mostrar badge
+              let badgeCount = 0
+              if (item.path === '/app/likes' && likesCount > 0) {
+                badgeCount = likesCount
+              } else if (item.path === '/app/inbox' && unreadMessagesCount > 0) {
+                badgeCount = unreadMessagesCount
+              }
+              
               return (
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`nav-bottom-item ${active ? 'active' : ''}`}
+                  className={`nav-bottom-item relative ${active ? 'active' : ''}`}
                 >
-                  <Icon className={`w-6 h-6 mb-1 ${active ? 'text-primary' : ''}`} />
+                  <div className="relative">
+                    <Icon className={`w-6 h-6 mb-1 ${active ? 'text-primary' : ''}`} />
+                    {badgeCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {badgeCount > 9 ? '9+' : badgeCount}
+                      </span>
+                    )}
+                  </div>
                   <span>{item.label}</span>
                 </button>
               )

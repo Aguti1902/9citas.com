@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
+import { useNotificationStore } from '@/store/notificationStore'
 import ProfileCard from '@/components/profile/ProfileCard'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import { useNavigate } from 'react-router-dom'
@@ -9,6 +10,7 @@ import Button from '@/components/common/Button'
 export default function LikesPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  const { setLikesCount } = useNotificationStore()
   const [sentLikes, setSentLikes] = useState<any[]>([])
   const [receivedLikes, setReceivedLikes] = useState<any[]>([])
   const [receivedLikesTotal, setReceivedLikesTotal] = useState(0)
@@ -35,7 +37,10 @@ export default function LikesPage() {
       })))
       
       // Guardar total de likes recibidos
-      setReceivedLikesTotal(receivedResponse.data.total || 0)
+      const total = receivedResponse.data.total || 0
+      setReceivedLikesTotal(total)
+      // Actualizar el store de notificaciones
+      setLikesCount(total)
       
       // Si es Premium, mostrar perfiles. Si es Free, array vacío (bloqueado)
       if (isPremium) {

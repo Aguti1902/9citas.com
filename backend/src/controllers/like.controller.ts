@@ -78,6 +78,32 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
 
     const isMatch = !!theirLike;
 
+    // Emitir notificación de like recibido al perfil que recibió el like (si no es match)
+    if (!isMatch) {
+      const io = getIO();
+      
+      // Obtener perfil completo del usuario que dio like
+      const myProfile = await prisma.profile.findUnique({
+        where: { id: req.profileId! },
+        include: {
+          photos: {
+            where: { type: 'cover' },
+            take: 1,
+          },
+        },
+      });
+
+      // Emitir evento de like recibido al destinatario
+      io.to(`profile:${profileId}`).emit('new_like', {
+        fromProfile: {
+          id: myProfile?.id,
+          title: myProfile?.title,
+          age: myProfile?.age,
+          photos: myProfile?.photos || [],
+        },
+      });
+    }
+
     // Si hay match, emitir notificación por Socket.IO
     if (isMatch) {
       const io = getIO();

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
+import { useNotificationStore } from '@/store/notificationStore'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Modal from '@/components/common/Modal'
 import { formatDistanceToNow } from 'date-fns'
@@ -12,6 +13,7 @@ export default function ChatPage() {
   const { profileId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  const { decrementUnreadMessagesCount } = useNotificationStore()
   const [profile, setProfile] = useState<any>(null)
   const [messages, setMessages] = useState<any[]>([])
   const [newMessage, setNewMessage] = useState('')
@@ -60,8 +62,19 @@ export default function ChatPage() {
       const response = await api.get(`/messages/${profileId}`)
       setMessages(response.data.messages)
       
+      // Contar mensajes no leídos antes de marcarlos
+      const unreadCount = response.data.messages.filter((msg: any) => 
+        !msg.isRead && msg.fromProfileId === profileId
+      ).length
+      
       // Marcar como leídos
-      await api.put(`/messages/${profileId}/read`)
+      if (unreadCount > 0) {
+        await api.put(`/messages/${profileId}/read`)
+        // Actualizar el contador
+        for (let i = 0; i < unreadCount; i++) {
+          decrementUnreadMessagesCount()
+        }
+      }
     } catch (error) {
       console.error('Error al cargar mensajes:', error)
     } finally {

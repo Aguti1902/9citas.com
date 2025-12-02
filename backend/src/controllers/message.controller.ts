@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { generateChatbotResponse } from '../services/chatbot.service';
 import { normalizeProfilePhotos } from '../utils/photo.utils';
+import { getIO } from '../services/socket.io';
 
 const prisma = new PrismaClient();
 
@@ -115,7 +116,9 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // TODO: Emitir evento de Socket.IO para enviar mensaje en tiempo real
+    // Emitir evento de Socket.IO para enviar mensaje en tiempo real
+    const io = getIO();
+    io.to(`profile:${toProfileId}`).emit('new_message', message);
 
     // Si el destinatario tiene personalidad (perfil automático), generar respuesta automática
     if (toProfile.personality && text) {
