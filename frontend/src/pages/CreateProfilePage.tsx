@@ -147,9 +147,24 @@ export default function CreateProfilePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    if (files.length + selectedFiles.length > 8) {
-      setError('Máximo 8 fotos (1 portada + 3 públicas + 4 privadas)')
-      return
+    const currentPublicCount = Math.min(selectedFiles.length, 4)
+    const currentPrivateCount = Math.max(0, selectedFiles.length - 4)
+    
+    // Determinar si es para fotos públicas o privadas basado en el input
+    const isPrivate = e.target.id === 'photo-upload-private'
+    
+    if (isPrivate) {
+      // Fotos privadas: máximo 4
+      if (currentPrivateCount + files.length > 4) {
+        setError('Máximo 4 fotos privadas')
+        return
+      }
+    } else {
+      // Fotos públicas: máximo 4 (1 portada + 3 públicas)
+      if (currentPublicCount + files.length > 4) {
+        setError('Máximo 4 fotos públicas (1 portada + 3 públicas)')
+        return
+      }
     }
     
     setSelectedFiles([...selectedFiles, ...files])
@@ -406,10 +421,10 @@ export default function CreateProfilePage() {
             </p>
           </div>
 
-          {/* FOTOS */}
+          {/* FOTOS PÚBLICAS */}
           <div className="bg-gray-800 rounded-lg p-4">
             <label className="block text-sm font-medium text-white mb-3">
-              📸 Fotos (Obligatorio: mínimo 1, máximo 8)
+              📸 Fotos Públicas (Obligatorio: mínimo 1, máximo 4)
             </label>
             
             <div className="mb-3">
@@ -419,17 +434,17 @@ export default function CreateProfilePage() {
                 multiple
                 onChange={handleFileChange}
                 className="hidden"
-                id="photo-upload"
+                id="photo-upload-public"
               />
               <label
-                htmlFor="photo-upload"
+                htmlFor="photo-upload-public"
                 className="block w-full bg-primary hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg text-center cursor-pointer transition-opacity"
               >
-                + Añadir Fotos
+                + Añadir Fotos Públicas
               </label>
             </div>
 
-            {photoPreview.length > 0 && (
+            {photoPreview.length > 0 && photoPreview.length <= 4 && (
               <div className="grid grid-cols-4 gap-2">
                 {photoPreview.map((preview, index) => (
                   <div key={index} className="relative aspect-square">
@@ -446,7 +461,7 @@ export default function CreateProfilePage() {
                       ×
                     </button>
                     <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded">
-                      {index === 0 ? 'Portada' : index <= 3 ? 'Pública' : 'Privada'}
+                      {index === 0 ? 'Portada' : 'Pública'}
                     </div>
                   </div>
                 ))}
@@ -454,9 +469,62 @@ export default function CreateProfilePage() {
             )}
 
             <p className="text-xs text-gray-400 mt-2">
-              • 1ª foto: Portada (obligatoria)<br/>
-              • Fotos 2-4: Públicas<br/>
-              • Fotos 5-8: Privadas (solo en chat)
+              • 1ª foto: Portada (obligatoria, se muestra en tu perfil)<br/>
+              • Fotos 2-4: Públicas (visibles para todos)
+            </p>
+          </div>
+
+          {/* FOTOS PRIVADAS */}
+          <div className="bg-gray-800 rounded-lg p-4 border-2 border-accent">
+            <label className="block text-sm font-medium text-white mb-3 flex items-center gap-2">
+              🔒 Fotos Privadas (Opcional: máximo 4)
+            </label>
+            
+            <div className="mb-3">
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+                id="photo-upload-private"
+              />
+              <label
+                htmlFor="photo-upload-private"
+                className="block w-full bg-accent hover:opacity-90 text-black font-semibold py-3 px-6 rounded-lg text-center cursor-pointer transition-opacity"
+              >
+                + Añadir Fotos Privadas
+              </label>
+            </div>
+
+            {photoPreview.length > 4 && (
+              <div className="grid grid-cols-4 gap-2">
+                {photoPreview.slice(4).map((preview, index) => (
+                  <div key={index + 4} className="relative aspect-square">
+                    <img
+                      src={preview}
+                      alt={`Preview privada ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index + 4)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                    >
+                      ×
+                    </button>
+                    <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded flex items-center gap-1">
+                      🔒 Privada
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <p className="text-xs text-gray-400 mt-2">
+              • Solo visibles para usuarios con los que tengas match<br/>
+              • Pueden solicitar acceso para verlas<br/>
+              • Máximo 4 fotos privadas
             </p>
           </div>
 

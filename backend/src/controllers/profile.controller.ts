@@ -454,14 +454,23 @@ export const getProfileById = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'No puedes ver este perfil' });
     }
 
+    // Verificar acceso a fotos privadas
+    const privatePhotoAccess = await prisma.privatePhotoAccess.findUnique({
+      where: {
+        ownerProfileId_viewerProfileId: {
+          ownerProfileId: id,
+          viewerProfileId: req.profileId!,
+        },
+      },
+    });
+
+    const hasPrivateAccess = privatePhotoAccess?.status === 'granted';
+
+    // Siempre incluir todas las fotos (públicas y privadas) para que el frontend pueda mostrarlas borrosas
     const profile = await prisma.profile.findUnique({
       where: { id },
       include: {
-        photos: {
-          where: {
-            OR: [{ type: 'cover' }, { type: 'public' }],
-          },
-        },
+        photos: true, // Incluir todas las fotos
         receivedLikes: {
           where: { fromProfileId: req.profileId! },
         },

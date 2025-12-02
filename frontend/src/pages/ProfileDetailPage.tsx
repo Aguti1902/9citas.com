@@ -365,46 +365,100 @@ export default function ProfileDetailPage() {
                   ))}
               </div>
             ) : privatePhotoAccess?.status === 'pending' ? (
-              // Solicitud pendiente
-              <div className="text-center py-8">
-                <Lock className="w-16 h-16 text-accent mx-auto mb-4" />
-                <p className="text-white font-semibold mb-2">Solicitud Pendiente</p>
-                <p className="text-gray-400 text-sm">
-                  Este usuario revisará tu solicitud pronto
-                </p>
+              // Solicitud pendiente - mostrar fotos borrosas
+              <div>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {profile.photos
+                    .filter((p: any) => p.type === 'private')
+                    .map((photo: any, index: number) => (
+                      <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
+                        <img
+                          src={photo.url}
+                          alt={`Privada ${index + 1}`}
+                          className="w-full h-full object-cover filter blur-md"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                          <Lock className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="text-center">
+                  <p className="text-white font-semibold mb-2">Solicitud Pendiente</p>
+                  <p className="text-gray-400 text-sm">
+                    Este usuario revisará tu solicitud pronto
+                  </p>
+                </div>
               </div>
             ) : privatePhotoAccess?.status === 'rejected' ? (
-              // Solicitud rechazada
-              <div className="text-center py-8">
-                <Lock className="w-16 h-16 text-danger mx-auto mb-4" />
-                <p className="text-white font-semibold mb-2">Solicitud Rechazada</p>
-                <p className="text-gray-400 text-sm">
-                  El usuario no ha concedido acceso a sus fotos privadas
-                </p>
+              // Solicitud rechazada - mostrar fotos borrosas
+              <div>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {profile.photos
+                    .filter((p: any) => p.type === 'private')
+                    .map((photo: any, index: number) => (
+                      <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
+                        <img
+                          src={photo.url}
+                          alt={`Privada ${index + 1}`}
+                          className="w-full h-full object-cover filter blur-md"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                          <Lock className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="text-center">
+                  <p className="text-white font-semibold mb-2">Solicitud Rechazada</p>
+                  <p className="text-gray-400 text-sm">
+                    El usuario no ha concedido acceso a sus fotos privadas
+                  </p>
+                </div>
               </div>
             ) : (
-              // Sin solicitud - mostrar blur y botón
-              <div className="text-center py-8">
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  {[1, 2, 3, 4].slice(0, profile.photos.filter((p: any) => p.type === 'private').length).map((n: number) => (
-                    <div key={n} className="aspect-square rounded-lg bg-gray-700 flex items-center justify-center backdrop-blur-2xl">
-                      <Lock className="w-12 h-12 text-gray-500" />
-                    </div>
-                  ))}
+              // Sin solicitud - mostrar fotos borrosas y botón SOLO SI HAY MATCH
+              <div>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {profile.photos
+                    .filter((p: any) => p.type === 'private')
+                    .map((photo: any, index: number) => (
+                      <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
+                        <img
+                          src={photo.url}
+                          alt={`Privada ${index + 1}`}
+                          className="w-full h-full object-cover filter blur-md"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                          <Lock className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    ))}
                 </div>
-                <p className="text-white font-semibold mb-3">Fotos Privadas Bloqueadas</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  Solicita acceso para ver las fotos privadas de este usuario
-                </p>
-                <Button
-                  variant="accent"
-                  onClick={handleRequestPrivatePhotoAccess}
-                  isLoading={isRequestingAccess}
-                  className="flex items-center gap-2 mx-auto"
-                >
-                  <Eye className="w-5 h-5" />
-                  Solicitar Acceso
-                </Button>
+                {hasMatch ? (
+                  <div className="text-center">
+                    <p className="text-white font-semibold mb-3">Fotos Privadas Bloqueadas</p>
+                    <p className="text-gray-400 text-sm mb-4">
+                      Tienes match con este usuario. Solicita acceso para ver sus fotos privadas.
+                    </p>
+                    <Button
+                      variant="accent"
+                      onClick={handleRequestPrivatePhotoAccess}
+                      isLoading={isRequestingAccess}
+                      className="flex items-center gap-2 mx-auto"
+                    >
+                      <Eye className="w-5 h-5" />
+                      Solicitar Acceso
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-white font-semibold mb-2">Fotos Privadas</p>
+                    <p className="text-gray-400 text-sm">
+                      Necesitas hacer match con este usuario para solicitar acceso a sus fotos privadas
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
