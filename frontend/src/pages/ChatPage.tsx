@@ -35,6 +35,26 @@ export default function ChatPage() {
     loadMyPhotos()
   }, [profileId])
 
+  // Polling cada segundo para recibir mensajes nuevos (respaldo de Socket.IO)
+  useEffect(() => {
+    if (!profileId) return
+
+    // Esperar 1 segundo antes de empezar el polling para no sobrecargar
+    const timeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        loadMessages(true) // Carga silenciosa (no muestra loading, no marca como leídos automáticamente)
+      }, 1000) // Cada 1 segundo
+
+      return () => {
+        clearInterval(interval)
+      }
+    }, 1000)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [profileId])
+
   // Escuchar mensajes en tiempo real con Socket.IO
   useEffect(() => {
     const socket = getSocket()
@@ -108,18 +128,28 @@ export default function ChatPage() {
     }
   }
 
-  const loadMessages = async () => {
+  const loadMessages = async (silent = false) => {
     try {
       const response = await api.get(`/messages/${profileId}`)
-      setMessages(response.data.messages)
+      const newMessages = response.data.messages
+      
+      // Solo actualizar si hay cambios para evitar re-renders innecesarios
+      setMessages((prev) => {
+        // Comparar por IDs para evitar actualizar si no hay cambios
+        if (prev.length === newMessages.length && 
+            prev.every((msg, idx) => msg.id === newMessages[idx]?.id && msg.isRead === newMessages[idx]?.isRead)) {
+          return prev // No hay cambios, mantener estado anterior
+        }
+        return newMessages
+      })
       
       // Contar mensajes no leídos antes de marcarlos
-      const unreadCount = response.data.messages.filter((msg: any) => 
+      const unreadCount = newMessages.filter((msg: any) => 
         !msg.isRead && msg.fromProfileId === profileId
       ).length
       
-      // Marcar como leídos
-      if (unreadCount > 0) {
+      // Marcar como leídos (solo si no es una carga silenciosa o si hay no leídos)
+      if (!silent && unreadCount > 0) {
         await api.put(`/messages/${profileId}/read`)
         // Actualizar el contador
         for (let i = 0; i < unreadCount; i++) {
@@ -127,9 +157,13 @@ export default function ChatPage() {
         }
       }
     } catch (error) {
-      console.error('Error al cargar mensajes:', error)
+      if (!silent) {
+        console.error('Error al cargar mensajes:', error)
+      }
     } finally {
-      setIsLoading(false)
+      if (!silent) {
+        setIsLoading(false)
+      }
     }
   }
 
