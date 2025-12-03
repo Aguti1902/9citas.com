@@ -239,7 +239,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     console.log(`\n📋 Filtros aplicados:`);
     console.log(`   - Género buscado: ${whereClause.gender || 'NO DEFINIDO ❌'}`);
     console.log(`   - Orientación: ${whereClause.orientation}`);
-    console.log(`   - isFake: ${JSON.stringify(whereClause.OR)}`);
+    console.log(`   - isFake: ${whereClause.OR ? 'false o null' : 'N/A'}`);
     console.log(`   - Excluir IDs: ${[req.profileId!, ...blockedIds, ...likedProfileIds].length} perfiles`);
 
     // IMPORTANTE: Usuarios gratuitos (no 9Plus) ven TODOS los perfiles que coinciden
