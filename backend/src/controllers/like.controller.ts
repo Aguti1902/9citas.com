@@ -139,6 +139,7 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
           id: targetProfile.id,
           title: targetProfile.title,
           age: targetProfile.age,
+          city: targetProfile.city,
           photos: normalizedTargetPhotos,
         },
         myProfile: {
@@ -152,6 +153,7 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
           id: myProfile?.id,
           title: myProfile?.title,
           age: myProfile?.age,
+          city: myProfile?.city,
           photos: normalizedMyPhotos,
         },
         myProfile: {

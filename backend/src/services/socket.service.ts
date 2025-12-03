@@ -93,11 +93,18 @@ export const setupSocketHandlers = (io: Server) => {
           },
         });
 
+        // Normalizar fotos del mensaje antes de emitir
+        const { normalizeProfilePhotos } = require('../utils/photo.utils');
+        const normalizedMessage = {
+          ...message,
+          fromProfile: message.fromProfile ? normalizeProfilePhotos(message.fromProfile) : message.fromProfile,
+        };
+
         // Enviar mensaje al destinatario
-        io.to(`profile:${toProfileId}`).emit('new_message', message);
+        io.to(`profile:${toProfileId}`).emit('new_message', normalizedMessage);
 
         // Confirmar al remitente
-        socket.emit('message_sent', message);
+        socket.emit('message_sent', normalizedMessage);
       } catch (error) {
         console.error('Error al enviar mensaje:', error);
         socket.emit('error', { message: 'Error al enviar mensaje' });

@@ -8,6 +8,7 @@ import Modal from '@/components/common/Modal'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Image, MapPin, Lock } from 'lucide-react'
+import { getSocket } from '@/services/socket'
 
 export default function ChatPage() {
   const { profileId } = useParams()
@@ -33,6 +34,56 @@ export default function ChatPage() {
     loadMessages()
     loadMyPhotos()
   }, [profileId])
+
+  // Escuchar mensajes en tiempo real con Socket.IO
+  useEffect(() => {
+    const socket = getSocket()
+    if (!socket || !profileId) return
+
+    console.log('💬 ChatPage: Escuchando mensajes en tiempo real para:', profileId)
+
+    const handleNewMessage = (message: any) => {
+      console.log('📨 Nuevo mensaje recibido:', message)
+      
+      // Solo añadir si el mensaje es de este chat
+      if (message.fromProfileId === profileId || message.toProfileId === profileId) {
+        setMessages((prev) => {
+          // Evitar duplicados
+          const exists = prev.some((m) => m.id === message.id)
+          if (exists) return prev
+          
+          return [...prev, message]
+        })
+        
+        // Marcar como leído si es un mensaje recibido
+        if (message.fromProfileId === profileId && !message.isRead) {
+          api.put(`/messages/${profileId}/read`).then(() => {
+            decrementUnreadMessagesCount()
+          }).catch(console.error)
+        }
+      }
+    }
+
+    const handleMessageSent = (message: any) => {
+      console.log('✅ Mensaje enviado confirmado:', message)
+      // El mensaje ya se añadió al enviar, pero actualizamos por si acaso
+      setMessages((prev) => {
+        const exists = prev.some((m) => m.id === message.id)
+        if (exists) {
+          return prev.map((m) => m.id === message.id ? message : m)
+        }
+        return [...prev, message]
+      })
+    }
+
+    socket.on('new_message', handleNewMessage)
+    socket.on('message_sent', handleMessageSent)
+
+    return () => {
+      socket.off('new_message', handleNewMessage)
+      socket.off('message_sent', handleMessageSent)
+    }
+  }, [profileId, decrementUnreadMessagesCount])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
