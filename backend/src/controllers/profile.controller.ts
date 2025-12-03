@@ -239,67 +239,22 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       whereClause: JSON.stringify(whereClause, null, 2),
     });
 
-    // Filtro por ciudad (si no es Plus, solo puede ver su ciudad)
-    // IMPORTANTE: Si no hay perfiles en la misma ciudad, mostrar todos los que coinciden
-    if (!isPlus) {
-      if (myProfile.city) {
-        // Primero buscar todos los perfiles que coinciden con género y orientación (sin filtro de ciudad aún)
-        const allMatchingProfiles = await prisma.profile.findMany({
-          where: {
-            orientation: myProfile.orientation,
-            OR: [
-              { isFake: false },
-              { isFake: null },
-            ],
-          },
-          select: { city: true, id: true, gender: true },
-        });
-        
-        // Aplicar filtro de género según orientación
-        let genderFilter = allMatchingProfiles;
-        if (myProfile.orientation === 'hetero') {
-          if (myProfile.gender === 'hombre') {
-            genderFilter = allMatchingProfiles.filter(p => p.gender === 'mujer');
-          } else if (myProfile.gender === 'mujer') {
-            genderFilter = allMatchingProfiles.filter(p => p.gender === 'hombre');
-          }
-        }
-        
-        // Verificar si hay perfiles en la misma ciudad (case-insensitive)
-        const profilesInSameCity = genderFilter.filter(p => 
-          p.city && p.city.toLowerCase().trim() === myProfile.city?.toLowerCase().trim()
-        );
-        
-        console.log(`🔍 Análisis de perfiles:`);
-        console.log(`   - Total perfiles con misma orientación: ${allMatchingProfiles.length}`);
-        console.log(`   - Perfiles con género correcto: ${genderFilter.length}`);
-        console.log(`   - Perfiles en misma ciudad (${myProfile.city}): ${profilesInSameCity.length}`);
-        
-        if (profilesInSameCity.length > 0) {
-          // Hay perfiles en la misma ciudad, filtrar por ciudad
-          const uniqueCities = [...new Set(profilesInSameCity.map(p => p.city).filter(Boolean))]
-          whereClause.city = { 
-            in: uniqueCities
-          }
-          console.log(`✅ Encontrados ${profilesInSameCity.length} perfiles en la ciudad ${myProfile.city}`);
-        } else {
-          // No hay perfiles en la misma ciudad, mostrar todos los perfiles que coinciden (sin filtrar por ciudad)
-          console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden (${genderFilter.length} perfiles)`);
-          // NO aplicar filtro de ciudad - permitir ver perfiles de otras ciudades
-          // Esto es importante: si no hay perfiles en tu ciudad, puedes ver perfiles de otras ciudades
-          // Asegurarse de que whereClause NO tenga filtro de ciudad
-          if (whereClause.city) {
-            delete whereClause.city;
-            console.log(`✅ Eliminado filtro de ciudad para mostrar perfiles de otras ciudades`);
-          }
-        }
-      } else {
-        // Si el usuario no tiene ciudad definida, no filtrar por ciudad
-        console.log(`⚠️  Usuario sin ciudad definida, mostrando todos los perfiles que coinciden`);
-      }
-    } else if (city) {
-      // Usuario Plus: puede filtrar por ciudad específica
+    // IMPORTANTE: Usuarios gratuitos (no 9Plus) ven TODOS los perfiles que coinciden
+    // NO tienen restricción de ciudad, distancia ni edad
+    // Solo pueden ver hasta 50 perfiles al día
+    
+    // Usuarios 9Plus: pueden filtrar por ciudad, distancia, edad, etc.
+    if (isPlus && city) {
+      // Usuario Plus: puede filtrar por ciudad específica si lo desea
       whereClause.city = city;
+      console.log(`✅ Usuario 9Plus filtrando por ciudad: ${city}`);
+    } else if (!isPlus) {
+      // Usuario gratuito: NO filtrar por ciudad, ver TODOS los perfiles que coinciden
+      console.log(`✅ Usuario gratuito: mostrando TODOS los perfiles que coinciden (sin filtro de ciudad)`);
+      // Asegurarse de que NO haya filtro de ciudad
+      if (whereClause.city) {
+        delete whereClause.city;
+      }
     }
 
     // Filtro ONLINE (solo 9Plus)
