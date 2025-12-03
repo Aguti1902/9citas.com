@@ -287,7 +287,15 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
           console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden (${genderFilter.length} perfiles)`);
           // NO aplicar filtro de ciudad - permitir ver perfiles de otras ciudades
           // Esto es importante: si no hay perfiles en tu ciudad, puedes ver perfiles de otras ciudades
+          // Asegurarse de que whereClause NO tenga filtro de ciudad
+          if (whereClause.city) {
+            delete whereClause.city;
+            console.log(`✅ Eliminado filtro de ciudad para mostrar perfiles de otras ciudades`);
+          }
         }
+      } else {
+        // Si el usuario no tiene ciudad definida, no filtrar por ciudad
+        console.log(`⚠️  Usuario sin ciudad definida, mostrando todos los perfiles que coinciden`);
       }
     } else if (city) {
       // Usuario Plus: puede filtrar por ciudad específica
@@ -328,14 +336,6 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         ...(ageMin && { gte: parseInt(ageMin as string) }),
         ...(ageMax && { lte: parseInt(ageMax as string) }),
       };
-    }
-
-    // IMPORTANTE: Si no hay perfiles en la misma ciudad, asegurarse de que NO se filtre por ciudad
-    // Esto permite que usuarios vean perfiles de otras ciudades si no hay en la suya
-    if (!isPlus && myProfile.city) {
-      // Si genderFilter.length > 0 pero profilesInSameCity.length === 0,
-      // significa que hay perfiles que coinciden pero en otras ciudades
-      // En ese caso, NO aplicar filtro de ciudad (ya se hizo arriba)
     }
 
     // Obtener perfiles (solo los que tienen al menos una foto de portada)
