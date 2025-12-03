@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getSocket } from '@/services/socket'
 import { useNavigate } from 'react-router-dom'
-import { MessageCircle, Search } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 
 interface MatchProfile {
   id: string

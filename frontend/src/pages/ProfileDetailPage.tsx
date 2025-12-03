@@ -159,10 +159,13 @@ export default function ProfileDetailPage() {
   const photos = allPhotos
   const currentPhoto = photos[currentPhotoIndex]
   
+  // Separar fotos privadas para la sección de fotos privadas
+  const privatePhotos = profile.photos?.filter((p: any) => p.type === 'private') || []
+  
   console.log('🖼️ Fotos procesadas:', {
     totalPhotos: photos.length,
     coverPhotos: photos.filter((p: any) => p.type === 'cover').length,
-    privatePhotos: photos.filter((p: any) => p.type === 'private').length,
+    privatePhotos: privatePhotos.length,
     currentIndex: currentPhotoIndex,
     currentPhotoType: currentPhoto?.type,
   })
