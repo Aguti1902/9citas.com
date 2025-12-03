@@ -435,18 +435,33 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     const maxProfilesForFree = 50;
     const finalProfiles = finalUniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), maxProfilesForFree));
 
-    // Debug: Log de resultados
-    console.log(`✅ Encontrados ${finalProfiles.length} perfiles para usuario ${myProfile.id}`);
+    // Debug: Log de resultados FINALES
+    console.log(`\n✅ ===== RESULTADOS FINALES =====`);
+    console.log(`📊 Perfiles encontrados: ${finalProfiles.length}`);
+    console.log(`👤 Usuario: ${myProfile.title} (${myProfile.id})`);
     console.log(`   - Tipo: ${isPlus ? '9Plus' : 'Gratuito (máx 50/día)'}`);
-    console.log(`   - Orientación: ${myProfile.orientation}, Género: ${myProfile.gender}`);
+    console.log(`   - Orientación: ${myProfile.orientation}`);
+    console.log(`   - Género: ${myProfile.gender}`);
     console.log(`   - Ciudad: ${myProfile.city || 'No definida'}`);
-    console.log(`   - Perfiles excluidos (likes): ${likedProfileIds.length}`);
-    console.log(`   - Perfiles bloqueados: ${blockedIds.length}`);
+    console.log(`   - Buscando: ${whereClause.gender} ${whereClause.orientation}`);
+    console.log(`   - Excluidos (likes): ${likedProfileIds.length}`);
+    console.log(`   - Bloqueados: ${blockedIds.length}`);
+    
     if (finalProfiles.length > 0) {
-      console.log(`   - Primeros perfiles:`, finalProfiles.slice(0, 3).map(p => ({ title: p.title, gender: p.gender, city: p.city })));
+      console.log(`\n✅ PERFILES ENCONTRADOS:`);
+      finalProfiles.forEach((p, i) => {
+        console.log(`   ${i + 1}. ${p.title} - ${p.gender} ${p.orientation} - ${p.city}`);
+      });
     } else {
-      console.warn(`⚠️  No se encontraron perfiles. Verificar criterios de búsqueda.`);
+      console.error(`\n❌ NO SE ENCONTRARON PERFILES`);
+      console.error(`\n🔍 DIAGNÓSTICO:`);
+      console.error(`   1. ¿Hay perfiles con género "${whereClause.gender}" y orientación "${whereClause.orientation}"?`);
+      console.error(`   2. ¿Tienen foto de portada?`);
+      console.error(`   3. ¿Están marcados como isFake: false o null?`);
+      console.error(`   4. ¿Están bloqueados o ya les diste like?`);
+      console.error(`   5. ¿Tu perfil tiene género y orientación definidos?`);
     }
+    console.log(`\n${'='.repeat(60)}\n`);
 
     // Normalizar URLs de fotos antes de enviar
     const normalizedProfiles = normalizeProfilesPhotos(finalProfiles);
