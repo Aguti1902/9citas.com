@@ -209,14 +209,15 @@ export default function FilterBar({
                 Hasta
               </label>
               <select
-                value={tempDistanceMax >= 100 ? 500 : tempDistanceMax}
+                value={tempDistanceMax > 100 ? 500 : tempDistanceMax}
                 onChange={(e) => {
                   const value = parseInt(e.target.value)
                   setTempDistanceMax(value)
                 }}
                 className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
-                {Array.from({ length: 101 }, (_, i) => i).map(km => (
+                <option value={0}>0 km</option>
+                {Array.from({ length: 100 }, (_, i) => i + 1).map(km => (
                   <option key={km} value={km}>{km} km</option>
                 ))}
                 <option value={500}>100+ km</option>

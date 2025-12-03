@@ -61,10 +61,87 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
     
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords
+        const { latitude, longitude, accuracy } = position.coords
+        
+        console.log(`📍 Ubicación obtenida: ${latitude}, ${longitude} (precisión: ${accuracy}m)`)
         
         try {
-          // Buscar la ciudad más cercana en nuestra lista
+          // Usar geocodificación inversa para obtener la ciudad exacta
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=es`,
+            {
+              headers: {
+                'User-Agent': '9citas.com/1.0'
+              }
+            }
+          )
+          
+          if (response.ok) {
+            const data = await response.json()
+            const address = data.address
+            
+            // Intentar obtener la ciudad de diferentes campos
+            let cityName = address.city || 
+                          address.town || 
+                          address.municipality || 
+                          address.village ||
+                          address.county ||
+                          address.state_district
+            
+            // Si no encontramos ciudad, buscar la más cercana de nuestra lista
+            if (!cityName) {
+              console.log('⚠️ No se encontró ciudad en geocodificación, usando ciudad más cercana')
+              let closestCity = SPANISH_CITIES[0]
+              let minDistance = Infinity
+
+              SPANISH_CITIES.forEach(city => {
+                const distance = Math.sqrt(
+                  Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
+                )
+                if (distance < minDistance) {
+                  minDistance = distance
+                  closestCity = city
+                }
+              })
+              cityName = closestCity.name
+            } else {
+              // Normalizar nombre de ciudad (capitalizar primera letra)
+              cityName = cityName.split(' ').map((word: string) => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+              ).join(' ')
+              
+              // Verificar si la ciudad está en nuestra lista, si no, usar la más cercana
+              const cityInList = SPANISH_CITIES.find(c => 
+                c.name.toLowerCase() === cityName.toLowerCase()
+              )
+              
+              if (!cityInList) {
+                console.log(`⚠️ Ciudad "${cityName}" no está en lista, usando ciudad más cercana`)
+                let closestCity = SPANISH_CITIES[0]
+                let minDistance = Infinity
+
+                SPANISH_CITIES.forEach(city => {
+                  const distance = Math.sqrt(
+                    Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
+                  )
+                  if (distance < minDistance) {
+                    minDistance = distance
+                    closestCity = city
+                  }
+                })
+                cityName = closestCity.name
+              }
+            }
+            
+            console.log(`✅ Ciudad detectada: ${cityName}`)
+            
+            onLocationChange(cityName, latitude, longitude)
+          } else {
+            throw new Error('Error en geocodificación')
+          }
+        } catch (error) {
+          console.error('Error en geocodificación inversa:', error)
+          // Fallback: buscar la ciudad más cercana
           let closestCity = SPANISH_CITIES[0]
           let minDistance = Infinity
 
@@ -79,9 +156,6 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
           })
 
           onLocationChange(closestCity.name, latitude, longitude)
-        } catch (error) {
-          console.error('Error al obtener ciudad:', error)
-          alert('No se pudo determinar tu ciudad')
         } finally {
           setIsGettingLocation(false)
         }

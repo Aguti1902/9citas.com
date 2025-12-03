@@ -303,10 +303,11 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       ];
     }
 
-    // Filtro TODO: conectados en el último mes
+    // Filtro TODO: mostrar todos los perfiles activos (no filtrar por lastSeenAt)
+    // Esto permite que nuevos usuarios vean perfiles aunque no se hayan conectado recientemente
     if (filter === 'all' || !filter) {
-      const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      whereClause.lastSeenAt = { gte: oneMonthAgo };
+      // No aplicar filtro de lastSeenAt para que aparezcan todos los perfiles
+      // Si quieres filtrar por actividad, puedes usar el filtro "online" o "new"
     }
 
     // Filtro por edad (solo 9Plus)
@@ -425,9 +426,16 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     const finalProfiles = finalUniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), 50));
 
     // Debug: Log de resultados
-    console.log(`✅ Encontrados ${finalProfiles.length} perfiles para usuario ${myProfile.id} (${myProfile.orientation}, ${myProfile.gender})`);
+    console.log(`✅ Encontrados ${finalProfiles.length} perfiles para usuario ${myProfile.id} (${myProfile.orientation}, ${myProfile.gender}, ciudad: ${myProfile.city})`);
     if (finalProfiles.length > 0) {
       console.log(`   Primeros perfiles encontrados:`, finalProfiles.slice(0, 3).map(p => ({ id: p.id, title: p.title, gender: p.gender, orientation: p.orientation, city: p.city })));
+    } else {
+      console.warn(`⚠️  No se encontraron perfiles. Verificar:`);
+      console.warn(`   - Orientación del usuario: ${myProfile.orientation}`);
+      console.warn(`   - Género del usuario: ${myProfile.gender}`);
+      console.warn(`   - Ciudad del usuario: ${myProfile.city}`);
+      console.warn(`   - Perfiles excluidos (likes): ${likedProfileIds.length}`);
+      console.warn(`   - Perfiles bloqueados: ${blockedIds.length}`);
     }
 
     // Normalizar URLs de fotos antes de enviar
