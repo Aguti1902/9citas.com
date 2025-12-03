@@ -192,11 +192,11 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     const likedProfileIds = sentLikes.map(like => like.toProfileId);
 
     // Construir filtros base
-    // Mostrar perfiles reales (no fake) - pueden tener o no personalidad
-    // Si isFake es null o undefined, también se consideran reales
+    // IMPORTANTE: Mostrar TODOS los perfiles reales (no fake)
     const whereClause: any = {
       id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] }, // Solo excluir perfiles a los que TÚ les diste like
-      orientation: myProfile.orientation, // Mismo orientation
+      orientation: myProfile.orientation, // Mismo orientation (hetero ve hetero, gay ve gay)
+      // Mostrar perfiles reales (no fake)
       OR: [
         { isFake: false },
         { isFake: null },
@@ -209,13 +209,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     if (myProfile.orientation === 'hetero') {
       // Heteros solo ven del género opuesto
       if (myProfile.gender === 'hombre') {
-        whereClause.gender = 'mujer'; // Hombres heteros ven mujeres
+        whereClause.gender = 'mujer'; // Hombres heteros ven mujeres hetero
       } else if (myProfile.gender === 'mujer') {
-        whereClause.gender = 'hombre'; // Mujeres heteras ven hombres
+        whereClause.gender = 'hombre'; // Mujeres heteras ven hombres hetero
       } else {
-        // Si no tiene género definido, no mostrar nada (o mostrar ambos)
-        // Por seguridad, no mostrar nada si no está definido
-        console.warn(`⚠️  Perfil ${myProfile.id} no tiene género definido. Orientation: ${myProfile.orientation}`);
+        // Si no tiene género definido, no mostrar nada
+        console.error(`❌ ERROR: Perfil ${myProfile.id} no tiene género definido. Orientation: ${myProfile.orientation}`);
         whereClause.gender = null; // Esto no mostrará ningún perfil
       }
     } else if (myProfile.orientation === 'gay') {
@@ -223,21 +222,25 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       if (myProfile.gender) {
         whereClause.gender = myProfile.gender;
       } else {
-        console.warn(`⚠️  Perfil ${myProfile.id} (gay) no tiene género definido`);
+        console.error(`❌ ERROR: Perfil ${myProfile.id} (gay) no tiene género definido`);
         whereClause.gender = null; // Esto no mostrará ningún perfil
       }
     }
     
     // Debug: Log para verificar la lógica
-    console.log(`🔍 Buscando perfiles para usuario ${myProfile.id} (${myProfile.title}):`, {
-      orientation: myProfile.orientation,
-      gender: myProfile.gender,
-      city: myProfile.city,
-      isPlus,
-      excludedProfileIds: likedProfileIds.length,
-      blockedIds: blockedIds.length,
-      whereClause: JSON.stringify(whereClause, null, 2),
-    });
+    console.log(`\n🔍 ===== BÚSQUEDA DE PERFILES =====`);
+    console.log(`👤 Usuario: ${myProfile.title} (${myProfile.id})`);
+    console.log(`   - Orientación: ${myProfile.orientation}`);
+    console.log(`   - Género: ${myProfile.gender || 'NO DEFINIDO ❌'}`);
+    console.log(`   - Ciudad: ${myProfile.city || 'No definida'}`);
+    console.log(`   - Tipo: ${isPlus ? '9Plus' : 'Gratuito'}`);
+    console.log(`   - Excluidos (likes): ${likedProfileIds.length}`);
+    console.log(`   - Bloqueados: ${blockedIds.length}`);
+    console.log(`\n📋 Filtros aplicados:`);
+    console.log(`   - Género buscado: ${whereClause.gender || 'NO DEFINIDO ❌'}`);
+    console.log(`   - Orientación: ${whereClause.orientation}`);
+    console.log(`   - isFake: ${JSON.stringify(whereClause.OR)}`);
+    console.log(`   - Excluir IDs: ${[req.profileId!, ...blockedIds, ...likedProfileIds].length} perfiles`);
 
     // IMPORTANTE: Usuarios gratuitos (no 9Plus) ven TODOS los perfiles que coinciden
     // NO tienen restricción de ciudad, distancia ni edad
@@ -294,11 +297,10 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     }
 
     // Obtener perfiles (solo los que tienen al menos una foto de portada)
-    // PERMITIR perfiles falsos (los 7 perfiles de mujeres que creamos)
     let profiles = await prisma.profile.findMany({
       where: {
         ...whereClause,
-        // Permitir perfiles falsos (los 7 perfiles de mujeres)
+        // REQUISITO: Debe tener al menos una foto de portada
         photos: {
           some: {
             type: 'cover',
@@ -324,6 +326,24 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     
     // Filtrar perfiles que no tienen foto de portada (por si acaso)
     profiles = profiles.filter(profile => profile.photos && profile.photos.length > 0);
+    
+    console.log(`\n📊 Resultados de búsqueda:`);
+    console.log(`   - Perfiles encontrados: ${profiles.length}`);
+    if (profiles.length > 0) {
+      console.log(`   - Primeros perfiles:`, profiles.slice(0, 5).map(p => ({
+        nombre: p.title,
+        género: p.gender,
+        orientación: p.orientation,
+        ciudad: p.city,
+        fotos: p.photos.length
+      })));
+    } else {
+      console.error(`   ❌ NO SE ENCONTRARON PERFILES`);
+      console.error(`   Verificar:`);
+      console.error(`   1. ¿Hay perfiles con género "${whereClause.gender}" y orientación "${whereClause.orientation}"?`);
+      console.error(`   2. ¿Tienen foto de portada?`);
+      console.error(`   3. ¿Están marcados como isFake: false o null?`);
+    }
 
     // Ordenar perfiles: Roam activo primero, luego por fecha
     profiles.sort((a, b) => {
