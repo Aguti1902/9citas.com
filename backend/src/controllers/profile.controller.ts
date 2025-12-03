@@ -297,6 +297,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     }
 
     // Obtener perfiles (solo los que tienen al menos una foto de portada)
+    // IMPORTANTE: Buscar TODOS los perfiles que coinciden con los criterios
     let profiles = await prisma.profile.findMany({
       where: {
         ...whereClause,
