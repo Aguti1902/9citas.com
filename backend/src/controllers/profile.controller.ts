@@ -330,6 +330,14 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       };
     }
 
+    // IMPORTANTE: Si no hay perfiles en la misma ciudad, asegurarse de que NO se filtre por ciudad
+    // Esto permite que usuarios vean perfiles de otras ciudades si no hay en la suya
+    if (!isPlus && myProfile.city) {
+      // Si genderFilter.length > 0 pero profilesInSameCity.length === 0,
+      // significa que hay perfiles que coinciden pero en otras ciudades
+      // En ese caso, NO aplicar filtro de ciudad (ya se hizo arriba)
+    }
+
     // Obtener perfiles (solo los que tienen al menos una foto de portada)
     // PERMITIR perfiles falsos (los 7 perfiles de mujeres que creamos)
     let profiles = await prisma.profile.findMany({
