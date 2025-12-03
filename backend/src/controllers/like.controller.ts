@@ -125,8 +125,15 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
 
       console.log(`🎉 MATCH! ${myProfile?.title} ↔ ${targetProfile.title}`);
       console.log(`   Emitiendo new_match a profile:${req.profileId!} y profile:${profileId}`);
+      console.log(`   Salas activas:`, Object.keys(io.sockets.adapter.rooms).filter(r => r.startsWith('profile:')));
 
       // Emitir evento de match a ambos usuarios
+      // IMPORTANTE: Emitir tanto a la sala como directamente al socket si está conectado
+      const socketsInRoom1 = await io.in(`profile:${req.profileId!}`).fetchSockets();
+      const socketsInRoom2 = await io.in(`profile:${profileId}`).fetchSockets();
+      console.log(`   Sockets en profile:${req.profileId!}: ${socketsInRoom1.length}`);
+      console.log(`   Sockets en profile:${profileId}: ${socketsInRoom2.length}`);
+      
       io.to(`profile:${req.profileId!}`).emit('new_match', {
         matchProfile: {
           id: targetProfile.id,

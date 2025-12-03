@@ -31,9 +31,11 @@ export default function MatchNotification() {
     }
 
     console.log('✅ MatchNotification: Escuchando evento new_match')
+    console.log('   Socket conectado:', socket.connected)
+    console.log('   Socket ID:', socket.id)
 
     const handleNewMatch = (data: MatchNotificationData) => {
-      console.log('🎉 MatchNotification: Recibido evento new_match', data)
+      console.log('🎉🎉🎉 MatchNotification: Recibido evento new_match', data)
       setMatch(data)
       setIsVisible(true)
 
@@ -43,10 +45,18 @@ export default function MatchNotification() {
       }, 10000)
     }
 
+    // Escuchar todos los eventos para debug
+    socket.onAny((event, ...args) => {
+      if (event === 'new_match') {
+        console.log('📡 Evento recibido:', event, args)
+      }
+    })
+
     socket.on('new_match', handleNewMatch)
 
     return () => {
       socket.off('new_match', handleNewMatch)
+      socket.offAny()
     }
   }, [])
 

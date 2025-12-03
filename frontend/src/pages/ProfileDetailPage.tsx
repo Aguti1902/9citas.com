@@ -104,18 +104,22 @@ export default function ProfileDetailPage() {
       } else {
         // Dar like - el backend ahora retorna si hay match
         const response = await api.post(`/likes/${id}`)
+        console.log('💚 Like dado, respuesta:', response.data)
         setIsLiked(true)
         
         // Si hay match → ¡MATCH! 💕
         if (response.data.isMatch) {
+          console.log('🎉 MATCH detectado en handleLike!')
           setHasMatch(true)
           setShowMatchModal(true)
+          // La notificación de Socket.IO también debería aparecer
         }
       }
       
       // Actualizar estado de match después de dar/quitar like
       await checkMatch()
     } catch (error: any) {
+      console.error('❌ Error al dar like:', error)
       showToast(error.response?.data?.error || 'Error al dar like', 'error')
     }
   }
@@ -149,18 +153,18 @@ export default function ProfileDetailPage() {
     )
   }
 
-  // Separar fotos de portada y privadas
-  const coverPhotos = profile.photos?.filter((p: any) => p.type === 'cover') || []
-  const privatePhotos = profile.photos?.filter((p: any) => p.type === 'private') || []
-  const allPhotos = [...coverPhotos, ...privatePhotos]
+  // IMPORTANTE: Mostrar TODAS las fotos (portada y privadas)
+  // Las privadas se mostrarán borrosas si no hay acceso
+  const allPhotos = profile.photos || []
   const photos = allPhotos
   const currentPhoto = photos[currentPhotoIndex]
   
   console.log('🖼️ Fotos procesadas:', {
-    coverPhotos: coverPhotos.length,
-    privatePhotos: privatePhotos.length,
-    total: photos.length,
+    totalPhotos: photos.length,
+    coverPhotos: photos.filter((p: any) => p.type === 'cover').length,
+    privatePhotos: photos.filter((p: any) => p.type === 'private').length,
     currentIndex: currentPhotoIndex,
+    currentPhotoType: currentPhoto?.type,
   })
 
   return (
