@@ -196,7 +196,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     const whereClause: any = {
       id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] }, // Solo excluir perfiles a los que TÚ les diste like
       orientation: myProfile.orientation, // Mismo orientation (hetero ve hetero, gay ve gay)
-      // Mostrar perfiles reales (no fake)
+      // Mostrar perfiles reales (no fake) - usar OR para incluir false y null
       OR: [
         { isFake: false },
         { isFake: null },
@@ -318,16 +318,28 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       excludedIds: whereClause.id?.notIn?.length || 0,
     });
     
-    let profiles = await prisma.profile.findMany({
-      where: {
-        ...whereClause,
-        // REQUISITO: Debe tener al menos una foto de portada
-        photos: {
-          some: {
-            type: 'cover',
-          },
+    // Construir el where final combinando todos los filtros
+    const finalWhere: any = {
+      id: whereClause.id,
+      orientation: whereClause.orientation,
+      gender: whereClause.gender,
+      // Filtrar perfiles reales (no fake)
+      OR: whereClause.OR,
+      // REQUISITO: Debe tener al menos una foto de portada
+      photos: {
+        some: {
+          type: 'cover',
         },
       },
+    };
+    
+    // Si hay filtro de ciudad (solo para 9Plus), añadirlo
+    if (whereClause.city) {
+      finalWhere.city = whereClause.city;
+    }
+    
+    let profiles = await prisma.profile.findMany({
+      where: finalWhere,
       include: {
         photos: {
           where: { type: 'cover' },
