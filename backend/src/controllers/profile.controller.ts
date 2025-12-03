@@ -338,8 +338,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         },
       },
       orderBy: [
-        { isRoaming: 'desc' }, // Perfiles en Roam primero
-        { lastSeenAt: 'desc' },
+        { lastSeenAt: 'desc' }, // Más recientes primero
       ],
       skip: (Number(page) - 1) * Number(limit),
       take: isPlus ? Number(limit) * 3 : Math.min(Number(limit) * 3, 150), // Obtener más para filtrar por distancia
@@ -368,13 +367,8 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       console.error(`   3. ¿Están marcados como isFake: false o null?`);
     }
 
-    // Ordenar perfiles: Roam activo primero, luego por fecha
+    // Ordenar perfiles: más recientes primero
     profiles.sort((a, b) => {
-      const aRoaming = a.isRoaming && a.roamingUntil && new Date(a.roamingUntil) > new Date();
-      const bRoaming = b.isRoaming && b.roamingUntil && new Date(b.roamingUntil) > new Date();
-      
-      if (aRoaming && !bRoaming) return -1;
-      if (!aRoaming && bRoaming) return 1;
       return new Date(b.lastSeenAt).getTime() - new Date(a.lastSeenAt).getTime();
     });
     
