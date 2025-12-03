@@ -1,78 +1,81 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-async function main() {
-  console.log('📋 Listando todos los usuarios en la base de datos...\n')
+async function listAllUsers() {
+  try {
+    console.log('🔍 Listando TODOS los usuarios en la base de datos...\n');
 
-  const users = await prisma.user.findMany({
-    include: {
-      profile: {
-        select: {
-          id: true,
-          title: true,
-          isFake: true,
-          city: true,
-          orientation: true,
-          gender: true,
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  console.log(`Total de usuarios: ${users.length}\n`)
-
-  if (users.length === 0) {
-    console.log('No hay usuarios en la base de datos')
-  } else {
-    users.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.email} (ID: ${user.id})`)
-      if (user.profile) {
-        console.log(`   Perfil ID: ${user.profile.id}`)
-        console.log(`   Título: ${user.profile.title}`)
-        console.log(`   Tipo: ${user.profile.isFake ? '[FAKE]' : '[REAL]'}`)
-        console.log(`   Ciudad: ${user.profile.city || 'No definida'}`)
-        console.log(`   Orientación: ${user.profile.orientation}`)
-        console.log(`   Género: ${user.profile.gender || 'No definido'}`)
-      } else {
-        console.log(`   Sin perfil`)
-      }
-      console.log('')
-    })
-  }
-
-  // Buscar específicamente los emails mencionados (case-insensitive)
-  console.log('\n🔍 Buscando emails específicos...\n')
-  const targetEmails = ['agutierrez3b1415@gmail.com', 'hola@gmail.com']
-  
-  for (const email of targetEmails) {
-    const user = await prisma.user.findFirst({
-      where: {
-        email: {
-          equals: email,
-          mode: 'insensitive',
-        },
-      },
+    // Obtener TODOS los usuarios
+    const users = await prisma.user.findMany({
       include: {
-        profile: true,
+        profile: {
+          select: {
+            id: true,
+            title: true,
+            gender: true,
+            orientation: true,
+            city: true,
+          },
+        },
       },
-    })
-    
-    if (user) {
-      console.log(`✅ Encontrado: ${user.email}`)
-    } else {
-      console.log(`❌ No encontrado: ${email}`)
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    console.log(`📊 Total de usuarios: ${users.length}\n`);
+
+    if (users.length === 0) {
+      console.log('❌ No hay usuarios en la base de datos');
+      return;
     }
+
+    console.log('📋 Lista completa de usuarios:\n');
+    users.forEach((user, index) => {
+      console.log(`${index + 1}. ${user.email}`);
+      console.log(`   - ID: ${user.id}`);
+      console.log(`   - Registrado: ${user.createdAt.toISOString()}`);
+      console.log(`   - Email verificado: ${user.emailVerified ? 'Sí' : 'No'}`);
+      if (user.profile) {
+        console.log(`   - ✅ TIENE PERFIL:`);
+        console.log(`      * Nombre: ${user.profile.title}`);
+        console.log(`      * Género: ${user.profile.gender || 'NO DEFINIDO'}`);
+        console.log(`      * Orientación: ${user.profile.orientation || 'NO DEFINIDO'}`);
+        console.log(`      * Ciudad: ${user.profile.city || 'NO DEFINIDO'}`);
+      } else {
+        console.log(`   - ❌ NO TIENE PERFIL (solo se registró, no completó el perfil)`);
+      }
+      console.log('');
+    });
+
+    // Estadísticas
+    const usersWithProfile = users.filter(u => u.profile);
+    const usersWithoutProfile = users.filter(u => !u.profile);
+    
+    console.log('\n📊 Estadísticas:');
+    console.log(`   - Usuarios con perfil: ${usersWithProfile.length}`);
+    console.log(`   - Usuarios sin perfil: ${usersWithoutProfile.length}`);
+
+    if (usersWithProfile.length > 0) {
+      const profiles = usersWithProfile.map(u => u.profile!);
+      const hombres = profiles.filter(p => p.gender === 'hombre');
+      const mujeres = profiles.filter(p => p.gender === 'mujer');
+      const hetero = profiles.filter(p => p.orientation === 'hetero');
+      const gay = profiles.filter(p => p.orientation === 'gay');
+
+      console.log('\n📊 Distribución de perfiles:');
+      console.log(`   - Hombres: ${hombres.length}`);
+      console.log(`   - Mujeres: ${mujeres.length}`);
+      console.log(`   - Hetero: ${hetero.length}`);
+      console.log(`   - Gay: ${gay.length}`);
+    }
+
+  } catch (error) {
+    console.error('❌ Error:', error);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
-
+listAllUsers();

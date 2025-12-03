@@ -4,7 +4,24 @@ const prisma = new PrismaClient();
 
 async function checkProfiles() {
   try {
-    console.log('🔍 Verificando usuarios y perfiles...\n');
+    console.log('🔍 Verificando TODOS los perfiles en la base de datos...\n');
+
+    // Obtener TODOS los perfiles (no solo los asociados a usuarios)
+    const allProfiles = await prisma.profile.findMany({
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+        photos: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    console.log(`📊 Total de PERFILES en la base de datos: ${allProfiles.length}\n`);
 
     // Obtener todos los usuarios
     const users = await prisma.user.findMany({
@@ -13,64 +30,58 @@ async function checkProfiles() {
       },
     });
 
-    console.log(`📊 Total de usuarios: ${users.length}\n`);
+    console.log(`📊 Total de USUARIOS: ${users.length}\n`);
 
     // Usuarios sin perfil
     const usersWithoutProfile = users.filter(u => !u.profile);
-    console.log(`❌ Usuarios SIN perfil: ${usersWithoutProfile.length}`);
+    console.log(`❌ Usuarios SIN perfil (registrados pero no completaron perfil): ${usersWithoutProfile.length}`);
     if (usersWithoutProfile.length > 0) {
-      console.log('   Emails:', usersWithoutProfile.map(u => u.email).join(', '));
+      console.log('\n   📧 Emails de usuarios sin perfil:');
+      usersWithoutProfile.forEach((u, index) => {
+        console.log(`      ${index + 1}. ${u.email} (registrado: ${u.createdAt.toISOString()})`);
+      });
+      console.log('\n   ⚠️  Estos usuarios se registraron pero NO completaron su perfil.');
+      console.log('   Por eso NO aparecen en las búsquedas.\n');
     }
 
     // Usuarios con perfil
     const usersWithProfile = users.filter(u => u.profile);
     console.log(`\n✅ Usuarios CON perfil: ${usersWithProfile.length}`);
 
-    if (usersWithProfile.length > 0) {
-      console.log('\n📋 Detalles de perfiles:');
-      for (const user of usersWithProfile) {
-        const profile = user.profile!;
-        const photos = await prisma.photo.findMany({
-          where: { profileId: profile.id },
-        });
-        const coverPhoto = photos.find(p => p.type === 'cover');
+    // Mostrar TODOS los perfiles
+    console.log('\n📋 Detalles de TODOS los perfiles:');
+    for (const profile of allProfiles) {
+      const coverPhoto = profile.photos.find(p => p.type === 'cover');
+      const userEmail = profile.user?.email || 'SIN USUARIO ASOCIADO';
 
-        console.log(`\n   👤 ${user.email}`);
-        console.log(`      - ID: ${profile.id}`);
-        console.log(`      - Nombre: ${profile.title}`);
-        console.log(`      - Género: ${profile.gender || 'NO DEFINIDO'}`);
-        console.log(`      - Orientación: ${profile.orientation || 'NO DEFINIDO'}`);
-        console.log(`      - Ciudad: ${profile.city || 'NO DEFINIDO'}`);
-        console.log(`      - Edad: ${profile.age}`);
-        console.log(`      - isFake: ${profile.isFake}`);
-        console.log(`      - Fotos: ${photos.length} (Portada: ${coverPhoto ? 'Sí' : 'NO'})`);
-        console.log(`      - Última conexión: ${profile.lastSeenAt.toISOString()}`);
+      console.log(`\n   👤 ${userEmail}`);
+      console.log(`      - ID: ${profile.id}`);
+      console.log(`      - Nombre: ${profile.title}`);
+      console.log(`      - Género: ${profile.gender || 'NO DEFINIDO'}`);
+      console.log(`      - Orientación: ${profile.orientation || 'NO DEFINIDO'}`);
+      console.log(`      - Ciudad: ${profile.city || 'NO DEFINIDO'}`);
+      console.log(`      - Edad: ${profile.age}`);
+      console.log(`      - isFake: ${profile.isFake}`);
+      console.log(`      - Fotos: ${profile.photos.length} (Portada: ${coverPhoto ? 'Sí' : 'NO'})`);
+      console.log(`      - Última conexión: ${profile.lastSeenAt.toISOString()}`);
 
-        // Verificar si aparecería en búsqueda
-        const issues: string[] = [];
-        if (!profile.gender) issues.push('Sin género');
-        if (!profile.orientation) issues.push('Sin orientación');
-        if (!profile.city) issues.push('Sin ciudad');
-        if (!coverPhoto) issues.push('Sin foto de portada');
-        if (profile.isFake === true) issues.push('Marcado como fake');
+      // Verificar si aparecería en búsqueda
+      const issues: string[] = [];
+      if (!profile.gender) issues.push('Sin género');
+      if (!profile.orientation) issues.push('Sin orientación');
+      if (!profile.city) issues.push('Sin ciudad');
+      if (!coverPhoto) issues.push('Sin foto de portada');
+      if (profile.isFake === true) issues.push('Marcado como fake');
 
-        if (issues.length > 0) {
-          console.log(`      ⚠️  PROBLEMAS: ${issues.join(', ')}`);
-        } else {
-          console.log(`      ✅ Perfil completo`);
-        }
+      if (issues.length > 0) {
+        console.log(`      ⚠️  PROBLEMAS: ${issues.join(', ')}`);
+      } else {
+        console.log(`      ✅ Perfil completo`);
       }
     }
 
     // Verificar perfiles que deberían aparecer
     console.log('\n\n🔎 Verificando perfiles que deberían aparecer en búsqueda...\n');
-
-    const allProfiles = await prisma.profile.findMany({
-      include: {
-        photos: true,
-        user: true,
-      },
-    });
 
     const validProfiles = allProfiles.filter(p => {
       const hasCoverPhoto = p.photos.some(photo => photo.type === 'cover');
