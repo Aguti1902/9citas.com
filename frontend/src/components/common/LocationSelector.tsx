@@ -92,9 +92,9 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
         setIsGettingLocation(false)
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        enableHighAccuracy: true, // Máxima precisión usando GPS
+        timeout: 30000, // 30 segundos para obtener ubicación precisa
+        maximumAge: 0, // No usar ubicación en caché, siempre obtener nueva
       }
     )
   }

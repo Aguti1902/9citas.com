@@ -153,6 +153,11 @@ export default function ChatPage() {
       () => {
         alert('No se pudo obtener tu ubicación')
         setIsSending(false)
+      },
+      {
+        enableHighAccuracy: true, // Máxima precisión usando GPS
+        timeout: 30000, // 30 segundos para obtener ubicación precisa
+        maximumAge: 0, // No usar ubicación en caché, siempre obtener nueva
       }
     )
   }

@@ -34,7 +34,7 @@ export default function NavigatePage() {
   const [currentCity, setCurrentCity] = useState(user?.profile?.city || 'Madrid')
   const [detectedCity, setDetectedCity] = useState<string | null>(null)
   const [ageRange, setAgeRange] = useState({ min: 18, max: 99 })
-  const [distanceRange, setDistanceRange] = useState({ min: 1, max: 50 })
+  const [distanceRange, setDistanceRange] = useState({ min: 0, max: 500 })
 
   const isPremium = user?.subscription?.isActive || false
 
@@ -99,9 +99,9 @@ export default function NavigatePage() {
           console.error('Error de geolocalización:', error)
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+          enableHighAccuracy: true, // Máxima precisión usando GPS
+          timeout: 30000, // 30 segundos para obtener ubicación precisa
+          maximumAge: 0, // No usar ubicación en caché, siempre obtener nueva
         }
       )
     }

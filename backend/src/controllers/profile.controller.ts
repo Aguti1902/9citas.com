@@ -396,12 +396,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
 
     // Filtrar por rango de distancia si es Plus y se especifica
     let filteredProfiles = profilesWithDistance;
-    if (isPlus && (distanceMin || distanceMax)) {
+    if (isPlus && (distanceMin !== undefined || distanceMax !== undefined)) {
       filteredProfiles = profilesWithDistance.filter(profile => {
         if (profile.distance === null) return false; // Solo mostrar si tiene coordenadas
         
-        const min = distanceMin ? parseInt(distanceMin as string) : 1;
-        const max = distanceMax ? parseInt(distanceMax as string) : 50;
+        const min = distanceMin !== undefined ? parseInt(distanceMin as string) : 0;
+        const max = distanceMax !== undefined ? parseInt(distanceMax as string) : 500;
         
         return profile.distance >= min && profile.distance <= max;
       });

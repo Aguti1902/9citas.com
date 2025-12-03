@@ -20,7 +20,7 @@ export default function FilterBar({
   isPremium,
   onPremiumRequired,
   ageRange = { min: 18, max: 99 },
-  distanceRange = { min: 1, max: 50 },
+  distanceRange = { min: 0, max: 500 },
   onAgeRangeChange,
   onDistanceRangeChange,
 }: FilterBarProps) {
@@ -197,7 +197,8 @@ export default function FilterBar({
                 onChange={(e) => setTempDistanceMin(parseInt(e.target.value))}
                 className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
-                {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
+                <option value={0}>0 km</option>
+                {Array.from({ length: 100 }, (_, i) => i + 1).map(km => (
                   <option key={km} value={km}>{km} km</option>
                 ))}
               </select>
@@ -212,9 +213,11 @@ export default function FilterBar({
                 onChange={(e) => setTempDistanceMax(parseInt(e.target.value))}
                 className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-base border border-gray-700 focus:border-primary focus:outline-none"
               >
-                {Array.from({ length: 50 }, (_, i) => i + 1).map(km => (
+                <option value={0}>0 km</option>
+                {Array.from({ length: 100 }, (_, i) => i + 1).map(km => (
                   <option key={km} value={km}>{km} km</option>
                 ))}
+                <option value={500}>100+ km</option>
               </select>
             </div>
           </div>
