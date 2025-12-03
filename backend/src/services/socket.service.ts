@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import { normalizeProfilePhotos } from '../utils/photo.utils';
 
 const prisma = new PrismaClient();
 
@@ -94,7 +95,6 @@ export const setupSocketHandlers = (io: Server) => {
         });
 
         // Normalizar fotos del mensaje antes de emitir
-        const { normalizeProfilePhotos } = require('../utils/photo.utils');
         const normalizedMessage = {
           ...message,
           fromProfile: message.fromProfile ? normalizeProfilePhotos(message.fromProfile) : message.fromProfile,
