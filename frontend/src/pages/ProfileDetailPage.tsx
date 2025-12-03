@@ -41,6 +41,12 @@ export default function ProfileDetailPage() {
     
     try {
       const response = await api.get(`/profile/${id}`)
+      console.log('📸 Perfil cargado:', {
+        totalPhotos: response.data.photos?.length || 0,
+        coverPhotos: response.data.photos?.filter((p: any) => p.type === 'cover').length || 0,
+        privatePhotos: response.data.photos?.filter((p: any) => p.type === 'private').length || 0,
+        privatePhotoAccess: response.data.privatePhotoAccess,
+      })
       setProfile(response.data)
       setIsLiked(response.data.isLiked || false)
     } catch (error: any) {
@@ -143,8 +149,19 @@ export default function ProfileDetailPage() {
     )
   }
 
-  const photos = profile.photos || []
+  // Separar fotos de portada y privadas
+  const coverPhotos = profile.photos?.filter((p: any) => p.type === 'cover') || []
+  const privatePhotos = profile.photos?.filter((p: any) => p.type === 'private') || []
+  const allPhotos = [...coverPhotos, ...privatePhotos]
+  const photos = allPhotos
   const currentPhoto = photos[currentPhotoIndex]
+  
+  console.log('🖼️ Fotos procesadas:', {
+    coverPhotos: coverPhotos.length,
+    privatePhotos: privatePhotos.length,
+    total: photos.length,
+    currentIndex: currentPhotoIndex,
+  })
 
   return (
     <div className="max-w-4xl mx-auto pb-8">
@@ -152,11 +169,25 @@ export default function ProfileDetailPage() {
       <div className="relative aspect-[3/4] bg-gray-900">
         {photos.length > 0 ? (
           <>
-            <img
-              src={currentPhoto.url}
-              alt={profile.title}
-              className="w-full h-full object-cover"
-            />
+            {/* Mostrar foto borrosa si es privada y no hay acceso */}
+            {currentPhoto.type === 'private' && !privatePhotoAccess?.hasAccess ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={currentPhoto.url}
+                  alt={profile.title}
+                  className="w-full h-full object-cover filter blur-md"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                  <Lock className="w-16 h-16 text-white" />
+                </div>
+              </div>
+            ) : (
+              <img
+                src={currentPhoto.url}
+                alt={profile.title}
+                className="w-full h-full object-cover"
+              />
+            )}
 
             {/* Navegación de fotos */}
             {photos.length > 1 && (
@@ -332,27 +363,26 @@ export default function ProfileDetailPage() {
           </div>
         )}
 
-        {/* Fotos Privadas */}
-        {profile.photos && profile.photos.filter((p: any) => p.type === 'private').length > 0 && (
+        {/* Fotos Privadas - SIEMPRE mostrar si hay fotos privadas */}
+        {privatePhotos.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6 border-2 border-accent">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                 <Lock className="w-5 h-5 text-accent" />
-                Fotos Privadas ({profile.photos.filter((p: any) => p.type === 'private').length})
+                Fotos Privadas ({privatePhotos.length})
               </h2>
             </div>
             
             {privatePhotoAccess?.hasAccess ? (
               // Tiene acceso - mostrar fotos
               <div className="grid grid-cols-2 gap-3">
-                {profile.photos
-                  .filter((p: any) => p.type === 'private')
-                  .map((photo: any, index: number) => (
+                {privatePhotos.map((photo: any, index: number) => (
                     <div
                       key={photo.id}
                       className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => {
-                        setCurrentPhotoIndex(profile.photos.findIndex((p: any) => p.id === photo.id))
+                        const photoIndex = allPhotos.findIndex((p: any) => p.id === photo.id)
+                        setCurrentPhotoIndex(photoIndex >= 0 ? photoIndex : 0)
                         setShowPrivatePhotosModal(true)
                       }}
                     >
@@ -368,9 +398,7 @@ export default function ProfileDetailPage() {
               // Solicitud pendiente - mostrar fotos borrosas
               <div>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {profile.photos
-                    .filter((p: any) => p.type === 'private')
-                    .map((photo: any, index: number) => (
+                  {privatePhotos.map((photo: any, index: number) => (
                       <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
                         <img
                           src={photo.url}
@@ -394,9 +422,7 @@ export default function ProfileDetailPage() {
               // Solicitud rechazada - mostrar fotos borrosas
               <div>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {profile.photos
-                    .filter((p: any) => p.type === 'private')
-                    .map((photo: any, index: number) => (
+                  {privatePhotos.map((photo: any, index: number) => (
                       <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
                         <img
                           src={photo.url}
@@ -420,9 +446,7 @@ export default function ProfileDetailPage() {
               // Sin solicitud - mostrar fotos borrosas y botón SOLO SI HAY MATCH
               <div>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {profile.photos
-                    .filter((p: any) => p.type === 'private')
-                    .map((photo: any, index: number) => (
+                  {privatePhotos.map((photo: any, index: number) => (
                       <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
                         <img
                           src={photo.url}
