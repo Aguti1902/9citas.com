@@ -181,7 +181,10 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       b.blockerProfileId === req.profileId ? b.blockedProfileId : b.blockerProfileId
     );
 
-    // Obtener IDs de perfiles a los que ya se ha dado like (para no mostrarlos)
+    // IMPORTANTE: Solo excluir perfiles a los que TÚ les diste like
+    // Si alguien te da like a ti, DEBES poder verlo en navegación (si tú no le has dado like aún)
+    // Si le das like después → match
+    // Si le das dislike/pass → simplemente pasas y su like queda ahí
     const sentLikes = await prisma.like.findMany({
       where: { fromProfileId: req.profileId! },
       select: { toProfileId: true },
@@ -192,7 +195,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     // Mostrar perfiles reales (no fake) - pueden tener o no personalidad
     // Si isFake es null o undefined, también se consideran reales
     const whereClause: any = {
-      id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] },
+      id: { notIn: [req.profileId!, ...blockedIds, ...likedProfileIds] }, // Solo excluir perfiles a los que TÚ les diste like
       orientation: myProfile.orientation, // Mismo orientation
       OR: [
         { isFake: false },

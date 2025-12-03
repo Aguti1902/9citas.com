@@ -8,7 +8,7 @@ export const generateAccessToken = (userId: string): string => {
   return jwt.sign(
     { userId },
     secret,
-    { expiresIn: '15m' }
+    { expiresIn: '7d' } // Cambiado a 7 días para que la sesión persista
   );
 };
 
