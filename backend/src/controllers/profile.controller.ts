@@ -437,19 +437,22 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     );
 
     // Limitar resultados finales
-    const finalProfiles = finalUniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), 50));
+    // Usuarios gratuitos: máximo 50 perfiles al día
+    // Usuarios 9Plus: sin límite (o el límite que especifiquen)
+    const maxProfilesForFree = 50;
+    const finalProfiles = finalUniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), maxProfilesForFree));
 
     // Debug: Log de resultados
-    console.log(`✅ Encontrados ${finalProfiles.length} perfiles para usuario ${myProfile.id} (${myProfile.orientation}, ${myProfile.gender}, ciudad: ${myProfile.city})`);
+    console.log(`✅ Encontrados ${finalProfiles.length} perfiles para usuario ${myProfile.id}`);
+    console.log(`   - Tipo: ${isPlus ? '9Plus' : 'Gratuito (máx 50/día)'}`);
+    console.log(`   - Orientación: ${myProfile.orientation}, Género: ${myProfile.gender}`);
+    console.log(`   - Ciudad: ${myProfile.city || 'No definida'}`);
+    console.log(`   - Perfiles excluidos (likes): ${likedProfileIds.length}`);
+    console.log(`   - Perfiles bloqueados: ${blockedIds.length}`);
     if (finalProfiles.length > 0) {
-      console.log(`   Primeros perfiles encontrados:`, finalProfiles.slice(0, 3).map(p => ({ id: p.id, title: p.title, gender: p.gender, orientation: p.orientation, city: p.city })));
+      console.log(`   - Primeros perfiles:`, finalProfiles.slice(0, 3).map(p => ({ title: p.title, gender: p.gender, city: p.city })));
     } else {
-      console.warn(`⚠️  No se encontraron perfiles. Verificar:`);
-      console.warn(`   - Orientación del usuario: ${myProfile.orientation}`);
-      console.warn(`   - Género del usuario: ${myProfile.gender}`);
-      console.warn(`   - Ciudad del usuario: ${myProfile.city}`);
-      console.warn(`   - Perfiles excluidos (likes): ${likedProfileIds.length}`);
-      console.warn(`   - Perfiles bloqueados: ${blockedIds.length}`);
+      console.warn(`⚠️  No se encontraron perfiles. Verificar criterios de búsqueda.`);
     }
 
     // Normalizar URLs de fotos antes de enviar
