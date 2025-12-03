@@ -296,8 +296,23 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       };
     }
 
+    // IMPORTANTE: Verificar que el género esté definido antes de buscar
+    if (!whereClause.gender) {
+      console.error(`❌ ERROR CRÍTICO: No se puede buscar perfiles sin género definido`);
+      return res.status(400).json({ 
+        error: 'Tu perfil no tiene género definido. Por favor, actualiza tu perfil.',
+        details: {
+          myGender: myProfile.gender,
+          myOrientation: myProfile.orientation,
+        }
+      });
+    }
+
     // Obtener perfiles (solo los que tienen al menos una foto de portada)
     // IMPORTANTE: Buscar TODOS los perfiles que coinciden con los criterios
+    console.log(`\n🔎 Ejecutando búsqueda en base de datos...`);
+    console.log(`   Query:`, JSON.stringify(whereClause, null, 2));
+    
     let profiles = await prisma.profile.findMany({
       where: {
         ...whereClause,
@@ -324,6 +339,8 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       skip: (Number(page) - 1) * Number(limit),
       take: isPlus ? Number(limit) * 3 : Math.min(Number(limit) * 3, 150), // Obtener más para filtrar por distancia
     });
+    
+    console.log(`   ✅ Encontrados ${profiles.length} perfiles en la consulta inicial`);
     
     // Filtrar perfiles que no tienen foto de portada (por si acaso)
     profiles = profiles.filter(profile => profile.photos && profile.photos.length > 0);
