@@ -311,7 +311,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     // Obtener perfiles (solo los que tienen al menos una foto de portada)
     // IMPORTANTE: Buscar TODOS los perfiles que coinciden con los criterios
     console.log(`\n🔎 Ejecutando búsqueda en base de datos...`);
-    console.log(`   Query:`, JSON.stringify(whereClause, null, 2));
+    console.log(`   Query:`, {
+      gender: whereClause.gender,
+      orientation: whereClause.orientation,
+      isFake: whereClause.OR,
+      excludedIds: whereClause.id?.notIn?.length || 0,
+    });
     
     let profiles = await prisma.profile.findMany({
       where: {
@@ -471,9 +476,13 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       hasMore: finalUniqueProfiles.length > finalProfiles.length,
       isPlus,
     });
-  } catch (error) {
-    console.error('Error al buscar perfiles:', error);
-    res.status(500).json({ error: 'Error al buscar perfiles' });
+  } catch (error: any) {
+    console.error('❌ ERROR al buscar perfiles:', error);
+    console.error('Stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Error al buscar perfiles',
+      message: error.message || 'Error desconocido',
+    });
   }
 };
 
