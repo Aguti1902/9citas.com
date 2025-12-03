@@ -234,15 +234,16 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       gender: myProfile.gender,
       city: myProfile.city,
       isPlus,
+      excludedProfileIds: likedProfileIds.length,
+      blockedIds: blockedIds.length,
       whereClause: JSON.stringify(whereClause, null, 2),
     });
 
     // Filtro por ciudad (si no es Plus, solo puede ver su ciudad)
-    // Normalizar comparación de ciudades (case-insensitive)
+    // IMPORTANTE: Si no hay perfiles en la misma ciudad, mostrar todos los que coinciden
     if (!isPlus) {
       if (myProfile.city) {
-        // Para usuarios gratis, buscar perfiles en la misma ciudad
-        // Primero buscar todos los perfiles que coinciden con género y orientación
+        // Primero buscar todos los perfiles que coinciden con género y orientación (sin filtro de ciudad aún)
         const allMatchingProfiles = await prisma.profile.findMany({
           where: {
             orientation: myProfile.orientation,
@@ -264,21 +265,26 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
           }
         }
         
-        // Encontrar ciudades que coincidan (case-insensitive)
-        const matchingCities = genderFilter
-          .map(p => p.city)
-          .filter(c => c && c.toLowerCase() === myProfile.city?.toLowerCase());
+        // Verificar si hay perfiles en la misma ciudad (case-insensitive)
+        const profilesInSameCity = genderFilter.filter(p => 
+          p.city && p.city.toLowerCase().trim() === myProfile.city?.toLowerCase().trim()
+        );
         
-        if (matchingCities.length > 0) {
-          whereClause.city = { in: matchingCities };
+        if (profilesInSameCity.length > 0) {
+          // Hay perfiles en la misma ciudad, filtrar por ciudad
+          const uniqueCities = [...new Set(profilesInSameCity.map(p => p.city).filter(Boolean))]
+          whereClause.city = { 
+            in: uniqueCities
+          }
+          console.log(`✅ Encontrados ${profilesInSameCity.length} perfiles en la ciudad ${myProfile.city}`);
         } else {
-          // Si no hay perfiles en la misma ciudad, mostrar todos los perfiles que coinciden
-          // (esto permite que se vean perfiles aunque estén en ciudades diferentes)
-          console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden`);
-          // No aplicar filtro de ciudad
+          // No hay perfiles en la misma ciudad, mostrar todos los perfiles que coinciden (sin filtrar por ciudad)
+          console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden (${genderFilter.length} perfiles)`);
+          // NO aplicar filtro de ciudad - permitir ver perfiles de otras ciudades
         }
       }
     } else if (city) {
+      // Usuario Plus: puede filtrar por ciudad específica
       whereClause.city = city;
     }
 
