@@ -119,13 +119,20 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
         },
       });
 
+      // Normalizar fotos antes de emitir
+      const normalizedTargetPhotos = targetProfile.photos ? normalizeProfilePhotos(targetProfile).photos : [];
+      const normalizedMyPhotos = myProfile?.photos ? normalizeProfilePhotos(myProfile).photos : [];
+
+      console.log(`🎉 MATCH! ${myProfile?.title} ↔ ${targetProfile.title}`);
+      console.log(`   Emitiendo new_match a profile:${req.profileId!} y profile:${profileId}`);
+
       // Emitir evento de match a ambos usuarios
       io.to(`profile:${req.profileId!}`).emit('new_match', {
         matchProfile: {
           id: targetProfile.id,
           title: targetProfile.title,
           age: targetProfile.age,
-          photos: targetProfile.photos || [],
+          photos: normalizedTargetPhotos,
         },
         myProfile: {
           id: myProfile?.id,
@@ -138,7 +145,7 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
           id: myProfile?.id,
           title: myProfile?.title,
           age: myProfile?.age,
-          photos: myProfile?.photos || [],
+          photos: normalizedMyPhotos,
         },
         myProfile: {
           id: targetProfile.id,

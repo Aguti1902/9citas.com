@@ -25,9 +25,15 @@ export default function MatchNotification() {
 
   useEffect(() => {
     const socket = getSocket()
-    if (!socket) return
+    if (!socket) {
+      console.warn('⚠️ Socket no disponible para MatchNotification')
+      return
+    }
+
+    console.log('✅ MatchNotification: Escuchando evento new_match')
 
     const handleNewMatch = (data: MatchNotificationData) => {
+      console.log('🎉 MatchNotification: Recibido evento new_match', data)
       setMatch(data)
       setIsVisible(true)
 
