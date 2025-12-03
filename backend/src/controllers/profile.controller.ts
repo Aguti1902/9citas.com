@@ -270,6 +270,11 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
           p.city && p.city.toLowerCase().trim() === myProfile.city?.toLowerCase().trim()
         );
         
+        console.log(`🔍 Análisis de perfiles:`);
+        console.log(`   - Total perfiles con misma orientación: ${allMatchingProfiles.length}`);
+        console.log(`   - Perfiles con género correcto: ${genderFilter.length}`);
+        console.log(`   - Perfiles en misma ciudad (${myProfile.city}): ${profilesInSameCity.length}`);
+        
         if (profilesInSameCity.length > 0) {
           // Hay perfiles en la misma ciudad, filtrar por ciudad
           const uniqueCities = [...new Set(profilesInSameCity.map(p => p.city).filter(Boolean))]
@@ -281,6 +286,7 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
           // No hay perfiles en la misma ciudad, mostrar todos los perfiles que coinciden (sin filtrar por ciudad)
           console.log(`⚠️  No hay perfiles en la ciudad ${myProfile.city}, mostrando todos los perfiles que coinciden (${genderFilter.length} perfiles)`);
           // NO aplicar filtro de ciudad - permitir ver perfiles de otras ciudades
+          // Esto es importante: si no hay perfiles en tu ciudad, puedes ver perfiles de otras ciudades
         }
       }
     } else if (city) {

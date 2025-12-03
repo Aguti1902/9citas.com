@@ -1,147 +1,108 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-async function main() {
-  console.log('🔍 Verificando perfiles en la base de datos...\n')
+async function checkProfiles() {
+  try {
+    console.log('🔍 Verificando usuarios y perfiles...\n');
 
-  // Obtener todos los perfiles
-  const profiles = await prisma.profile.findMany({
-    include: {
-      photos: {
-        where: { type: 'cover' },
+    // Obtener todos los usuarios
+    const users = await prisma.user.findMany({
+      include: {
+        profile: true,
       },
-      user: {
-        select: {
-          email: true,
-        },
+    });
+
+    console.log(`📊 Total de usuarios: ${users.length}\n`);
+
+    // Usuarios sin perfil
+    const usersWithoutProfile = users.filter(u => !u.profile);
+    console.log(`❌ Usuarios SIN perfil: ${usersWithoutProfile.length}`);
+    if (usersWithoutProfile.length > 0) {
+      console.log('   Emails:', usersWithoutProfile.map(u => u.email).join(', '));
+    }
+
+    // Usuarios con perfil
+    const usersWithProfile = users.filter(u => u.profile);
+    console.log(`\n✅ Usuarios CON perfil: ${usersWithProfile.length}`);
+
+    if (usersWithProfile.length > 0) {
+      console.log('\n📋 Detalles de perfiles:');
+      for (const user of usersWithProfile) {
+        const profile = user.profile!;
+        const photos = await prisma.photo.findMany({
+          where: { profileId: profile.id },
+        });
+        const coverPhoto = photos.find(p => p.type === 'cover');
+
+        console.log(`\n   👤 ${user.email}`);
+        console.log(`      - ID: ${profile.id}`);
+        console.log(`      - Nombre: ${profile.title}`);
+        console.log(`      - Género: ${profile.gender || 'NO DEFINIDO'}`);
+        console.log(`      - Orientación: ${profile.orientation || 'NO DEFINIDO'}`);
+        console.log(`      - Ciudad: ${profile.city || 'NO DEFINIDO'}`);
+        console.log(`      - Edad: ${profile.age}`);
+        console.log(`      - isFake: ${profile.isFake}`);
+        console.log(`      - Fotos: ${photos.length} (Portada: ${coverPhoto ? 'Sí' : 'NO'})`);
+        console.log(`      - Última conexión: ${profile.lastSeenAt.toISOString()}`);
+
+        // Verificar si aparecería en búsqueda
+        const issues: string[] = [];
+        if (!profile.gender) issues.push('Sin género');
+        if (!profile.orientation) issues.push('Sin orientación');
+        if (!profile.city) issues.push('Sin ciudad');
+        if (!coverPhoto) issues.push('Sin foto de portada');
+        if (profile.isFake === true) issues.push('Marcado como fake');
+
+        if (issues.length > 0) {
+          console.log(`      ⚠️  PROBLEMAS: ${issues.join(', ')}`);
+        } else {
+          console.log(`      ✅ Perfil completo`);
+        }
+      }
+    }
+
+    // Verificar perfiles que deberían aparecer
+    console.log('\n\n🔎 Verificando perfiles que deberían aparecer en búsqueda...\n');
+
+    const allProfiles = await prisma.profile.findMany({
+      include: {
+        photos: true,
+        user: true,
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+    });
 
-  console.log(`📊 Total de perfiles: ${profiles.length}\n`)
+    const validProfiles = allProfiles.filter(p => {
+      const hasCoverPhoto = p.photos.some(photo => photo.type === 'cover');
+      const isReal = p.isFake === false || p.isFake === null;
+      const hasGender = !!p.gender;
+      const hasOrientation = !!p.orientation;
+      const hasCity = !!p.city;
 
-  // Agrupar por orientación y género
-  const heteroHombres = profiles.filter(p => p.orientation === 'hetero' && p.gender === 'hombre')
-  const heteroMujeres = profiles.filter(p => p.orientation === 'hetero' && p.gender === 'mujer')
-  const gayHombres = profiles.filter(p => p.orientation === 'gay' && p.gender === 'hombre')
-  const gayMujeres = profiles.filter(p => p.orientation === 'gay' && p.gender === 'mujer')
-  const sinGenero = profiles.filter(p => !p.gender)
+      return hasCoverPhoto && isReal && hasGender && hasOrientation && hasCity;
+    });
 
-  console.log('📈 Distribución:')
-  console.log(`  - Hetero Hombres: ${heteroHombres.length}`)
-  console.log(`  - Hetero Mujeres: ${heteroMujeres.length}`)
-  console.log(`  - Gay Hombres: ${gayHombres.length}`)
-  console.log(`  - Gay Mujeres: ${gayMujeres.length}`)
-  console.log(`  - Sin género: ${sinGenero.length}\n`)
+    console.log(`✅ Perfiles válidos (con foto de portada y datos completos): ${validProfiles.length}`);
+    console.log(`❌ Perfiles inválidos: ${allProfiles.length - validProfiles.length}`);
 
-  // Mostrar detalles de cada perfil
-  console.log('👥 Detalles de perfiles:\n')
-  for (const profile of profiles) {
-    const hasCoverPhoto = profile.photos.length > 0
-    console.log(`  ${profile.title || 'Sin título'} (ID: ${profile.id})`)
-    console.log(`    - Email: ${profile.user.email}`)
-    console.log(`    - Orientación: ${profile.orientation || 'NO DEFINIDA'}`)
-    console.log(`    - Género: ${profile.gender || 'NO DEFINIDO ⚠️'}`)
-    console.log(`    - Ciudad: ${profile.city || 'NO DEFINIDA'}`)
-    console.log(`    - Foto de portada: ${hasCoverPhoto ? '✅' : '❌'}`)
-    console.log(`    - Es fake: ${profile.isFake ? 'Sí' : 'No'}`)
-    console.log('')
-  }
+    if (validProfiles.length > 0) {
+      console.log('\n📊 Distribución por orientación y género:');
+      const heteroMen = validProfiles.filter(p => p.orientation === 'hetero' && p.gender === 'hombre');
+      const heteroWomen = validProfiles.filter(p => p.orientation === 'hetero' && p.gender === 'mujer');
+      const gayMen = validProfiles.filter(p => p.orientation === 'gay' && p.gender === 'hombre');
+      const gayWomen = validProfiles.filter(p => p.orientation === 'gay' && p.gender === 'mujer');
 
-  // Verificar matching
-  console.log('\n🔗 Verificación de matching:\n')
-  for (const profile of profiles) {
-    if (profile.isFake) continue // Saltar perfiles falsos
-
-    let compatibleProfiles: typeof profiles = []
-    
-    if (profile.orientation === 'hetero') {
-      if (profile.gender === 'hombre') {
-        compatibleProfiles = heteroMujeres.filter(p => p.id !== profile.id)
-      } else if (profile.gender === 'mujer') {
-        compatibleProfiles = heteroHombres.filter(p => p.id !== profile.id)
-      }
-    } else if (profile.orientation === 'gay') {
-      if (profile.gender === 'hombre') {
-        compatibleProfiles = gayHombres.filter(p => p.id !== profile.id)
-      } else if (profile.gender === 'mujer') {
-        compatibleProfiles = gayMujeres.filter(p => p.id !== profile.id)
-      }
+      console.log(`   - Hetero Hombres: ${heteroMen.length}`);
+      console.log(`   - Hetero Mujeres: ${heteroWomen.length}`);
+      console.log(`   - Gay Hombres: ${gayMen.length}`);
+      console.log(`   - Gay Mujeres: ${gayWomen.length}`);
     }
 
-    // Filtrar solo los que tienen foto de portada
-    const withCoverPhoto = compatibleProfiles.filter(p => p.photos.length > 0)
-    
-    // Filtrar por ciudad (simulando usuario free)
-    const sameCity = withCoverPhoto.filter(p => 
-      p.city?.toLowerCase() === profile.city?.toLowerCase()
-    )
-
-    console.log(`  ${profile.title || profile.id} (${profile.orientation}, ${profile.gender || 'SIN GÉNERO'})`)
-    console.log(`    Ciudad: ${profile.city || 'NO DEFINIDA'}`)
-    console.log(`    Compatibles totales: ${compatibleProfiles.length}`)
-    console.log(`    Con foto de portada: ${withCoverPhoto.length}`)
-    console.log(`    En la misma ciudad: ${sameCity.length}`)
-    
-    if (sameCity.length > 0) {
-      console.log(`    ✅ DEBERÍA VER: ${sameCity.map(p => `${p.title || p.id} (${p.city})`).join(', ')}`)
-    } else if (withCoverPhoto.length > 0) {
-      console.log(`    ⚠️  Hay ${withCoverPhoto.length} perfiles compatibles pero en ciudades diferentes`)
-      console.log(`    (Si eres 9Plus, los verías: ${withCoverPhoto.map(p => `${p.title || p.id} (${p.city})`).join(', ')})`)
-    } else {
-      console.log(`    ❌ No hay perfiles compatibles con foto de portada`)
-    }
-
-    // Verificar likes enviados
-    const sentLikes = await prisma.like.findMany({
-      where: { fromProfileId: profile.id },
-      select: { toProfileId: true },
-    })
-    const likedIds = sentLikes.map(l => l.toProfileId)
-    
-    // Verificar likes recibidos (matches)
-    const receivedLikes = await prisma.like.findMany({
-      where: { toProfileId: profile.id },
-      select: { fromProfileId: true },
-    })
-    const likedByIds = receivedLikes.map(l => l.fromProfileId)
-    
-    // Verificar matches (like mutuo)
-    const matches = sameCity.filter(p => 
-      likedIds.includes(p.id) && likedByIds.includes(p.id)
-    )
-    
-    if (likedIds.length > 0) {
-      const likedProfiles = sameCity.filter(p => likedIds.includes(p.id))
-      if (likedProfiles.length > 0) {
-        console.log(`    ⚠️  Ya diste like a: ${likedProfiles.map(p => p.title || p.id).join(', ')} (no aparecerán en tu feed)`)
-      }
-    }
-    
-    if (matches.length > 0) {
-      console.log(`    💚 MATCHES: ${matches.map(p => p.title || p.id).join(', ')} (pueden chatear)`)
-    }
-    
-    // Mostrar perfiles que SÍ debería ver (sin likes previos)
-    const shouldSeeNow = sameCity.filter(p => !likedIds.includes(p.id))
-    if (shouldSeeNow.length > 0) {
-      console.log(`    👀 DEBERÍA VER AHORA: ${shouldSeeNow.map(p => `${p.title || p.id} (${p.city})`).join(', ')}`)
-    } else if (sameCity.length > 0) {
-      console.log(`    ❌ No verá ningún perfil porque ya les diste like a todos`)
-    }
-    
-    console.log('')
+  } catch (error) {
+    console.error('❌ Error:', error);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
-
+checkProfiles();
