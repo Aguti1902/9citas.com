@@ -318,24 +318,33 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       excludedIds: whereClause.id?.notIn?.length || 0,
     });
     
-    // Construir el where final combinando todos los filtros
+    // Construir el where final usando AND para combinar todos los filtros
     const finalWhere: any = {
-      id: whereClause.id,
-      orientation: whereClause.orientation,
-      gender: whereClause.gender,
-      // Filtrar perfiles reales (no fake)
-      OR: whereClause.OR,
-      // REQUISITO: Debe tener al menos una foto de portada
-      photos: {
-        some: {
-          type: 'cover',
+      AND: [
+        { id: whereClause.id },
+        { orientation: whereClause.orientation },
+        { gender: whereClause.gender },
+        // Filtrar perfiles reales (no fake) usando OR
+        {
+          OR: [
+            { isFake: false },
+            { isFake: null },
+          ],
         },
-      },
+        // REQUISITO: Debe tener al menos una foto de portada
+        {
+          photos: {
+            some: {
+              type: 'cover',
+            },
+          },
+        },
+      ],
     };
     
-    // Si hay filtro de ciudad (solo para 9Plus), añadirlo
+    // Si hay filtro de ciudad (solo para 9Plus), añadirlo al AND
     if (whereClause.city) {
-      finalWhere.city = whereClause.city;
+      finalWhere.AND.push({ city: whereClause.city });
     }
     
     let profiles = await prisma.profile.findMany({
