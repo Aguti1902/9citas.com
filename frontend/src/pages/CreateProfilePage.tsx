@@ -232,7 +232,7 @@ export default function CreateProfilePage() {
         maximumAge: 0, // No usar ubicación en caché, siempre obtener nueva
       }
     )
-  }, [])
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
