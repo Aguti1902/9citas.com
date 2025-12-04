@@ -77,11 +77,14 @@ export default function CreateProfilePage() {
     { name: 'Figueres', lat: 42.2679, lng: 2.9616 },
   ]
 
+  const [lockedOrientation, setLockedOrientation] = useState<string | null>(null)
+
   // Obtener orientación guardada - NO detectar ubicación al crear perfil
   useEffect(() => {
     const savedOrientation = localStorage.getItem('userOrientation')
     if (savedOrientation) {
       setFormData(prev => ({ ...prev, orientation: savedOrientation }))
+      setLockedOrientation(savedOrientation) // Bloquear esta orientación
       localStorage.removeItem('userOrientation') // Limpiar después de usar
     }
 
@@ -421,32 +424,41 @@ export default function CreateProfilePage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Orientación
+              Orientación {lockedOrientation && <span className="text-xs text-gray-500">(definida al registrarte)</span>}
             </label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="orientation"
-                  value="hetero"
-                  checked={formData.orientation === 'hetero'}
-                  onChange={(e) => setFormData({ ...formData, orientation: e.target.value })}
-                  className="mr-2"
-                />
-                <span className="text-white">Hetero</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="orientation"
-                  value="gay"
-                  checked={formData.orientation === 'gay'}
-                  onChange={(e) => setFormData({ ...formData, orientation: e.target.value })}
-                  className="mr-2"
-                />
-                <span className="text-white">Gay</span>
-              </label>
-            </div>
+            {lockedOrientation ? (
+              // Orientación bloqueada - solo mostrar la seleccionada al registrarse
+              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
+                <span className="text-white font-medium capitalize">{lockedOrientation}</span>
+                <span className="text-gray-400 text-xs ml-auto">No se puede cambiar</span>
+              </div>
+            ) : (
+              // Orientación no bloqueada (fallback)
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="orientation"
+                    value="hetero"
+                    checked={formData.orientation === 'hetero'}
+                    onChange={(e) => setFormData({ ...formData, orientation: e.target.value })}
+                    className="mr-2"
+                  />
+                  <span className="text-white">Hetero</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="orientation"
+                    value="gay"
+                    checked={formData.orientation === 'gay'}
+                    onChange={(e) => setFormData({ ...formData, orientation: e.target.value })}
+                    className="mr-2"
+                  />
+                  <span className="text-white">Gay</span>
+                </label>
+              </div>
+            )}
           </div>
 
           <div>
