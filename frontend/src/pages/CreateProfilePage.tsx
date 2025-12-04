@@ -76,7 +76,7 @@ export default function CreateProfilePage() {
     { name: 'Pamplona', lat: 42.8125, lng: -1.6458 },
   ]
 
-  // Obtener orientación guardada y detectar ubicación automáticamente
+  // Obtener orientación guardada - NO detectar ubicación al crear perfil
   useEffect(() => {
     const savedOrientation = localStorage.getItem('userOrientation')
     if (savedOrientation) {
@@ -84,21 +84,25 @@ export default function CreateProfilePage() {
       localStorage.removeItem('userOrientation') // Limpiar después de usar
     }
 
-    // Detectar ubicación automáticamente
+    // IMPORTANTE: NO detectar ubicación automáticamente al crear el perfil
+    // La ubicación se detectará cuando el usuario navegue/use la app
+    setIsDetectingLocation(false)
+    setLocationError('')
+    
+    // NO establecer ubicación por defecto - dejar que el usuario la seleccione manualmente
+    // o que se detecte cuando navegue por la app
+  }, [])
+
+  // Función para detectar ubicación manualmente (si el usuario quiere)
+  const handleDetectLocation = () => {
     if (!navigator.geolocation) {
-      setLocationError('Tu navegador no soporta geolocalización. Por favor, usa un dispositivo móvil.')
-      setIsDetectingLocation(false)
-      // Usar Madrid como fallback
-      setFormData(prev => ({
-        ...prev,
-        city: 'Madrid',
-        latitude: 40.4168,
-        longitude: -3.7038,
-      }))
+      setLocationError('Tu navegador no soporta geolocalización.')
       return
     }
 
     setIsDetectingLocation(true)
+    setLocationError('')
+    
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude, accuracy } = position.coords
@@ -293,6 +297,9 @@ export default function CreateProfilePage() {
       setError('El título debe tener máximo 15 caracteres')
       return
     }
+
+    // IMPORTANTE: La ciudad NO es obligatoria al crear el perfil
+    // Se puede crear sin ciudad y se detectará cuando use la app
 
     const age = parseInt(formData.age)
     if (age < 18 || age > 99) {

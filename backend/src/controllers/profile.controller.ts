@@ -305,6 +305,15 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       index === self.findIndex(p => p.id === profile.id)
     );
 
+    // Ordenar por distancia: más cercano primero (ascendente)
+    uniqueProfiles.sort((a, b) => {
+      // Perfiles con distancia van primero
+      if (a.distance === null && b.distance === null) return 0
+      if (a.distance === null) return 1 // Sin distancia al final
+      if (b.distance === null) return -1 // Con distancia primero
+      return a.distance - b.distance // Ordenar de menor a mayor distancia
+    })
+
     // Limitar resultados (50 para gratuitos)
     const maxProfilesForFree = 50;
     const finalProfiles = uniqueProfiles.slice(0, isPlus ? Number(limit) : Math.min(Number(limit), maxProfilesForFree));
