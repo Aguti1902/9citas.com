@@ -485,32 +485,53 @@ export default function CreateProfilePage() {
             </p>
           </div>
 
-          {/* Ubicación detectada automáticamente */}
+          {/* Ubicación - NO se detecta automáticamente al crear perfil */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Ubicación
+              Ubicación (Opcional)
             </label>
-            {isDetectingLocation ? (
-              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-                <span className="text-gray-400">Detectando tu ubicación...</span>
-              </div>
-            ) : (
-              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
-                <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span className="text-white font-medium">{formData.city}</span>
-                <span className="text-gray-400 text-sm ml-auto">Detectada automáticamente</span>
-              </div>
+            <p className="text-gray-400 text-xs mb-2">
+              La ubicación se detectará automáticamente cuando uses la app. Puedes seleccionar una ciudad manualmente si lo deseas.
+            </p>
+            <div className="flex gap-2">
+              <select
+                value={formData.city}
+                onChange={(e) => {
+                  const selectedCity = SPANISH_CITIES.find(c => c.name === e.target.value)
+                  setFormData(prev => ({
+                    ...prev,
+                    city: e.target.value,
+                    latitude: selectedCity?.lat || null,
+                    longitude: selectedCity?.lng || null,
+                  }))
+                }}
+                className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:border-primary focus:outline-none"
+              >
+                <option value="">Seleccionar ciudad (opcional)</option>
+                {SPANISH_CITIES.map(city => (
+                  <option key={city.name} value={city.name}>{city.name}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={isDetectingLocation}
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDetectingLocation ? 'Detectando...' : '📍 Detectar'}
+              </button>
+            </div>
+            {isDetectingLocation && (
+              <p className="text-gray-400 text-xs mt-2">Detectando tu ubicación...</p>
             )}
             {locationError && (
               <p className="text-red-400 text-xs mt-1">{locationError}</p>
             )}
-            <p className="text-gray-400 text-xs mt-1">
-              Tu ubicación se ha detectado automáticamente desde tu dispositivo
-            </p>
+            {formData.city && !isDetectingLocation && !locationError && (
+              <p className="text-gray-400 text-xs mt-1">
+                Ciudad seleccionada: {formData.city}
+              </p>
+            )}
           </div>
 
           {/* FOTOS PÚBLICAS */}
