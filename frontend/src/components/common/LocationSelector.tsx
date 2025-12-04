@@ -39,6 +39,7 @@ const SPANISH_CITIES = [
   { name: 'Móstoles', lat: 40.3230, lng: -3.8651 },
   { name: 'Alcalá de Henares', lat: 40.4818, lng: -3.3634 },
   { name: 'Pamplona', lat: 42.8125, lng: -1.6458 },
+  { name: 'Figueres', lat: 42.2679, lng: 2.9616 },
 ]
 
 export default function LocationSelector({ currentCity, onLocationChange }: LocationSelectorProps) {
