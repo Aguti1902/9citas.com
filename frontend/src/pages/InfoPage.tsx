@@ -1,6 +1,22 @@
 import Logo from '@/components/common/Logo'
+import Button from '@/components/common/Button'
+import { useNavigate } from 'react-router-dom'
+import { BookOpen } from 'lucide-react'
 
 export default function InfoPage() {
+  const navigate = useNavigate()
+
+  const handleShowTutorial = () => {
+    // Eliminar la marca de que ya vio el tutorial
+    localStorage.removeItem('hasSeenOnboarding')
+    // Redirigir a la página principal para que se muestre el tutorial
+    navigate('/app')
+    // Recargar la página para activar el tutorial
+    setTimeout(() => {
+      window.location.reload()
+    }, 100)
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
@@ -8,6 +24,23 @@ export default function InfoPage() {
       </div>
 
       <div className="space-y-8">
+        {/* Botón para ver tutorial */}
+        <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <BookOpen className="w-6 h-6 text-white" />
+            <h3 className="text-xl font-bold text-white">Tutorial interactivo</h3>
+          </div>
+          <p className="text-white mb-4">
+            ¿Necesitas ayuda? Vuelve a ver el tutorial paso a paso de cómo funciona 9citas
+          </p>
+          <Button
+            variant="accent"
+            onClick={handleShowTutorial}
+          >
+            Ver tutorial de nuevo
+          </Button>
+        </div>
+
         {/* Cómo funciona */}
         <section className="bg-gray-900 rounded-xl p-6">
           <h2 className="text-2xl font-bold text-white mb-4">¿Cómo funciona 9citas?</h2>

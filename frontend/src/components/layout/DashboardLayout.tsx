@@ -4,6 +4,7 @@ import InstallPWA from '../common/InstallPWA'
 import RoamSummaryModal from '../common/RoamSummaryModal'
 import Toast from '../common/Toast'
 import MatchNotification from '../common/MatchNotification'
+import OnboardingTutorial from '../common/OnboardingTutorial'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useNotificationStore } from '@/store/notificationStore'
@@ -16,13 +17,14 @@ import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Lock } from 'lu
 export default function DashboardLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { logout, accessToken } = useAuthStore()
+  const { logout, accessToken, user } = useAuthStore()
   const { toasts, removeToast, addToast } = useToastStore()
   const { likesCount, unreadMessagesCount, setLikesCount, setUnreadMessagesCount, incrementLikesCount, incrementUnreadMessagesCount } = useNotificationStore()
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [pendingRequests, setPendingRequests] = useState(0)
   const [showRoamSummary, setShowRoamSummary] = useState(false)
   const [roamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   // Conectar Socket.IO cuando hay token
   useEffect(() => {
@@ -48,13 +50,23 @@ export default function DashboardLayout() {
     loadPendingRequests()
     loadRoamStatus()
     loadNotifications()
+    
+    // Verificar si es la primera vez del usuario (mostrar tutorial)
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding')
+    if (!hasSeenOnboarding && user?.id) {
+      // Esperar 1 segundo para que cargue todo antes de mostrar el tutorial
+      setTimeout(() => {
+        setShowOnboarding(true)
+      }, 1000)
+    }
+    
     const interval = setInterval(() => {
       loadPendingRequests()
       loadRoamStatus()
       loadNotifications()
     }, 30000) // Check every 30s
     return () => clearInterval(interval)
-  }, [])
+  }, [user?.id])
 
   // Escuchar eventos de Socket.IO para notificaciones en tiempo real
   useEffect(() => {
@@ -369,6 +381,16 @@ export default function DashboardLayout() {
 
       {/* Notificación de Match */}
       <MatchNotification />
+
+      {/* Tutorial de bienvenida (solo primera vez) */}
+      {showOnboarding && (
+        <OnboardingTutorial
+          onComplete={() => {
+            setShowOnboarding(false)
+            localStorage.setItem('hasSeenOnboarding', 'true')
+          }}
+        />
+      )}
     </div>
   )
 }
