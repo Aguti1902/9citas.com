@@ -29,8 +29,6 @@ export default function ProfileDetailPage() {
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [showMatchModal, setShowMatchModal] = useState(false)
 
-  const isPremium = user?.subscription?.isActive || false
-
   useEffect(() => {
     loadProfile()
     checkPrivatePhotoAccess()
