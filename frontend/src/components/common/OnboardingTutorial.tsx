@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, ChevronRight, ChevronLeft, Heart, Search, MessageCircle, Star, Camera } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Heart, Search, MessageCircle, Star, Camera, Filter, Sparkles } from 'lucide-react'
 import Button from './Button'
 
 interface OnboardingTutorialProps {
@@ -9,15 +9,15 @@ interface OnboardingTutorialProps {
 const tutorialSteps = [
   {
     id: 1,
-    title: '¡Bienvenido a 9citas! 🎉',
-    description: 'Te vamos a enseñar cómo funciona la app en unos pocos pasos. ¡Es muy fácil!',
-    icon: '👋',
-    iconComponent: null,
+    title: 'Bienvenido a 9citas',
+    description: 'Te vamos a enseñar cómo funciona la app en unos pocos pasos. Es muy fácil.',
+    icon: null,
+    iconComponent: Heart,
   },
   {
     id: 2,
     title: 'Navega y descubre perfiles',
-    description: 'En la sección Navegar puedes ver perfiles de personas cerca de ti. Desliza las tarjetas o usa los botones para dar like ❤️ o pasar ✕',
+    description: 'En la sección Navegar puedes ver perfiles de personas cerca de ti. Desliza las tarjetas o usa los botones para dar like o pasar.',
     icon: null,
     iconComponent: Search,
     highlight: 'swipe',
@@ -25,7 +25,7 @@ const tutorialSteps = [
   {
     id: 3,
     title: 'Haz Match y conecta',
-    description: 'Cuando das like a alguien que también te ha dado like, ¡haces Match! 💕 Verás una notificación y podrás chatear directamente.',
+    description: 'Cuando das like a alguien que también te ha dado like, haces Match. Verás una notificación y podrás chatear directamente.',
     icon: null,
     iconComponent: Heart,
     highlight: 'likes',
@@ -41,14 +41,14 @@ const tutorialSteps = [
   {
     id: 5,
     title: 'Filtros inteligentes',
-    description: 'Usa los filtros para encontrar personas por edad, distancia, género y más. ¡Encuentra exactamente lo que buscas!',
-    icon: '🔍',
-    iconComponent: null,
+    description: 'Usa los filtros para encontrar personas por edad, distancia, género y más. Encuentra exactamente lo que buscas.',
+    icon: null,
+    iconComponent: Filter,
     highlight: 'filters',
   },
   {
     id: 6,
-    title: 'Fotos privadas 🔒',
+    title: 'Fotos privadas',
     description: 'Puedes subir fotos privadas y decidir a quién darles acceso. También puedes solicitar ver las fotos privadas de otros usuarios.',
     icon: null,
     iconComponent: Camera,
@@ -56,18 +56,18 @@ const tutorialSteps = [
   },
   {
     id: 7,
-    title: 'Sube de nivel con 9Plus ⭐',
-    description: 'Con 9Plus obtienes filtros avanzados, mensajes ilimitados, ver quién te da like, y mucho más. ¡Aprovecha al máximo la app!',
+    title: 'Sube de nivel con 9Plus',
+    description: 'Con 9Plus obtienes filtros avanzados, mensajes ilimitados, ver quién te da like, y mucho más. Aprovecha al máximo la app.',
     icon: null,
     iconComponent: Star,
     highlight: 'premium',
   },
   {
     id: 8,
-    title: '¡Listo para empezar! 🚀',
-    description: 'Ya conoces lo básico. Ahora es tu turno: completa tu perfil, sube fotos y empieza a conocer gente increíble. ¡Mucha suerte!',
-    icon: '✨',
-    iconComponent: null,
+    title: 'Listo para empezar',
+    description: 'Ya conoces lo básico. Ahora es tu turno: completa tu perfil, sube fotos y empieza a conocer gente increíble. Mucha suerte.',
+    icon: null,
+    iconComponent: Sparkles,
   },
 ]
 
@@ -113,13 +113,11 @@ export default function OnboardingTutorial({ onComplete }: OnboardingTutorialPro
         <div className="px-8 py-12 text-center">
           {/* Icono */}
           <div className="mb-6 flex justify-center">
-            {step.icon ? (
-              <div className="text-7xl animate-bounce">{step.icon}</div>
-            ) : step.iconComponent ? (
+            {step.iconComponent && (
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center animate-pulse">
                 <step.iconComponent className="w-10 h-10 text-white" />
               </div>
-            ) : null}
+            )}
           </div>
 
           {/* Título */}
