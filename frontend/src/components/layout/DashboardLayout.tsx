@@ -75,14 +75,18 @@ export default function DashboardLayout() {
 
     // Escuchar nuevos likes
     const handleNewLike = (data: any) => {
-      incrementLikesCount()
-      addToast(`¡${data.fromProfile.title} te ha dado like! 💕`, 'success', 5000)
+      // Solo incrementar si NO estamos en la página de likes
+      const currentPath = window.location.pathname
+      if (!currentPath.includes('/app/likes')) {
+        incrementLikesCount()
+        addToast(`¡${data.fromProfile.title} te ha dado like! 💕`, 'success', 5000)
+      }
     }
 
     // Escuchar nuevos mensajes
     const handleNewMessage = (message: any) => {
       // Solo incrementar si no estamos en la página de chat con ese usuario
-      const currentPath = location.pathname
+      const currentPath = window.location.pathname
       const isInChat = currentPath.includes(`/app/chat/${message.fromProfileId}`)
       if (!isInChat) {
         incrementUnreadMessagesCount()
@@ -304,7 +308,8 @@ export default function DashboardLayout() {
               
               // Determinar si mostrar badge
               let badgeCount = 0
-              if (item.path === '/app/likes' && likesCount > 0) {
+              // NO mostrar badge de likes si estamos actualmente en la página de likes
+              if (item.path === '/app/likes' && likesCount > 0 && !location.pathname.includes('/app/likes')) {
                 badgeCount = likesCount
               } else if (item.path === '/app/inbox' && unreadMessagesCount > 0) {
                 badgeCount = unreadMessagesCount

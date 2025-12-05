@@ -26,6 +26,16 @@ export default function LikesPage() {
     // Limpiar badge de notificaciones ANTES de cargar
     setLikesCount(0)
     loadLikes()
+
+    // Mantener el badge en 0 mientras estemos en esta página
+    // Verificar cada segundo por si el polling lo vuelve a incrementar
+    const keepBadgeClear = setInterval(() => {
+      setLikesCount(0)
+    }, 1000)
+
+    return () => {
+      clearInterval(keepBadgeClear)
+    }
   }, [])
 
   const loadLikes = async () => {
