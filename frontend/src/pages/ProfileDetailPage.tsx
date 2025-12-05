@@ -12,7 +12,6 @@ import { Lock, Eye } from 'lucide-react'
 export default function ProfileDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuthStore()
   const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLiked, setIsLiked] = useState(false)
