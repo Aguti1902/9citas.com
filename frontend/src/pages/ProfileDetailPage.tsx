@@ -18,6 +18,11 @@ export default function ProfileDetailPage() {
   const [isLiked, setIsLiked] = useState(false)
   const [hasMatch, setHasMatch] = useState(false)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  
+  // Resetear índice cuando cambia el perfil o las fotos públicas
+  useEffect(() => {
+    setCurrentPhotoIndex(0)
+  }, [id, profile?.photos])
   const [privatePhotoAccess, setPrivatePhotoAccess] = useState<any>(null)
   const [showPrivatePhotosModal, setShowPrivatePhotosModal] = useState(false)
   const [isRequestingAccess, setIsRequestingAccess] = useState(false)
