@@ -17,6 +17,8 @@ export default function LikesPage() {
   const [receivedLikesTotal, setReceivedLikesTotal] = useState(0)
   const [activeTab, setActiveTab] = useState<'matches' | 'sent' | 'received'>('matches')
   const [isLoading, setIsLoading] = useState(true)
+  // Trackear qué tabs han sido vistos para ocultar sus contadores
+  const [viewedTabs, setViewedTabs] = useState<Set<string>>(new Set(['matches'])) // matches se marca como visto al cargar
 
   const isPremium = user?.subscription?.isActive || false
 
@@ -77,6 +79,12 @@ export default function LikesPage() {
     activeTab === 'sent' ? sentLikes : 
     receivedLikes
 
+  // Función para cambiar de tab y marcar como visto
+  const handleTabChange = (tab: 'matches' | 'sent' | 'received') => {
+    setActiveTab(tab)
+    setViewedTabs(prev => new Set([...prev, tab]))
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold text-white mb-6">Me gusta</h1>
@@ -84,34 +92,34 @@ export default function LikesPage() {
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-gray-800 overflow-x-auto">
         <button
-          onClick={() => setActiveTab('matches')}
+          onClick={() => handleTabChange('matches')}
           className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
             activeTab === 'matches'
               ? 'text-primary border-b-2 border-primary'
               : 'text-gray-400 hover:text-white'
           }`}
         >
-          💕 Matches {matches.length > 0 && `(${matches.length})`}
+          💕 Matches {matches.length > 0 && !viewedTabs.has('matches') && `(${matches.length})`}
         </button>
         <button
-          onClick={() => setActiveTab('received')}
+          onClick={() => handleTabChange('received')}
           className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
             activeTab === 'received'
               ? 'text-primary border-b-2 border-primary'
               : 'text-gray-400 hover:text-white'
           }`}
         >
-          Recibidos {receivedLikesTotal > 0 && `(${receivedLikesTotal})`}
+          Recibidos {receivedLikesTotal > 0 && !viewedTabs.has('received') && `(${receivedLikesTotal})`}
         </button>
         <button
-          onClick={() => setActiveTab('sent')}
+          onClick={() => handleTabChange('sent')}
           className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
             activeTab === 'sent'
               ? 'text-primary border-b-2 border-primary'
               : 'text-gray-400 hover:text-white'
           }`}
         >
-          Enviados {sentLikes.length > 0 && `(${sentLikes.length})`}
+          Enviados {sentLikes.length > 0 && !viewedTabs.has('sent') && `(${sentLikes.length})`}
         </button>
       </div>
 
