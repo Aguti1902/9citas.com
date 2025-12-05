@@ -89,10 +89,13 @@ export default function DashboardLayout() {
 
   const loadNotifications = async () => {
     try {
-      // Cargar likes recibidos
-      const likesResponse = await api.get('/likes/received')
-      const likesTotal = likesResponse.data.total || 0
-      setLikesCount(likesTotal)
+      // Cargar likes recibidos - SOLO si NO estamos en la página de likes
+      // Si estamos en /app/likes, el contador ya se limpió y no debe actualizarse
+      if (!location.pathname.includes('/app/likes')) {
+        const likesResponse = await api.get('/likes/received')
+        const likesTotal = likesResponse.data.total || 0
+        setLikesCount(likesTotal)
+      }
 
       // Cargar mensajes no leídos
       const conversationsResponse = await api.get('/messages/conversations')

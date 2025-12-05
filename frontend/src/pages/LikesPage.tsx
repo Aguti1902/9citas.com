@@ -21,9 +21,9 @@ export default function LikesPage() {
   const isPremium = user?.subscription?.isActive || false
 
   useEffect(() => {
-    loadLikes()
-    // Limpiar badge de notificaciones al entrar a la página
+    // Limpiar badge de notificaciones ANTES de cargar
     setLikesCount(0)
+    loadLikes()
   }, [])
 
   const loadLikes = async () => {
@@ -43,8 +43,8 @@ export default function LikesPage() {
       // Guardar total de likes recibidos
       const total = receivedResponse.data.total || 0
       setReceivedLikesTotal(total)
-      // Actualizar el store de notificaciones
-      setLikesCount(total)
+      // NO actualizar el contador aquí - ya se limpió al entrar a la página
+      // El contador solo debe incrementarse cuando llega un nuevo like por Socket.IO
       
       // Si es Premium, mostrar perfiles. Si es Free, array vacío (bloqueado)
       if (isPremium) {
