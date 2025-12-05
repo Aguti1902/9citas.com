@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import { useNotificationStore } from '@/store/notificationStore'
@@ -22,9 +22,11 @@ export default function LikesPage() {
 
   const isPremium = user?.subscription?.isActive || false
 
-  // Limpiar badge INMEDIATAMENTE al montar (incluso antes del useEffect)
-  // Esto previene que aparezca al recargar la página
-  setLikesCount(0)
+  // useLayoutEffect se ejecuta ANTES del render, incluso antes que useEffect
+  // Esto asegura que el badge se limpie antes de que se muestre en pantalla
+  useLayoutEffect(() => {
+    setLikesCount(0)
+  }, [])
 
   useEffect(() => {
     // Limpiar badge múltiples veces al inicio para asegurar que se borre
