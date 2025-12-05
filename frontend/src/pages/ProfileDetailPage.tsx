@@ -153,21 +153,21 @@ export default function ProfileDetailPage() {
     )
   }
 
-  // IMPORTANTE: Mostrar TODAS las fotos (portada y privadas)
-  // Las privadas se mostrarán borrosas si no hay acceso
-  const allPhotos = profile.photos || []
-  const photos = allPhotos
+  // IMPORTANTE: En el carrusel SOLO se muestran fotos públicas (no privadas)
+  const publicPhotos = profile.photos?.filter((p: any) => p.type === 'cover') || []
+  const photos = publicPhotos
   const currentPhoto = photos[currentPhotoIndex]
   
   // Separar fotos privadas para la sección de fotos privadas
   const privatePhotos = profile.photos?.filter((p: any) => p.type === 'private') || []
   
+  // Todas las fotos (para el modal de fotos privadas)
+  const allPhotos = profile.photos || []
+  
   console.log('🖼️ Fotos procesadas:', {
-    totalPhotos: photos.length,
-    coverPhotos: photos.filter((p: any) => p.type === 'cover').length,
+    publicPhotos: photos.length,
     privatePhotos: privatePhotos.length,
     currentIndex: currentPhotoIndex,
-    currentPhotoType: currentPhoto?.type,
   })
 
   return (
@@ -176,42 +176,34 @@ export default function ProfileDetailPage() {
       <div className="relative aspect-[3/4] bg-gray-900">
         {photos.length > 0 ? (
           <>
-            {/* Mostrar foto borrosa si es privada y no hay acceso */}
-            {currentPhoto.type === 'private' && !privatePhotoAccess?.hasAccess ? (
-              <div className="relative w-full h-full">
-                <img
-                  src={currentPhoto.url}
-                  alt={profile.title}
-                  className="w-full h-full object-cover filter blur-md"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
-                  <Lock className="w-16 h-16 text-white" />
-                </div>
-              </div>
-            ) : (
-              <img
-                src={currentPhoto.url}
-                alt={profile.title}
-                className="w-full h-full object-cover"
-              />
-            )}
+            <img
+              src={currentPhoto.url}
+              alt={profile.title}
+              className="w-full h-full object-cover"
+            />
 
-            {/* Navegación de fotos */}
+            {/* Navegación de fotos - Flechas mejoradas */}
             {photos.length > 1 && (
               <>
                 <button
                   onClick={() => setCurrentPhotoIndex((prev) => Math.max(0, prev - 1))}
                   disabled={currentPhotoIndex === 0}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 disabled:opacity-30"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-full p-3 shadow-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 z-10 border-2 border-white/30 hover:border-white/50 hover:scale-110 disabled:hover:scale-100"
+                  aria-label="Foto anterior"
                 >
-                  ←
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+                  </svg>
                 </button>
                 <button
                   onClick={() => setCurrentPhotoIndex((prev) => Math.min(photos.length - 1, prev + 1))}
                   disabled={currentPhotoIndex === photos.length - 1}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 disabled:opacity-30"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-full p-3 shadow-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 z-10 border-2 border-white/30 hover:border-white/50 hover:scale-110 disabled:hover:scale-100"
+                  aria-label="Foto siguiente"
                 >
-                  →
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                  </svg>
                 </button>
 
                 {/* Indicadores */}
