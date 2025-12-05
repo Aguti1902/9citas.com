@@ -59,9 +59,40 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'No puedes enviar mensajes a este perfil' });
     }
 
-    // IMPORTANTE: Usuarios gratis pueden chatear con cualquier usuario
-    // La única limitación es que solo pueden ver/chatear con 50 usuarios máximo (ya controlado en búsqueda)
-    // No hay restricción de ciudad ni de match mutuo para chatear
+    // Verificar restricción de ciudad para usuarios gratis
+    const isPlus = myProfile?.user?.subscription?.isActive || false;
+    if (!isPlus && myProfile?.city !== toProfile.city) {
+      return res.status(403).json({
+        error: 'Solo puedes chatear con usuarios de tu ciudad. Suscríbete a 9Plus para chatear con cualquiera.',
+        requiresPremium: true,
+      });
+    }
+
+    // Verificar match mutuo para usuarios FREE
+    if (!isPlus) {
+      // Verificar que AMBOS se hayan dado like (match mutuo)
+      const myLike = await prisma.like.findFirst({
+        where: {
+          fromProfileId: req.profileId!,
+          toProfileId: toProfileId,
+        },
+      });
+
+      const theirLike = await prisma.like.findFirst({
+        where: {
+          fromProfileId: toProfileId,
+          toProfileId: req.profileId!,
+        },
+      });
+
+      if (!myLike || !theirLike) {
+        return res.status(403).json({
+          error: 'Solo puedes chatear con usuarios que también te hayan dado "Me gusta". Suscríbete a 9Plus para chatear con cualquiera.',
+          requiresPremium: true,
+          requiresMatch: true,
+        });
+      }
+    }
 
     // Crear mensaje
     const message = await prisma.message.create({

@@ -437,30 +437,29 @@ export const checkMatch = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Obtener todos los matches (perfiles donde ambos se han dado like)
+// Obtener matches (likes mutuos)
 export const getMatches = async (req: AuthRequest, res: Response) => {
   try {
-    // Obtener todos los likes que yo he dado
-    const myLikes = await prisma.like.findMany({
-      where: {
+    // Obtener todos los likes que he enviado
+    const sentLikes = await prisma.like.findMany({
+      where: { 
         fromProfileId: req.profileId!,
+        toProfile: {
+          isFake: false, // EXCLUIR perfiles falsos
+        },
       },
-      select: {
-        toProfileId: true,
-      },
+      select: { toProfileId: true },
     });
 
-    const myLikedProfileIds = myLikes.map(like => like.toProfileId);
+    const sentLikeIds = sentLikes.map(like => like.toProfileId);
 
-    // Obtener perfiles que me han dado like Y a los que yo también les he dado like (MATCH)
+    // De esos, encontrar cuáles me han dado like de vuelta (MATCH)
     const matches = await prisma.like.findMany({
       where: {
-        toProfileId: req.profileId!,
-        fromProfileId: {
-          in: myLikedProfileIds, // Solo los que yo también les he dado like
-        },
+        fromProfileId: { in: sentLikeIds }, // De los que yo le di like
+        toProfileId: req.profileId!, // Que me dieron like de vuelta
         fromProfile: {
-          isFake: false, // Excluir perfiles falsos
+          isFake: false, // EXCLUIR perfiles falsos
         },
       },
       include: {
@@ -473,20 +472,18 @@ export const getMatches = async (req: AuthRequest, res: Response) => {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     // Normalizar URLs de fotos
-    const normalizedMatches = matches.map(like => ({
-      ...like.fromProfile,
-      photos: like.fromProfile.photos,
-      matchedAt: like.createdAt,
-    })).map(profile => normalizeProfilePhotos(profile));
+    const normalizedMatches = matches.map(match => ({
+      ...match,
+      fromProfile: match.fromProfile ? normalizeProfilePhotos(match.fromProfile) : match.fromProfile,
+    }));
 
-    res.json({
+    res.json({ 
       matches: normalizedMatches,
+      total: normalizedMatches.length,
     });
   } catch (error) {
     console.error('Error al obtener matches:', error);

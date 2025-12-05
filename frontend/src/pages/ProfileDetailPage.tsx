@@ -130,8 +130,8 @@ export default function ProfileDetailPage() {
   }
 
   const handleChat = () => {
-    // Todos pueden chatear directamente (gratis y premium)
-    // La única limitación es que usuarios gratis solo pueden ver/chatear con 50 usuarios máximo
+    // Todos los usuarios pueden chatear sin necesidad de match
+    // La limitación de usuarios FREE es solo ver 50 perfiles totales
     navigate(`/app/chat/${id}`)
   }
 

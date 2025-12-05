@@ -15,7 +15,7 @@ export default function LikesPage() {
   const [receivedLikes, setReceivedLikes] = useState<any[]>([])
   const [matches, setMatches] = useState<any[]>([])
   const [receivedLikesTotal, setReceivedLikesTotal] = useState(0)
-  const [activeTab, setActiveTab] = useState<'sent' | 'received' | 'matches'>('received')
+  const [activeTab, setActiveTab] = useState<'matches' | 'sent' | 'received'>('matches')
   const [isLoading, setIsLoading] = useState(true)
 
   const isPremium = user?.subscription?.isActive || false
@@ -30,7 +30,7 @@ export default function LikesPage() {
       const [sentResponse, receivedResponse, matchesResponse] = await Promise.all([
         api.get('/likes/sent'),
         api.get('/likes/received'),
-        api.get('/likes/matches').catch(() => ({ data: { matches: [] } })), // Si falla, usar array vacío
+        api.get('/likes/matches'),
       ])
       
       setSentLikes(sentResponse.data.likes.map((like: any) => ({
@@ -58,8 +58,11 @@ export default function LikesPage() {
         })))
       }
       
-      // Cargar matches (disponible para todos, gratis y premium)
-      setMatches(matchesResponse.data.matches || [])
+      // Cargar matches (likes mutuos) - disponible para todos los usuarios
+      setMatches(matchesResponse.data.matches.map((match: any) => ({
+        ...match.fromProfile,
+        matchDate: match.createdAt,
+      })))
     } catch (error) {
       console.error('Error al cargar likes:', error)
     } finally {
@@ -67,23 +70,30 @@ export default function LikesPage() {
     }
   }
 
-  const getCurrentProfiles = () => {
-    if (activeTab === 'sent') return sentLikes
-    if (activeTab === 'matches') return matches
-    return receivedLikes
-  }
-  
-  const currentProfiles = getCurrentProfiles()
+  const currentProfiles = 
+    activeTab === 'matches' ? matches :
+    activeTab === 'sent' ? sentLikes : 
+    receivedLikes
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold text-white mb-6">Me gusta</h1>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-800">
+      <div className="flex gap-2 mb-6 border-b border-gray-800 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('matches')}
+          className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
+            activeTab === 'matches'
+              ? 'text-primary border-b-2 border-primary'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          💕 Matches {matches.length > 0 && `(${matches.length})`}
+        </button>
         <button
           onClick={() => setActiveTab('received')}
-          className={`px-6 py-3 font-semibold transition-colors ${
+          className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
             activeTab === 'received'
               ? 'text-primary border-b-2 border-primary'
               : 'text-gray-400 hover:text-white'
@@ -93,23 +103,13 @@ export default function LikesPage() {
         </button>
         <button
           onClick={() => setActiveTab('sent')}
-          className={`px-6 py-3 font-semibold transition-colors ${
+          className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
             activeTab === 'sent'
               ? 'text-primary border-b-2 border-primary'
               : 'text-gray-400 hover:text-white'
           }`}
         >
           Enviados {sentLikes.length > 0 && `(${sentLikes.length})`}
-        </button>
-        <button
-          onClick={() => setActiveTab('matches')}
-          className={`px-6 py-3 font-semibold transition-colors ${
-            activeTab === 'matches'
-              ? 'text-primary border-b-2 border-primary'
-              : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          Matches {matches.length > 0 && `(${matches.length})`}
         </button>
       </div>
 
@@ -137,10 +137,10 @@ export default function LikesPage() {
       ) : currentProfiles.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-400 text-lg">
-            {activeTab === 'sent'
+            {activeTab === 'matches'
+              ? 'Aún no tienes matches. ¡Da "Me gusta" a alguien para hacer match!'
+              : activeTab === 'sent'
               ? 'Aún no has dado "Me gusta" a nadie'
-              : activeTab === 'matches'
-              ? 'Aún no tienes ningún match'
               : 'Aún no has recibido ningún "Me gusta"'}
           </p>
         </div>

@@ -22,7 +22,7 @@ router.get('/received', likeController.getReceivedLikes);
 // Verificar match mutuo
 router.get('/check/:profileId', likeController.checkMatch);
 
-// Obtener todos los matches
+// Obtener matches (likes mutuos)
 router.get('/matches', likeController.getMatches);
 
 export default router;
