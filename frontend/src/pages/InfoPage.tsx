@@ -1,10 +1,18 @@
 import Logo from '@/components/common/Logo'
 import Button from '@/components/common/Button'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, FileText, Shield, Cookie, Users } from 'lucide-react'
+import { useState } from 'react'
+import TermsAndConditions from '@/components/legal/TermsAndConditions'
+import PrivacyPolicy from '@/components/legal/PrivacyPolicy'
+import CookiePolicy from '@/components/legal/CookiePolicy'
+import CommunityGuidelines from '@/components/legal/CommunityGuidelines'
+
+type LegalTab = 'info' | 'terms' | 'privacy' | 'cookies' | 'community'
 
 export default function InfoPage() {
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<LegalTab>('info')
 
   const handleShowTutorial = () => {
     // Eliminar la marca de que ya vio el tutorial
@@ -17,13 +25,44 @@ export default function InfoPage() {
     }, 100)
   }
 
+  const tabs = [
+    { id: 'info' as LegalTab, label: 'Información', icon: BookOpen },
+    { id: 'terms' as LegalTab, label: 'Términos', icon: FileText },
+    { id: 'privacy' as LegalTab, label: 'Privacidad', icon: Shield },
+    { id: 'cookies' as LegalTab, label: 'Cookies', icon: Cookie },
+    { id: 'community' as LegalTab, label: 'Normas', icon: Users },
+  ]
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <Logo size="md" className="mb-4" />
       </div>
 
-      <div className="space-y-8">
+      {/* Tabs de navegación */}
+      <div className="flex gap-2 mb-8 border-b border-gray-800 overflow-x-auto pb-2">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-6 py-3 font-semibold transition-colors whitespace-nowrap rounded-t-lg ${
+                activeTab === tab.id
+                  ? 'text-primary bg-gray-900 border-b-2 border-primary'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              {tab.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Contenido según tab activo */}
+      {activeTab === 'info' && (
+        <div className="space-y-8">
         {/* Botón para ver tutorial */}
         <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -126,34 +165,105 @@ export default function InfoPage() {
         <section className="bg-gray-900 rounded-xl p-6">
           <h2 className="text-2xl font-bold text-white mb-4">Información legal</h2>
           <div className="text-gray-300 space-y-2">
-            <a href="#" className="block text-primary hover:underline">
-              Aviso legal
-            </a>
-            <a href="#" className="block text-primary hover:underline">
-              Política de privacidad
-            </a>
-            <a href="#" className="block text-primary hover:underline">
-              Política de cookies
-            </a>
-            <a href="#" className="block text-primary hover:underline">
+            <button
+              onClick={() => setActiveTab('terms')}
+              className="block text-primary hover:underline text-left"
+            >
               Términos y condiciones
-            </a>
+            </button>
+            <button
+              onClick={() => setActiveTab('privacy')}
+              className="block text-primary hover:underline text-left"
+            >
+              Política de privacidad
+            </button>
+            <button
+              onClick={() => setActiveTab('cookies')}
+              className="block text-primary hover:underline text-left"
+            >
+              Política de cookies
+            </button>
+            <button
+              onClick={() => setActiveTab('community')}
+              className="block text-primary hover:underline text-left"
+            >
+              Normas de la comunidad
+            </button>
           </div>
         </section>
 
         {/* Contacto */}
         <section className="bg-gray-900 rounded-xl p-6">
           <h2 className="text-2xl font-bold text-white mb-4">Contacto y soporte</h2>
+          <div className="text-gray-300 space-y-3">
+            <div>
+              <p className="font-semibold text-white mb-1">Soporte General</p>
+              <p>📧 soporte@9citas.com</p>
+            </div>
+            <div>
+              <p className="font-semibold text-white mb-1">Asuntos Legales</p>
+              <p>⚖️ legal@9citas.com</p>
+            </div>
+            <div>
+              <p className="font-semibold text-white mb-1">Privacidad y Datos</p>
+              <p>🔒 privacy@9citas.com</p>
+            </div>
+            <div>
+              <p className="font-semibold text-white mb-1">Seguridad y Reportes</p>
+              <p>🛡️ safety@9citas.com</p>
+            </div>
+            <div>
+              <p className="font-semibold text-white mb-1">Horario de Atención</p>
+              <p>🕐 Lunes a Viernes, 9:00 - 18:00h (CET)</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Empresa */}
+        <section className="bg-gray-900 rounded-xl p-6">
+          <h2 className="text-2xl font-bold text-white mb-4">Información de la empresa</h2>
           <div className="text-gray-300 space-y-2">
             <p>
-              <strong className="text-white">Email:</strong> soporte@9citas.com
+              <strong className="text-white">Empresa:</strong> Class Ads Entertainments LLC
             </p>
             <p>
-              <strong className="text-white">Horario:</strong> Lunes a Viernes, 9:00 - 18:00h
+              <strong className="text-white">Servicio:</strong> 9citas.com
+            </p>
+            <p className="text-sm text-gray-400 mt-4">
+              © {new Date().getFullYear()} Class Ads Entertainments LLC. Todos los derechos reservados.
             </p>
           </div>
         </section>
-      </div>
+        </div>
+      )}
+
+      {/* Términos y Condiciones */}
+      {activeTab === 'terms' && (
+        <div className="bg-gray-900 rounded-xl p-8">
+          <TermsAndConditions />
+        </div>
+      )}
+
+      {/* Política de Privacidad */}
+      {activeTab === 'privacy' && (
+        <div className="bg-gray-900 rounded-xl p-8">
+          <PrivacyPolicy />
+        </div>
+      )}
+
+      {/* Política de Cookies */}
+      {activeTab === 'cookies' && (
+        <div className="bg-gray-900 rounded-xl p-8">
+          <CookiePolicy />
+        </div>
+      )}
+
+      {/* Normas de la Comunidad */}
+      {activeTab === 'community' && (
+        <div className="bg-gray-900 rounded-xl p-8">
+          <CommunityGuidelines />
+        </div>
+      )}
     </div>
   )
 }
