@@ -177,9 +177,9 @@ export default function ProfileDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-8">
-      {/* Carrusel de fotos */}
+      {/* Carrusel de fotos - Solo fotos públicas */}
       <div className="relative aspect-[3/4] bg-gray-900">
-        {photos.length > 0 ? (
+        {photos.length > 0 && currentPhoto ? (
           <>
             <img
               src={currentPhoto.url}
