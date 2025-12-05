@@ -203,17 +203,13 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       b.blockerProfileId === req.profileId ? b.blockedProfileId : b.blockerProfileId
     );
 
-    const sentLikes = await prisma.like.findMany({
-      where: { fromProfileId: req.profileId! },
-      select: { toProfileId: true },
-    });
-    const likedProfileIds = sentLikes.map(like => like.toProfileId);
-
-    const excludedIds = [req.profileId!, ...blockedIds, ...likedProfileIds];
+    // IMPORTANTE: NO excluir perfiles con like para que se repitan
+    // Los usuarios gratuitos solo ven 50 perfiles, necesitan que se repitan
+    const excludedIds = [req.profileId!, ...blockedIds];
 
     console.log(`\n🔍 BÚSQUEDA: ${myProfile.title} (${myProfile.gender} ${myProfile.orientation})`);
     console.log(`   Buscando: ${targetGender} ${myProfile.orientation}`);
-    console.log(`   Excluir: ${excludedIds.length} perfiles`);
+    console.log(`   Excluir: ${excludedIds.length} perfiles (propio + bloqueados)`);
 
     // Construir where SIMPLE
     const where: any = {
