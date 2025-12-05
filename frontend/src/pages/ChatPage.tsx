@@ -413,12 +413,12 @@ export default function ChatPage() {
           paddingBottom: `max(12px, calc(12px + env(safe-area-inset-bottom)))`, // Safe area para iOS
         }}
       >
-        <div className="flex gap-2 items-center max-w-full">
+        <div className="flex gap-2 items-center w-full">
           {/* Botón de fotos */}
           <button
             type="button"
             onClick={() => setShowPhotoModal(true)}
-            className="bg-gray-800 text-white rounded-full p-2 hover:bg-gray-700 transition-colors"
+            className="bg-gray-800 text-white rounded-full p-2 hover:bg-gray-700 transition-colors flex-shrink-0"
             title="Enviar foto"
             disabled={isSending}
           >
@@ -429,7 +429,7 @@ export default function ChatPage() {
           <button
             type="button"
             onClick={handleSendLocation}
-            className="bg-gray-800 text-white rounded-full p-2 hover:bg-gray-700 transition-colors"
+            className="bg-gray-800 text-white rounded-full p-2 hover:bg-gray-700 transition-colors flex-shrink-0"
             title="Compartir ubicación"
             disabled={isSending}
           >
@@ -441,13 +441,13 @@ export default function ChatPage() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Escribe un mensaje..."
-            className="flex-1 bg-gray-800 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="flex-1 bg-gray-800 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary text-sm min-w-0"
             disabled={isSending}
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || isSending}
-            className="bg-primary text-white rounded-full px-6 py-2 font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-primary text-white rounded-full px-4 py-2 font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 text-sm whitespace-nowrap"
           >
             Enviar
           </button>

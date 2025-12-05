@@ -22,6 +22,8 @@ export default function LikesPage() {
 
   useEffect(() => {
     loadLikes()
+    // Limpiar badge de notificaciones al entrar a la página
+    setLikesCount(0)
   }, [])
 
   const loadLikes = async () => {

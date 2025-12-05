@@ -237,8 +237,8 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         if (ageMax) where.age.lte = parseInt(ageMax as string);
       }
       if (filter === 'online') {
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-        where.lastSeenAt = { gte: oneHourAgo };
+        // ONLINE: Solo usuarios conectados AHORA (isOnline = true)
+        where.isOnline = true;
       }
     }
 
