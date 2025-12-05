@@ -143,8 +143,8 @@ export default function ProfileDetailPage() {
     )
   }
 
-  // IMPORTANTE: En el carrusel SOLO se muestran fotos públicas (no privadas)
-  const publicPhotos = profile.photos?.filter((p: any) => p.type === 'cover') || []
+  // IMPORTANTE: En el carrusel se muestran TODAS las fotos EXCEPTO las privadas
+  const publicPhotos = profile.photos?.filter((p: any) => p.type !== 'private') || []
   const photos = publicPhotos
   const currentPhoto = photos[currentPhotoIndex]
   
@@ -158,6 +158,7 @@ export default function ProfileDetailPage() {
     publicPhotos: photos.length,
     privatePhotos: privatePhotos.length,
     currentIndex: currentPhotoIndex,
+    allPhotos: allPhotos.map((p: any) => ({ id: p.id, type: p.type })),
   })
 
   return (
