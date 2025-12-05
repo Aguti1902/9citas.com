@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '@/services/api'
-import { useAuthStore } from '@/store/authStore'
 import { showToast } from '@/store/toastStore'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Button from '@/components/common/Button'
