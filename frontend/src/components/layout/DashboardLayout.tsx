@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react'
 import Modal from '../common/Modal'
 import { api } from '@/services/api'
 import { connectSocket, disconnectSocket, getSocket } from '@/services/socket'
-import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Bell } from 'lucide-react'
+import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Lock } from 'lucide-react'
 
 export default function DashboardLayout() {
   const location = useLocation()
@@ -91,7 +91,9 @@ export default function DashboardLayout() {
     try {
       // Cargar likes recibidos - SOLO si NO estamos en la página de likes
       // Si estamos en /app/likes, el contador ya se limpió y no debe actualizarse
-      if (!location.pathname.includes('/app/likes')) {
+      // Usar window.location.pathname para obtener la ruta actual en tiempo real
+      const currentPath = window.location.pathname
+      if (!currentPath.includes('/app/likes')) {
         const likesResponse = await api.get('/likes/received')
         const likesTotal = likesResponse.data.total || 0
         setLikesCount(likesTotal)
@@ -227,7 +229,7 @@ export default function DashboardLayout() {
               className="relative text-gray-300 hover:text-white transition-colors"
               title="Solicitudes de fotos privadas"
             >
-              <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Lock className="w-5 h-5 sm:w-6 sm:h-6" />
               {pendingRequests > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-accent text-black text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center">
                   {pendingRequests}

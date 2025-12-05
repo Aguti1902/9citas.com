@@ -35,8 +35,10 @@ export default function NavigatePage() {
   const [detectedCity, setDetectedCity] = useState<string | null>(null)
   const [ageRange, setAgeRange] = useState({ min: 18, max: 99 })
   const [distanceRange, setDistanceRange] = useState({ min: 0, max: 500 })
+  const [selectedGender, setSelectedGender] = useState<string | null>(null)
 
   const isPremium = user?.subscription?.isActive || false
+  const userOrientation = user?.profile?.orientation || 'hetero'
 
   // Lista de ciudades españolas (misma que LocationSelector)
   const SPANISH_CITIES = [
@@ -238,6 +240,11 @@ export default function NavigatePage() {
         queryParams.distanceMax = distanceRange.max
       }
 
+      // Añadir filtro de género si está seleccionado (solo para 9PLUS hetero)
+      if (selectedGender && isPremium && userOrientation === 'hetero') {
+        queryParams.gender = selectedGender
+      }
+
       const response = await api.get('/profile/search', {
         params: queryParams,
       })
@@ -264,7 +271,7 @@ export default function NavigatePage() {
     loadRoamStatus()
     const interval = setInterval(loadRoamStatus, 30000) // Check every 30s
     return () => clearInterval(interval)
-  }, [activeFilters, ageRange, distanceRange])
+  }, [activeFilters, ageRange, distanceRange, selectedGender])
 
   const loadRoamStatus = async () => {
     try {
@@ -474,6 +481,9 @@ export default function NavigatePage() {
             onDistanceRangeChange={(min, max) => {
               setDistanceRange({ min, max })
             }}
+            userOrientation={userOrientation}
+            selectedGender={selectedGender}
+            onGenderChange={setSelectedGender}
           />
         </div>
       </div>

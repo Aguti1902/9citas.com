@@ -147,7 +147,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 // Buscar perfiles (navegar) - SIMPLIFICADO AL MÁXIMO
 export const searchProfiles = async (req: AuthRequest, res: Response) => {
   try {
-    const { filter, city, ageMin, ageMax, distanceMin, distanceMax, page = 1, limit = 20 } = req.query;
+    const { filter, city, ageMin, ageMax, distanceMin, distanceMax, page = 1, limit = 20, gender } = req.query;
 
     // Obtener perfil actual
     const myProfile = await prisma.profile.findUnique({
@@ -174,17 +174,23 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Determinar qué género buscar
-    let targetGender: string;
+    // NUEVA LÓGICA: Determinar qué género buscar
+    let targetGender: string | null = null;
+    
     if (myProfile.orientation === 'hetero') {
-      if (myProfile.gender === 'hombre') {
-        targetGender = 'mujer';
-      } else if (myProfile.gender === 'mujer') {
-        targetGender = 'hombre';
+      // USUARIOS HETERO:
+      if (isPlus && gender) {
+        // 9PLUS: Puede filtrar por género específico
+        targetGender = gender as string;
+      } else if (isPlus && !gender) {
+        // 9PLUS sin filtro: Ver TODOS los géneros (hombres + mujeres)
+        targetGender = null;
       } else {
-        return res.status(400).json({ error: 'Género no válido' });
+        // FREE: Ver TODOS los géneros (hombres + mujeres) - NO PUEDEN FILTRAR
+        targetGender = null;
       }
     } else if (myProfile.orientation === 'gay') {
+      // GAY: Solo mismo género (lógica original)
       targetGender = myProfile.gender;
     } else {
       return res.status(400).json({ error: 'Orientación no válida' });
@@ -208,14 +214,14 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     const excludedIds = [req.profileId!, ...blockedIds];
 
     console.log(`\n🔍 BÚSQUEDA: ${myProfile.title} (${myProfile.gender} ${myProfile.orientation})`);
-    console.log(`   Buscando: ${targetGender} ${myProfile.orientation}`);
+    console.log(`   Buscando: ${targetGender || 'TODOS LOS GÉNEROS'} ${myProfile.orientation}`);
     console.log(`   Excluir: ${excludedIds.length} perfiles (propio + bloqueados)`);
+    console.log(`   Plan: ${isPlus ? '9PLUS' : 'FREE'}`);
 
     // Construir where SIMPLE
     const where: any = {
       id: { notIn: excludedIds },
       orientation: myProfile.orientation,
-      gender: targetGender,
       isFake: false, // Solo perfiles reales
       photos: {
         some: {
@@ -223,6 +229,11 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         },
       },
     };
+
+    // Agregar filtro de género SOLO si targetGender está definido
+    if (targetGender) {
+      where.gender = targetGender;
+    }
 
     // Filtros solo para 9Plus
     if (isPlus) {

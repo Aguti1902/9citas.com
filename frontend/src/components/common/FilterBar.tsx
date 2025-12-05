@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, Wifi, Calendar, MapPin, Sparkles, Star } from 'lucide-react'
+import { Users, Wifi, Calendar, MapPin, Sparkles, Star, UserCircle } from 'lucide-react'
 import Modal from './Modal'
 import Button from './Button'
 
@@ -12,6 +12,9 @@ interface FilterBarProps {
   distanceRange?: { min: number; max: number }
   onAgeRangeChange?: (min: number, max: number) => void
   onDistanceRangeChange?: (min: number, max: number) => void
+  userOrientation?: string
+  selectedGender?: string | null
+  onGenderChange?: (gender: string | null) => void
 }
 
 export default function FilterBar({
@@ -23,21 +26,35 @@ export default function FilterBar({
   distanceRange = { min: 0, max: 500 },
   onAgeRangeChange,
   onDistanceRangeChange,
+  userOrientation = 'hetero',
+  selectedGender = null,
+  onGenderChange,
 }: FilterBarProps) {
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [showDistanceModal, setShowDistanceModal] = useState(false)
+  const [showGenderModal, setShowGenderModal] = useState(false)
   const [tempAgeMin, setTempAgeMin] = useState(ageRange.min)
   const [tempAgeMax, setTempAgeMax] = useState(ageRange.max)
   const [tempDistanceMin, setTempDistanceMin] = useState(distanceRange.min)
   const [tempDistanceMax, setTempDistanceMax] = useState(distanceRange.max)
 
-  const filters = [
+  // Filtros base
+  const baseFilters = [
     { id: 'all', label: 'TODOS', premium: false, Icon: Users },
     { id: 'online', label: 'ONLINE', premium: true, Icon: Wifi },
     { id: 'age', label: 'EDAD', premium: true, Icon: Calendar, isModal: true },
     { id: 'distance', label: 'DISTANCIA', premium: false, Icon: MapPin, isModal: true },
     { id: 'new', label: 'NUEVOS', premium: false, Icon: Sparkles },
   ]
+
+  // Agregar filtro de GÉNERO solo para usuarios HETERO
+  const filters = userOrientation === 'hetero' 
+    ? [
+        ...baseFilters.slice(0, 2), // TODOS y ONLINE
+        { id: 'gender', label: 'GÉNERO', premium: true, Icon: UserCircle, isModal: true }, // Nuevo filtro
+        ...baseFilters.slice(2), // EDAD, DISTANCIA, NUEVOS
+      ]
+    : baseFilters
 
   const toggleFilter = (filterId: string, premium: boolean, isModal?: boolean) => {
     if (premium && !isPremium) {
@@ -51,6 +68,8 @@ export default function FilterBar({
         setShowAgeModal(true)
       } else if (filterId === 'distance') {
         setShowDistanceModal(true)
+      } else if (filterId === 'gender') {
+        setShowGenderModal(true)
       }
       return
     }
@@ -239,6 +258,92 @@ export default function FilterBar({
               onClick={handleApplyDistance}
             >
               Aplicar
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal Filtro de Género (solo para HETERO y 9PLUS) */}
+      <Modal
+        isOpen={showGenderModal}
+        onClose={() => setShowGenderModal(false)}
+        title="Filtrar por género"
+        maxWidth="sm"
+      >
+        <div className="space-y-6 pb-2">
+          <div className="space-y-3">
+            <p className="text-gray-400 text-sm mb-4">
+              Selecciona el género que quieres ver:
+            </p>
+            
+            <button
+              onClick={() => {
+                onGenderChange?.(null)
+                setShowGenderModal(false)
+              }}
+              className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                selectedGender === null
+                  ? 'border-primary bg-primary/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <UserCircle className="w-6 h-6" />
+                <div>
+                  <div className="font-semibold">Todos los géneros</div>
+                  <div className="text-sm text-gray-400">Ver hombres y mujeres</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                onGenderChange?.('hombre')
+                setShowGenderModal(false)
+              }}
+              className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                selectedGender === 'hombre'
+                  ? 'border-primary bg-primary/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <UserCircle className="w-6 h-6" />
+                <div>
+                  <div className="font-semibold">Solo hombres</div>
+                  <div className="text-sm text-gray-400">Ver solo perfiles de hombres</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                onGenderChange?.('mujer')
+                setShowGenderModal(false)
+              }}
+              className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                selectedGender === 'mujer'
+                  ? 'border-primary bg-primary/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <UserCircle className="w-6 h-6" />
+                <div>
+                  <div className="font-semibold">Solo mujeres</div>
+                  <div className="text-sm text-gray-400">Ver solo perfiles de mujeres</div>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <div className="pt-2">
+            <Button
+              fullWidth
+              variant="outline"
+              onClick={() => setShowGenderModal(false)}
+            >
+              Cerrar
             </Button>
           </div>
         </div>
