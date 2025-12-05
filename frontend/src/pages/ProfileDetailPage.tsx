@@ -206,14 +206,18 @@ export default function ProfileDetailPage() {
                   </svg>
                 </button>
 
-                {/* Indicadores */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {/* Indicadores mejorados */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                   {photos.map((_: any, index: number) => (
-                    <div
+                    <button
                       key={index}
-                      className={`w-2 h-2 rounded-full ${
-                        index === currentPhotoIndex ? 'bg-white' : 'bg-gray-500'
+                      onClick={() => setCurrentPhotoIndex(index)}
+                      className={`transition-all duration-200 rounded-full ${
+                        index === currentPhotoIndex 
+                          ? 'bg-white w-8 h-2 shadow-lg' 
+                          : 'bg-white/50 w-2 h-2 hover:bg-white/70 hover:w-3'
                       }`}
+                      aria-label={`Ir a foto ${index + 1}`}
                     />
                   ))}
                 </div>
