@@ -85,6 +85,10 @@ export default function DashboardLayout() {
       if (!currentPath.includes('/app/likes')) {
         incrementLikesCount()
         addToast(`¡${data.fromProfile.title} te ha dado like! 💕`, 'success', 5000)
+        
+        // Actualizar el conteo en localStorage
+        const currentCount = parseInt(localStorage.getItem('lastViewedLikesCount') || '0')
+        localStorage.setItem('lastViewedLikesCount', (currentCount + 1).toString())
       }
     }
 
@@ -117,7 +121,23 @@ export default function DashboardLayout() {
       if (!currentPath.includes('/app/likes')) {
         const likesResponse = await api.get('/likes/received')
         const likesTotal = likesResponse.data.total || 0
-        setLikesCount(likesTotal)
+        
+        // Verificar si el usuario ya vio la página de likes
+        const lastViewedLikesPage = localStorage.getItem('lastViewedLikesPage')
+        const lastViewedLikesCount = localStorage.getItem('lastViewedLikesCount')
+        
+        if (lastViewedLikesPage) {
+          // Si ya vio la página, solo mostrar badge si hay NUEVOS likes
+          const previousCount = parseInt(lastViewedLikesCount || '0')
+          const newLikesCount = Math.max(0, likesTotal - previousCount)
+          setLikesCount(newLikesCount)
+        } else {
+          // Primera vez, mostrar todos los likes
+          setLikesCount(likesTotal)
+        }
+        
+        // Guardar el conteo actual para futuras comparaciones
+        localStorage.setItem('lastViewedLikesCount', likesTotal.toString())
       }
 
       // Cargar mensajes no leídos

@@ -26,6 +26,9 @@ export default function LikesPage() {
   // Esto asegura que el badge se limpie antes de que se muestre en pantalla
   useLayoutEffect(() => {
     setLikesCount(0)
+    // Guardar en localStorage que el usuario vio la página de likes
+    // Esto previene que el badge aparezca al recargar
+    localStorage.setItem('lastViewedLikesPage', Date.now().toString())
   }, [])
 
   useEffect(() => {
