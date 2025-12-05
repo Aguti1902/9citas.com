@@ -437,3 +437,60 @@ export const checkMatch = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Obtener todos los matches (perfiles donde ambos se han dado like)
+export const getMatches = async (req: AuthRequest, res: Response) => {
+  try {
+    // Obtener todos los likes que yo he dado
+    const myLikes = await prisma.like.findMany({
+      where: {
+        fromProfileId: req.profileId!,
+      },
+      select: {
+        toProfileId: true,
+      },
+    });
+
+    const myLikedProfileIds = myLikes.map(like => like.toProfileId);
+
+    // Obtener perfiles que me han dado like Y a los que yo también les he dado like (MATCH)
+    const matches = await prisma.like.findMany({
+      where: {
+        toProfileId: req.profileId!,
+        fromProfileId: {
+          in: myLikedProfileIds, // Solo los que yo también les he dado like
+        },
+        fromProfile: {
+          isFake: false, // Excluir perfiles falsos
+        },
+      },
+      include: {
+        fromProfile: {
+          include: {
+            photos: {
+              where: { type: 'cover' },
+              take: 1,
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Normalizar URLs de fotos
+    const normalizedMatches = matches.map(like => ({
+      ...like.fromProfile,
+      photos: like.fromProfile.photos,
+      matchedAt: like.createdAt,
+    })).map(profile => normalizeProfilePhotos(profile));
+
+    res.json({
+      matches: normalizedMatches,
+    });
+  } catch (error) {
+    console.error('Error al obtener matches:', error);
+    res.status(500).json({ error: 'Error al obtener matches' });
+  }
+};
+

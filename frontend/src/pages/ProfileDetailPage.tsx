@@ -130,19 +130,8 @@ export default function ProfileDetailPage() {
   }
 
   const handleChat = () => {
-    // Si es Premium, puede chatear directamente
-    if (isPremium) {
-      navigate(`/app/chat/${id}`)
-      return
-    }
-
-    // Si es Free, necesita match mutuo
-    if (!hasMatch) {
-      setShowPremiumModal(true)
-      return
-    }
-
-    // Si hay match, puede chatear
+    // Todos pueden chatear directamente (gratis y premium)
+    // La única limitación es que usuarios gratis solo pueden ver/chatear con 50 usuarios máximo
     navigate(`/app/chat/${id}`)
   }
 
@@ -511,13 +500,8 @@ export default function ProfileDetailPage() {
             variant="secondary"
             onClick={handleChat}
             className="flex items-center justify-center gap-2"
-            disabled={!isPremium && !hasMatch}
           >
-            {!isPremium && !hasMatch ? (
-              '🔒 Match requerido'
-            ) : (
-              '💬 Chatear'
-            )}
+            💬 Chatear
           </Button>
         </div>
 

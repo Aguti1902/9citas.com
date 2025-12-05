@@ -13,8 +13,9 @@ export default function LikesPage() {
   const { setLikesCount } = useNotificationStore()
   const [sentLikes, setSentLikes] = useState<any[]>([])
   const [receivedLikes, setReceivedLikes] = useState<any[]>([])
+  const [matches, setMatches] = useState<any[]>([])
   const [receivedLikesTotal, setReceivedLikesTotal] = useState(0)
-  const [activeTab, setActiveTab] = useState<'sent' | 'received'>('received')
+  const [activeTab, setActiveTab] = useState<'sent' | 'received' | 'matches'>('received')
   const [isLoading, setIsLoading] = useState(true)
 
   const isPremium = user?.subscription?.isActive || false
@@ -26,9 +27,10 @@ export default function LikesPage() {
   const loadLikes = async () => {
     setIsLoading(true)
     try {
-      const [sentResponse, receivedResponse] = await Promise.all([
+      const [sentResponse, receivedResponse, matchesResponse] = await Promise.all([
         api.get('/likes/sent'),
         api.get('/likes/received'),
+        api.get('/likes/matches').catch(() => ({ data: { matches: [] } })), // Si falla, usar array vacío
       ])
       
       setSentLikes(sentResponse.data.likes.map((like: any) => ({
@@ -55,6 +57,9 @@ export default function LikesPage() {
           isBlocked: true,
         })))
       }
+      
+      // Cargar matches (disponible para todos, gratis y premium)
+      setMatches(matchesResponse.data.matches || [])
     } catch (error) {
       console.error('Error al cargar likes:', error)
     } finally {
@@ -62,7 +67,13 @@ export default function LikesPage() {
     }
   }
 
-  const currentProfiles = activeTab === 'sent' ? sentLikes : receivedLikes
+  const getCurrentProfiles = () => {
+    if (activeTab === 'sent') return sentLikes
+    if (activeTab === 'matches') return matches
+    return receivedLikes
+  }
+  
+  const currentProfiles = getCurrentProfiles()
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -89,6 +100,16 @@ export default function LikesPage() {
           }`}
         >
           Enviados {sentLikes.length > 0 && `(${sentLikes.length})`}
+        </button>
+        <button
+          onClick={() => setActiveTab('matches')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'matches'
+              ? 'text-primary border-b-2 border-primary'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          Matches {matches.length > 0 && `(${matches.length})`}
         </button>
       </div>
 
@@ -118,6 +139,8 @@ export default function LikesPage() {
           <p className="text-gray-400 text-lg">
             {activeTab === 'sent'
               ? 'Aún no has dado "Me gusta" a nadie'
+              : activeTab === 'matches'
+              ? 'Aún no tienes ningún match'
               : 'Aún no has recibido ningún "Me gusta"'}
           </p>
         </div>
