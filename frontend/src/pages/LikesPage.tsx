@@ -22,16 +22,25 @@ export default function LikesPage() {
 
   const isPremium = user?.subscription?.isActive || false
 
+  // Limpiar badge INMEDIATAMENTE al montar (incluso antes del useEffect)
+  // Esto previene que aparezca al recargar la página
+  setLikesCount(0)
+
   useEffect(() => {
-    // Limpiar badge de notificaciones ANTES de cargar
+    // Limpiar badge múltiples veces al inicio para asegurar que se borre
     setLikesCount(0)
+    setTimeout(() => setLikesCount(0), 50)
+    setTimeout(() => setLikesCount(0), 100)
+    setTimeout(() => setLikesCount(0), 200)
+    setTimeout(() => setLikesCount(0), 500)
+    
     loadLikes()
 
     // Mantener el badge en 0 mientras estemos en esta página
-    // Verificar cada segundo por si el polling lo vuelve a incrementar
+    // Verificar cada 500ms por si el polling lo vuelve a incrementar
     const keepBadgeClear = setInterval(() => {
       setLikesCount(0)
-    }, 1000)
+    }, 500)
 
     return () => {
       clearInterval(keepBadgeClear)

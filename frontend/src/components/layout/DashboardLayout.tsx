@@ -49,7 +49,12 @@ export default function DashboardLayout() {
   useEffect(() => {
     loadPendingRequests()
     loadRoamStatus()
-    loadNotifications()
+    
+    // Cargar notificaciones con un pequeño delay para que la página se monte primero
+    // Esto evita que el badge aparezca al recargar si estamos en /app/likes
+    setTimeout(() => {
+      loadNotifications()
+    }, 100)
     
     // Verificar si es la primera vez del usuario (mostrar tutorial)
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding')
