@@ -494,8 +494,8 @@ export default function NavigatePage() {
         </div>
       </div>
 
-      {/* Contenido - Ajustado para filtro fijo */}
-      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden pt-32' : 'pt-32 pb-6 overflow-y-auto'}`}>
+      {/* Contenido - SIN padding-top porque main ya tiene scroll */}
+      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden' : 'pb-6 overflow-y-auto'}`}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (

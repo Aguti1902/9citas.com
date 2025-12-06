@@ -186,8 +186,8 @@ export default function DashboardLayout() {
   ]
 
   return (
-    <div className="min-h-screen bg-dark flex flex-col">
-      {/* Header - CONTROLADO POR CSS - SIN CLASES DE TAILWIND QUE INTERFIERAN */}
+    <div className="min-h-screen bg-dark" style={{ height: '100vh', overflow: 'hidden', position: 'fixed', width: '100%' }}>
+      {/* Header - FIJO ARRIBA - NO SE MUEVE */}
       <header 
         className="dashboard-header bg-gray-900" 
         style={{ 
@@ -196,6 +196,7 @@ export default function DashboardLayout() {
           left: 0,
           right: 0,
           zIndex: 9998,
+          height: '56px',
         }}
       >
         <div className="max-w-7xl mx-auto px-3 flex items-center justify-between h-14">
@@ -238,12 +239,23 @@ export default function DashboardLayout() {
         </div>
       </header>
 
-      {/* Main content - Con padding para header y footer fijos */}
-      <main className="flex-1 pb-20 pt-14">
+      {/* Main content - SOLO ESTE ELEMENTO HACE SCROLL */}
+      <main 
+        style={{
+          position: 'fixed',
+          top: '56px',
+          bottom: '64px',
+          left: 0,
+          right: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
         <Outlet />
       </main>
 
-      {/* Bottom navigation - CONTROLADO POR CSS - SIN CLASES DE TAILWIND QUE INTERFIERAN */}
+      {/* Bottom navigation - FIJO ABAJO - NO SE MUEVE */}
       <nav 
         id="bottom-nav-fixed"
         className="dashboard-footer bg-gray-900 border-t border-gray-800"
@@ -253,6 +265,7 @@ export default function DashboardLayout() {
           left: 0,
           right: 0,
           zIndex: 9999,
+          height: '64px',
         }}
       >
         <div className="max-w-7xl mx-auto px-2">
