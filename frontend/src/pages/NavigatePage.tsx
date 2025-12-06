@@ -495,7 +495,7 @@ export default function NavigatePage() {
       </div>
 
       {/* Contenido - Ajustado para filtro fijo */}
-      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? '' : 'pt-32 pb-6 overflow-y-auto'}`}>
+      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden pt-32' : 'pt-32 pb-6 overflow-y-auto'}`}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (
@@ -505,74 +505,42 @@ export default function NavigatePage() {
             </p>
           </div>
         ) : viewMode === 'swipe' ? (
-          // Vista Swipe - CONTENEDOR POSITION FIXED PARA QUE NUNCA SE MUEVA
-          <div 
-            className="swipe-container-fixed"
-            style={{
-              position: 'fixed',
-              top: '132px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100%',
-              maxWidth: '28rem',
-              height: 'calc(100vh - 280px)',
-              zIndex: 10,
-              pointerEvents: 'auto',
-            }}
-          >
-            <div 
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                overflow: 'hidden',
-              }}
-            >
-              {showPromoCard ? (
-                // Card promocional de 9Plus
-                <PremiumPromoCard onClose={handleClosePromoCard} />
-              ) : currentProfile ? (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+          // Vista Swipe tipo Tinder
+          <div className="relative max-w-md mx-auto h-[calc(100vh-280px)] pt-0 overflow-hidden">
+            {showPromoCard ? (
+              // Card promocional de 9Plus
+              <PremiumPromoCard onClose={handleClosePromoCard} />
+            ) : currentProfile ? (
+              <>
+                <SwipeCard
+                  key={currentProfile.id}
+                  profile={currentProfile}
+                  onSwipeLeft={handleSwipeLeft}
+                  onSwipeRight={handleSwipeRight}
+                  onProfileClick={() => navigate(`/app/profile/${currentProfile.id}`)}
+                  isPremium={isPremium}
+                />
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="text-6xl mb-4">🎉</div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  ¡Has visto todos los perfiles!
+                </h3>
+                <p className="text-gray-400 mb-6">
+                  Cambia los filtros o vuelve más tarde para ver nuevos perfiles
+                </p>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setCurrentProfileIndex(0)
+                    loadProfiles()
                   }}
                 >
-                  <SwipeCard
-                    key={currentProfile.id}
-                    profile={currentProfile}
-                    onSwipeLeft={handleSwipeLeft}
-                    onSwipeRight={handleSwipeRight}
-                    onProfileClick={() => navigate(`/app/profile/${currentProfile.id}`)}
-                    isPremium={isPremium}
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <div className="text-6xl mb-4">🎉</div>
-                  <h3 className="text-2xl font-bold text-white mb-2">
-                    ¡Has visto todos los perfiles!
-                  </h3>
-                  <p className="text-gray-400 mb-6">
-                    Cambia los filtros o vuelve más tarde para ver nuevos perfiles
-                  </p>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      setCurrentProfileIndex(0)
-                      loadProfiles()
-                    }}
-                  >
-                    Recargar perfiles
-                  </Button>
-                </div>
-              )}
-            </div>
+                  Recargar perfiles
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           // Vista Grid (original)
