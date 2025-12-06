@@ -438,7 +438,7 @@ export default function ProfileDetailPage() {
                 </div>
               </div>
             ) : (
-              // Sin solicitud - mostrar fotos borrosas y botón SOLO SI HAY MATCH
+              // Sin solicitud - CUALQUIERA puede solicitar acceso (NO requiere match)
               <div>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {privatePhotos.map((photo: any, index: number) => (
@@ -454,30 +454,21 @@ export default function ProfileDetailPage() {
                       </div>
                     ))}
                 </div>
-                {hasMatch ? (
-                  <div className="text-center">
-                    <p className="text-white font-semibold mb-3">Fotos Privadas Bloqueadas</p>
-                    <p className="text-gray-400 text-sm mb-4">
-                      Tienes match con este usuario. Solicita acceso para ver sus fotos privadas.
-                    </p>
-                    <Button
-                      variant="accent"
-                      onClick={handleRequestPrivatePhotoAccess}
-                      isLoading={isRequestingAccess}
-                      className="flex items-center gap-2 mx-auto"
-                    >
-                      <Eye className="w-5 h-5" />
-                      Solicitar Acceso
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <p className="text-white font-semibold mb-2">Fotos Privadas</p>
-                    <p className="text-gray-400 text-sm">
-                      Necesitas hacer match con este usuario para solicitar acceso a sus fotos privadas
-                    </p>
-                  </div>
-                )}
+                <div className="text-center">
+                  <p className="text-white font-semibold mb-3">Fotos Privadas Bloqueadas</p>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Solicita acceso para ver las fotos privadas de este usuario
+                  </p>
+                  <Button
+                    variant="accent"
+                    onClick={handleRequestPrivatePhotoAccess}
+                    isLoading={isRequestingAccess}
+                    className="flex items-center gap-2 mx-auto"
+                  >
+                    <Eye className="w-5 h-5" />
+                    Solicitar Acceso
+                  </Button>
+                </div>
               </div>
             )}
           </div>
