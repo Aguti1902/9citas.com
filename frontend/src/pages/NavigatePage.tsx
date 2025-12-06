@@ -494,8 +494,8 @@ export default function NavigatePage() {
         </div>
       </div>
 
-      {/* Contenido - SIN padding-top porque main ya tiene scroll */}
-      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'h-full overflow-hidden' : 'pb-6 overflow-y-auto'}`}>
+      {/* Contenido - Con padding para que se vea debajo de filtros */}
+      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'pt-32' : 'pt-32 pb-6'}`} style={{ minHeight: viewMode === 'swipe' ? 'calc(100vh - 120px)' : 'auto' }}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (
@@ -506,7 +506,7 @@ export default function NavigatePage() {
           </div>
         ) : viewMode === 'swipe' ? (
           // Vista Swipe tipo Tinder
-          <div className="relative max-w-md mx-auto h-[calc(100vh-280px)] pt-0 overflow-hidden">
+          <div className="relative max-w-md mx-auto h-[calc(100vh-280px)] overflow-hidden">
             {showPromoCard ? (
               // Card promocional de 9Plus
               <PremiumPromoCard onClose={handleClosePromoCard} />
