@@ -242,7 +242,7 @@ export default function EditProfilePage() {
       }
 
       await refreshUserData()
-      navigate('/app')
+      navigate('/app', { replace: false }) // No reemplazar historial, mantener scroll
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al actualizar perfil')
     } finally {

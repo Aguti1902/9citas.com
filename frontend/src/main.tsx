@@ -14,6 +14,11 @@ const queryClient = new QueryClient({
   },
 })
 
+// Configurar comportamiento del scroll
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual' // Desactivar scroll automático del navegador
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>

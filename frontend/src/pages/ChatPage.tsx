@@ -26,10 +26,8 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Scroll al inicio de la página
-    window.scrollTo(0, 0)
-    document.body.scrollTop = 0
-    
+    // NO hacer scroll al inicio - mantener posición
+    // Solo cargar datos
     loadProfile()
     loadMessages()
     loadMyPhotos()
