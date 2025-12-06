@@ -508,35 +508,15 @@ export default function CreateProfilePage() {
                 </button>
               </div>
             ) : formData.city ? (
-              <div className="bg-gray-800 rounded-lg px-4 py-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-white font-medium">{formData.city}</span>
-                  <button
-                    type="button"
-                    onClick={handleDetectLocation}
-                    className="ml-auto text-primary text-sm hover:underline"
-                  >
-                    Actualizar
-                  </button>
-                </div>
-                
-                {/* Toggle para mostrar ubicación exacta */}
-                <div className="border-t border-gray-700 pt-3">
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div>
-                      <span className="text-sm font-medium text-white">Mostrar mi ubicación exacta</span>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Si desactivas esta opción, otros usuarios no verán tu distancia exacta
-                      </p>
-                    </div>
-                    <input
-                      type="checkbox"
-                      className="toggle toggle-primary ml-4"
-                      checked={formData.showExactLocation}
-                      onChange={(e) => setFormData(prev => ({ ...prev, showExactLocation: e.target.checked }))}
-                    />
-                  </label>
-                </div>
+              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center justify-between">
+                <span className="text-white font-medium">{formData.city}</span>
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  className="text-primary text-sm hover:underline"
+                >
+                  Actualizar
+                </button>
               </div>
             ) : (
               <button
