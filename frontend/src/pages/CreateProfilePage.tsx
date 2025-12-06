@@ -31,6 +31,7 @@ export default function CreateProfilePage() {
     children: 'no',
     pets: '',
     zodiacSign: '',
+    showExactLocation: true, // Por defecto mostrar ubicación
   })
 
   const [hobbies, setHobbies] = useState<string[]>([])
@@ -79,7 +80,7 @@ export default function CreateProfilePage() {
 
   const [lockedOrientation, setLockedOrientation] = useState<string | null>(null)
 
-  // Obtener orientación guardada - NO detectar ubicación al crear perfil
+  // Obtener orientación guardada y detectar ubicación automáticamente
   useEffect(() => {
     const savedOrientation = localStorage.getItem('userOrientation')
     if (savedOrientation) {
@@ -88,13 +89,8 @@ export default function CreateProfilePage() {
       localStorage.removeItem('userOrientation') // Limpiar después de usar
     }
 
-    // IMPORTANTE: NO detectar ubicación automáticamente al crear el perfil
-    // La ubicación se detectará cuando el usuario navegue/use la app
-    setIsDetectingLocation(false)
-    setLocationError('')
-    
-    // NO establecer ubicación por defecto - dejar que el usuario la seleccione manualmente
-    // o que se detecte cuando navegue por la app
+    // DETECTAR UBICACIÓN AUTOMÁTICAMENTE AL CREAR PERFIL
+    handleDetectLocation()
   }, [])
 
   // Función para detectar ubicación manualmente (si el usuario quiere)
@@ -357,6 +353,7 @@ export default function CreateProfilePage() {
         height: formData.height ? parseInt(formData.height) : null,
         hobbies,
         languages,
+        showExactLocation: formData.showExactLocation, // Enviar preferencia de ubicación
       })
 
       // Subir fotos con su tipo correcto
@@ -453,44 +450,7 @@ export default function CreateProfilePage() {
             placeholder="Tu edad"
           />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Orientación {lockedOrientation && <span className="text-xs text-gray-500">(definida al registrarte)</span>}
-            </label>
-            {lockedOrientation ? (
-              // Orientación bloqueada - solo mostrar la seleccionada al registrarse
-              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
-                <span className="text-white font-medium capitalize">{lockedOrientation}</span>
-                <span className="text-gray-400 text-xs ml-auto">No se puede cambiar</span>
-              </div>
-            ) : (
-              // Orientación no bloqueada (fallback)
-              <div className="flex gap-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="orientation"
-                    value="hetero"
-                    checked={formData.orientation === 'hetero'}
-                    onChange={(e) => setFormData({ ...formData, orientation: e.target.value })}
-                    className="mr-2"
-                  />
-                  <span className="text-white">Hetero</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="orientation"
-                    value="gay"
-                    checked={formData.orientation === 'gay'}
-                    onChange={(e) => setFormData({ ...formData, orientation: e.target.value })}
-                    className="mr-2"
-                  />
-                  <span className="text-white">Gay</span>
-                </label>
-              </div>
-            )}
-          </div>
+          {/* Orientación oculta - ya se seleccionó en el registro */}
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -524,52 +484,69 @@ export default function CreateProfilePage() {
             </div>
           </div>
 
-          {/* Ubicación - NO se detecta automáticamente al crear perfil */}
+          {/* Ubicación - Detección automática */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Ubicación (Opcional)
+              📍 Ubicación
             </label>
-            <p className="text-gray-400 text-xs mb-2">
-              La ubicación se detectará automáticamente cuando uses la app. Puedes seleccionar una ciudad manualmente si lo deseas.
-            </p>
-            <div className="flex gap-2">
-              <select
-                value={formData.city}
-                onChange={(e) => {
-                  const selectedCity = SPANISH_CITIES.find(c => c.name === e.target.value)
-                  setFormData(prev => ({
-                    ...prev,
-                    city: e.target.value,
-                    latitude: selectedCity?.lat || null,
-                    longitude: selectedCity?.lng || null,
-                  }))
-                }}
-                className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:border-primary focus:outline-none"
-              >
-                <option value="">Seleccionar ciudad (opcional)</option>
-                {SPANISH_CITIES.map(city => (
-                  <option key={city.name} value={city.name}>{city.name}</option>
-                ))}
-              </select>
+            
+            {isDetectingLocation ? (
+              <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                <span className="text-gray-300">Detectando tu ubicación...</span>
+              </div>
+            ) : locationError ? (
+              <div>
+                <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-2">
+                  {locationError}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  className="w-full bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-lg transition-colors"
+                >
+                  Reintentar detección
+                </button>
+              </div>
+            ) : formData.city ? (
+              <div className="bg-gray-800 rounded-lg px-4 py-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-white font-medium">{formData.city}</span>
+                  <button
+                    type="button"
+                    onClick={handleDetectLocation}
+                    className="ml-auto text-primary text-sm hover:underline"
+                  >
+                    Actualizar
+                  </button>
+                </div>
+                
+                {/* Toggle para mostrar ubicación exacta */}
+                <div className="border-t border-gray-700 pt-3">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div>
+                      <span className="text-sm font-medium text-white">Mostrar mi ubicación exacta</span>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Si desactivas esta opción, otros usuarios no verán tu distancia exacta
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary ml-4"
+                      checked={formData.showExactLocation}
+                      onChange={(e) => setFormData(prev => ({ ...prev, showExactLocation: e.target.checked }))}
+                    />
+                  </label>
+                </div>
+              </div>
+            ) : (
               <button
                 type="button"
                 onClick={handleDetectLocation}
-                disabled={isDetectingLocation}
-                className="bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg transition-colors"
               >
-                {isDetectingLocation ? 'Detectando...' : '📍 Detectar'}
+                Detectar mi ubicación
               </button>
-            </div>
-            {isDetectingLocation && (
-              <p className="text-gray-400 text-xs mt-2">Detectando tu ubicación...</p>
-            )}
-            {locationError && (
-              <p className="text-red-400 text-xs mt-1">{locationError}</p>
-            )}
-            {formData.city && !isDetectingLocation && !locationError && (
-              <p className="text-gray-400 text-xs mt-1">
-                Ciudad seleccionada: {formData.city}
-              </p>
             )}
           </div>
 
