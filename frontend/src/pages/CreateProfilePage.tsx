@@ -37,8 +37,8 @@ export default function CreateProfilePage() {
   const [languages, setLanguages] = useState<string[]>(['Español'])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [photoPreview, setPhotoPreview] = useState<string[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<Array<{ file: File, type: 'cover' | 'public' | 'private' }>>([])
+  const [photoPreview, setPhotoPreview] = useState<Array<{ url: string, type: 'cover' | 'public' | 'private' }>>([])
   const [isDetectingLocation, setIsDetectingLocation] = useState(true)
   const [locationError, setLocationError] = useState('')
 
@@ -240,33 +240,59 @@ export default function CreateProfilePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    const currentPublicCount = Math.min(selectedFiles.length, 4)
-    const currentPrivateCount = Math.max(0, selectedFiles.length - 4)
     
     // Determinar si es para fotos públicas o privadas basado en el input
-    const isPrivate = e.target.id === 'photo-upload-private'
+    const isPrivateInput = e.target.id === 'photo-upload-private'
     
-    if (isPrivate) {
+    // Contar fotos actuales por tipo
+    const coverCount = selectedFiles.filter(f => f.type === 'cover').length
+    const publicCount = selectedFiles.filter(f => f.type === 'public').length
+    const privateCount = selectedFiles.filter(f => f.type === 'private').length
+    
+    if (isPrivateInput) {
       // Fotos privadas: máximo 4
-      if (currentPrivateCount + files.length > 4) {
+      if (privateCount + files.length > 4) {
         setError('Máximo 4 fotos privadas')
         return
       }
     } else {
-      // Fotos públicas: máximo 4 (1 portada + 3 públicas)
-      if (currentPublicCount + files.length > 4) {
+      // Fotos públicas: 1 portada + 3 públicas = 4 total
+      if (coverCount + publicCount + files.length > 4) {
         setError('Máximo 4 fotos públicas (1 portada + 3 públicas)')
         return
       }
     }
     
-    setSelectedFiles([...selectedFiles, ...files])
+    // Agregar archivos con su tipo correcto
+    const newFiles = files.map(file => {
+      let type: 'cover' | 'public' | 'private'
+      
+      if (isPrivateInput) {
+        type = 'private'
+      } else {
+        // Si no hay cover aún, esta es la cover
+        const publicFilesCount = selectedFiles.filter(f => f.type !== 'private').length
+        if (coverCount === 0 && publicFilesCount === 0) {
+          type = 'cover'
+        } else {
+          type = 'public'
+        }
+      }
+      
+      console.log(`📸 Foto seleccionada: ${file.name} → tipo: ${type}`)
+      return { file, type }
+    })
     
-    // Preview
-    files.forEach(file => {
+    setSelectedFiles([...selectedFiles, ...newFiles])
+    
+    // Preview con tipo
+    files.forEach((file, index) => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setPhotoPreview(prev => [...prev, reader.result as string])
+        setPhotoPreview(prev => [...prev, { 
+          url: reader.result as string, 
+          type: newFiles[index].type 
+        }])
       }
       reader.readAsDataURL(file)
     })
@@ -333,24 +359,25 @@ export default function CreateProfilePage() {
         languages,
       })
 
-      // Subir fotos
+      // Subir fotos con su tipo correcto
       for (let i = 0; i < selectedFiles.length; i++) {
+        const photoData = selectedFiles[i]
         const formData = new FormData()
-        formData.append('photo', selectedFiles[i])
+        formData.append('photo', photoData.file)
+        formData.append('type', photoData.type) // Usar el tipo que se asignó al seleccionar
         
-        // Primera foto es portada, siguientes 3 son públicas, resto privadas
-        let type = 'cover'
-        if (i > 0 && i <= 3) type = 'public'
-        if (i > 3) type = 'private'
-        
-        formData.append('type', type)
+        console.log(`📤 Subiendo foto ${i + 1}:`, {
+          nombre: photoData.file.name,
+          tipo: photoData.type,
+        })
         
         try {
           await api.post('/photos/upload', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
+          console.log(`✅ Foto ${i + 1} subida como ${photoData.type}`)
         } catch (photoErr) {
-          console.error('Error subiendo foto:', photoErr)
+          console.error(`❌ Error subiendo foto ${i + 1}:`, photoErr)
         }
       }
 
@@ -569,12 +596,12 @@ export default function CreateProfilePage() {
               </label>
             </div>
 
-            {photoPreview.length > 0 && photoPreview.length <= 4 && (
+            {photoPreview.length > 0 && (
               <div className="grid grid-cols-4 gap-2">
                 {photoPreview.map((preview, index) => (
                   <div key={index} className="relative aspect-square">
                     <img
-                      src={preview}
+                      src={preview.url}
                       alt={`Preview ${index + 1}`}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -585,8 +612,14 @@ export default function CreateProfilePage() {
                     >
                       ×
                     </button>
-                    <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded">
-                      {index === 0 ? 'Portada' : 'Pública'}
+                    <div className={`absolute bottom-1 left-1 text-white text-xs px-2 py-0.5 rounded ${
+                      preview.type === 'cover' ? 'bg-primary' :
+                      preview.type === 'private' ? 'bg-accent' :
+                      'bg-secondary'
+                    }`}>
+                      {preview.type === 'cover' ? '📷 Portada' : 
+                       preview.type === 'private' ? '🔒 Privada' : 
+                       '👁️ Pública'}
                     </div>
                   </div>
                 ))}
