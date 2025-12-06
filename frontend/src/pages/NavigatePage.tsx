@@ -512,6 +512,7 @@ export default function NavigatePage() {
                   onSwipeLeft={handleSwipeLeft}
                   onSwipeRight={handleSwipeRight}
                   onProfileClick={() => navigate(`/app/profile/${currentProfile.id}`)}
+                  isPremium={isPremium}
                 />
               </>
             ) : (
@@ -543,6 +544,7 @@ export default function NavigatePage() {
                 key={profile.id}
                 profile={profile}
                 onLikeToggle={() => loadProfiles()}
+                isPremium={isPremium}
               />
             ))}
           </div>

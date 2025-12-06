@@ -7,9 +7,10 @@ import { formatLastSeen } from '@/utils/timeUtils'
 interface ProfileCardProps {
   profile: any
   onLikeToggle?: () => void
+  isPremium?: boolean // Para verificar si puede ver ubicación
 }
 
-export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps) {
+export default function ProfileCard({ profile, onLikeToggle, isPremium = false }: ProfileCardProps) {
   const navigate = useNavigate()
   const [isLiked, setIsLiked] = useState(profile.isLiked || false)
   const [isLiking, setIsLiking] = useState(false)
@@ -118,8 +119,8 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
             </span>
           </div>
 
-          {/* Mostrar ubicación solo si showExactLocation es true */}
-          {profile.showExactLocation !== false && (
+          {/* Mostrar ubicación SOLO si es usuario PREMIUM (9Plus) */}
+          {isPremium && profile.showExactLocation !== false && (
             <>
               <div className="flex items-center gap-2 text-gray-300 text-sm">
                 <MapPin className="w-3.5 h-3.5" />
@@ -131,6 +132,14 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
                 </p>
               )}
             </>
+          )}
+          
+          {/* Mensaje para usuarios gratis */}
+          {!isPremium && (
+            <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+              <MapPin className="w-3 h-3" />
+              <span>🔒 Oculta (9Plus)</span>
+            </div>
           )}
         </div>
       </div>

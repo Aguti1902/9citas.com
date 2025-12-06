@@ -7,6 +7,7 @@ interface SwipeCardProps {
   onSwipeLeft: () => void
   onSwipeRight: () => void
   onProfileClick: () => void
+  isPremium?: boolean // Para verificar si puede ver ubicación
 }
 
 export default function SwipeCard({
@@ -14,6 +15,7 @@ export default function SwipeCard({
   onSwipeLeft,
   onSwipeRight,
   onProfileClick,
+  isPremium = false,
 }: SwipeCardProps) {
   const [startX, setStartX] = useState(0)
   const [currentX, setCurrentX] = useState(0)
@@ -236,14 +238,22 @@ export default function SwipeCard({
                   </span>
                 </div>
 
-                {/* Mostrar ubicación solo si showExactLocation es true */}
-                {profile.showExactLocation !== false && (
+                {/* Mostrar ubicación SOLO si es usuario PREMIUM (9Plus) */}
+                {isPremium && profile.showExactLocation !== false && (
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     <span>{profile.city}</span>
                     {profile.distance !== null && profile.distance !== undefined && (
                       <span className="text-accent font-semibold">· {profile.distance} km</span>
                     )}
+                  </div>
+                )}
+                
+                {/* Mensaje para usuarios gratis */}
+                {!isPremium && (
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <MapPin className="w-4 h-4" />
+                    <span>🔒 Ubicación oculta (9Plus)</span>
                   </div>
                 )}
                 

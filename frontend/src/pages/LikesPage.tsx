@@ -209,6 +209,7 @@ export default function LikesPage() {
                 key={profile.id}
                 profile={profile}
                 onLikeToggle={loadLikes}
+                isPremium={isPremium}
               />
             )
           })}
