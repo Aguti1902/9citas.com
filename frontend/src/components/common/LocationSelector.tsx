@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { MapPin, Loader2, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MapPin, Loader2, X, Search } from 'lucide-react'
 import Modal from './Modal'
 
 interface LocationSelectorProps {
@@ -7,49 +7,87 @@ interface LocationSelectorProps {
   onLocationChange: (city: string, lat: number, lng: number) => void
 }
 
-// Ciudades españolas principales con coordenadas
-const SPANISH_CITIES = [
-  { name: 'Madrid', lat: 40.4168, lng: -3.7038 },
-  { name: 'Barcelona', lat: 41.3851, lng: 2.1734 },
-  { name: 'Valencia', lat: 39.4699, lng: -0.3763 },
-  { name: 'Sevilla', lat: 37.3891, lng: -5.9845 },
-  { name: 'Zaragoza', lat: 41.6488, lng: -0.8891 },
-  { name: 'Málaga', lat: 36.7213, lng: -4.4214 },
-  { name: 'Murcia', lat: 37.9922, lng: -1.1307 },
-  { name: 'Palma', lat: 39.5696, lng: 2.6502 },
-  { name: 'Las Palmas', lat: 28.1248, lng: -15.4300 },
-  { name: 'Bilbao', lat: 43.2630, lng: -2.9350 },
-  { name: 'Alicante', lat: 38.3452, lng: -0.4810 },
-  { name: 'Córdoba', lat: 37.8882, lng: -4.7794 },
-  { name: 'Valladolid', lat: 41.6523, lng: -4.7245 },
-  { name: 'Vigo', lat: 42.2406, lng: -8.7207 },
-  { name: 'Gijón', lat: 43.5450, lng: -5.6619 },
-  { name: 'Hospitalet de Llobregat', lat: 41.3598, lng: 2.0994 },
-  { name: 'A Coruña', lat: 43.3623, lng: -8.4115 },
-  { name: 'Granada', lat: 37.1773, lng: -3.5986 },
-  { name: 'Vitoria', lat: 42.8467, lng: -2.6716 },
-  { name: 'Elche', lat: 38.2699, lng: -0.6983 },
-  { name: 'Oviedo', lat: 43.3614, lng: -5.8593 },
-  { name: 'Santa Cruz de Tenerife', lat: 28.4698, lng: -16.2549 },
-  { name: 'Badalona', lat: 41.4502, lng: 2.2451 },
-  { name: 'Cartagena', lat: 37.6256, lng: -0.9960 },
-  { name: 'Terrassa', lat: 41.5633, lng: 2.0099 },
-  { name: 'Jerez', lat: 36.6862, lng: -6.1367 },
-  { name: 'Sabadell', lat: 41.5433, lng: 2.1092 },
-  { name: 'Móstoles', lat: 40.3230, lng: -3.8651 },
-  { name: 'Alcalá de Henares', lat: 40.4818, lng: -3.3634 },
-  { name: 'Pamplona', lat: 42.8125, lng: -1.6458 },
-  { name: 'Figueres', lat: 42.2679, lng: 2.9616 },
-]
+interface CityResult {
+  name: string
+  displayName: string
+  lat: number
+  lng: number
+}
 
 export default function LocationSelector({ currentCity, onLocationChange }: LocationSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchResults, setSearchResults] = useState<CityResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
-  const filteredCities = SPANISH_CITIES.filter(city =>
-    city.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Buscar ciudades cuando el usuario escribe
+  useEffect(() => {
+    if (searchTerm.length < 2) {
+      setSearchResults([])
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        // Buscar solo en España usando Nominatim
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?` +
+          `q=${encodeURIComponent(searchTerm)}&` +
+          `countrycodes=es&` + // Solo España
+          `format=json&` +
+          `addressdetails=1&` +
+          `limit=10&` +
+          `accept-language=es`,
+          {
+            headers: {
+              'User-Agent': '9citas.com/1.0'
+            }
+          }
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          
+          // Filtrar solo ciudades/pueblos (no calles, regiones, etc)
+          const cities = data
+            .filter((item: any) => {
+              const type = item.type
+              const addressType = item.address?.city || item.address?.town || item.address?.municipality || item.address?.village
+              return addressType || ['city', 'town', 'municipality', 'village', 'administrative'].includes(type)
+            })
+            .map((item: any) => {
+              // Obtener el nombre de la ciudad
+              const cityName = item.address?.city || 
+                              item.address?.town || 
+                              item.address?.municipality || 
+                              item.address?.village ||
+                              item.name
+
+              return {
+                name: cityName,
+                displayName: item.display_name,
+                lat: parseFloat(item.lat),
+                lng: parseFloat(item.lon)
+              }
+            })
+            // Eliminar duplicados por nombre
+            .filter((city: CityResult, index: number, self: CityResult[]) => 
+              index === self.findIndex(c => c.name === city.name)
+            )
+
+          setSearchResults(cities)
+        }
+      } catch (error) {
+        console.error('Error al buscar ciudades:', error)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 500) // Esperar 500ms después de que el usuario deje de escribir
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
 
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -82,57 +120,13 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
             const address = data.address
             
             // Intentar obtener la ciudad de diferentes campos
-            let cityName = address.city || 
+            const cityName = address.city || 
                           address.town || 
                           address.municipality || 
                           address.village ||
                           address.county ||
-                          address.state_district
-            
-            // Si no encontramos ciudad, buscar la más cercana de nuestra lista
-            if (!cityName) {
-              console.log('⚠️ No se encontró ciudad en geocodificación, usando ciudad más cercana')
-              let closestCity = SPANISH_CITIES[0]
-              let minDistance = Infinity
-
-              SPANISH_CITIES.forEach(city => {
-                const distance = Math.sqrt(
-                  Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
-                )
-                if (distance < minDistance) {
-                  minDistance = distance
-                  closestCity = city
-                }
-              })
-              cityName = closestCity.name
-            } else {
-              // Normalizar nombre de ciudad (capitalizar primera letra)
-              cityName = cityName.split(' ').map((word: string) => 
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-              ).join(' ')
-              
-              // Verificar si la ciudad está en nuestra lista, si no, usar la más cercana
-              const cityInList = SPANISH_CITIES.find(c => 
-                c.name.toLowerCase() === cityName.toLowerCase()
-              )
-              
-              if (!cityInList) {
-                console.log(`⚠️ Ciudad "${cityName}" no está en lista, usando ciudad más cercana`)
-                let closestCity = SPANISH_CITIES[0]
-                let minDistance = Infinity
-
-                SPANISH_CITIES.forEach(city => {
-                  const distance = Math.sqrt(
-                    Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
-                  )
-                  if (distance < minDistance) {
-                    minDistance = distance
-                    closestCity = city
-                  }
-                })
-                cityName = closestCity.name
-              }
-            }
+                          address.state_district ||
+                          'Ubicación desconocida'
             
             console.log(`✅ Ciudad detectada: ${cityName}`)
             
@@ -142,21 +136,7 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
           }
         } catch (error) {
           console.error('Error en geocodificación inversa:', error)
-          // Fallback: buscar la ciudad más cercana
-          let closestCity = SPANISH_CITIES[0]
-          let minDistance = Infinity
-
-          SPANISH_CITIES.forEach(city => {
-            const distance = Math.sqrt(
-              Math.pow(city.lat - latitude, 2) + Math.pow(city.lng - longitude, 2)
-            )
-            if (distance < minDistance) {
-              minDistance = distance
-              closestCity = city
-            }
-          })
-
-          onLocationChange(closestCity.name, latitude, longitude)
+          alert('No se pudo determinar tu ciudad. Por favor, búscala manualmente.')
         } finally {
           setIsGettingLocation(false)
         }
@@ -174,9 +154,11 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
     )
   }
 
-  const handleSelectCity = (city: typeof SPANISH_CITIES[0]) => {
+  const handleSelectCity = (city: CityResult) => {
     onLocationChange(city.name, city.lat, city.lng)
     setIsOpen(false)
+    setSearchTerm('')
+    setSearchResults([])
   }
 
   return (
@@ -223,22 +205,26 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
               <div className="w-full border-t border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-900 text-gray-400">o elige una ciudad</span>
+              <span className="px-2 bg-gray-900 text-gray-400">o busca tu ciudad</span>
             </div>
           </div>
 
           {/* Buscador de ciudades */}
           <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar ciudad..."
+              placeholder="Buscar ciudad en España..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pr-10"
+              className="input-field pl-10 pr-10"
             />
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm('')}
+                onClick={() => {
+                  setSearchTerm('')
+                  setSearchResults([])
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
               >
                 <X className="w-5 h-5" />
@@ -246,30 +232,59 @@ export default function LocationSelector({ currentCity, onLocationChange }: Loca
             )}
           </div>
 
-          {/* Lista de ciudades */}
-          <div className="max-h-96 overflow-y-auto space-y-2">
-            {filteredCities.map((city) => (
-              <button
-                key={city.name}
-                onClick={() => handleSelectCity(city)}
-                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                  city.name === currentCity
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5" />
-                  <span className="font-medium">{city.name}</span>
-                  {city.name === currentCity && (
-                    <span className="ml-auto text-xs bg-white/20 px-2 py-1 rounded">
-                      Actual
-                    </span>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
+          {/* Resultados de búsqueda */}
+          {isSearching && (
+            <div className="text-center py-8">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+              <p className="text-gray-400 mt-2">Buscando ciudades...</p>
+            </div>
+          )}
+
+          {!isSearching && searchTerm.length >= 2 && searchResults.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-400">No se encontraron ciudades</p>
+              <p className="text-gray-500 text-sm mt-1">Intenta con otro nombre</p>
+            </div>
+          )}
+
+          {!isSearching && searchResults.length > 0 && (
+            <div className="max-h-96 overflow-y-auto space-y-2">
+              {searchResults.map((city, index) => (
+                <button
+                  key={`${city.name}-${index}`}
+                  onClick={() => handleSelectCity(city)}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                    city.name === currentCity
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium">{city.name}</div>
+                      <div className="text-xs text-gray-400 truncate mt-0.5">
+                        {city.displayName}
+                      </div>
+                    </div>
+                    {city.name === currentCity && (
+                      <span className="flex-shrink-0 text-xs bg-white/20 px-2 py-1 rounded">
+                        Actual
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!isSearching && searchTerm.length < 2 && (
+            <div className="text-center py-8">
+              <Search className="w-12 h-12 mx-auto text-gray-600 mb-3" />
+              <p className="text-gray-400">Escribe al menos 2 letras para buscar</p>
+              <p className="text-gray-500 text-sm mt-1">Ejemplo: Madrid, Barcelona, Valencia...</p>
+            </div>
+          )}
         </div>
       </Modal>
     </>
