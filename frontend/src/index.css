@@ -16,71 +16,41 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Asegurar que el header siempre esté fijo */
-header[class*="bg-gray-900"],
-header.bg-gray-900 {
+/* Header SIEMPRE fijo - NO SE MUEVE CON SCROLL */
+header {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   z-index: 40 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  -webkit-transform: translateZ(0) !important;
-  -moz-transform: translateZ(0) !important;
-  -ms-transform: translateZ(0) !important;
-  -o-transform: translateZ(0) !important;
-}
-
-/* Asegurar que el menú inferior nunca se mueva - FORZADO ABSOLUTAMENTE */
-nav[class*="fixed bottom-0"],
-nav.fixed.bottom-0,
-nav#bottom-nav-fixed,
-nav[id="bottom-nav-fixed"],
-nav {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  top: auto !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  z-index: 9999 !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  -webkit-transform: translateZ(0) !important;
-  -moz-transform: translateZ(0) !important;
-  -ms-transform: translateZ(0) !important;
-  -o-transform: translateZ(0) !important;
-  -webkit-position: fixed !important;
-  -moz-position: fixed !important;
-  -ms-position: fixed !important;
-  -o-position: fixed !important;
-  -webkit-backface-visibility: hidden !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
   backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
-/* Prevenir que cualquier contenedor padre afecte al footer */
-body,
-html,
-#root,
-div[class*="min-h-screen"],
-div[class*="flex flex-col"] {
-  overflow-x: hidden !important;
-}
-
-/* Asegurar que el footer no se mueva con scroll en ningún caso */
+/* Footer/Nav SIEMPRE fijo - NO SE MUEVE CON SCROLL */
 nav#bottom-nav-fixed {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
+  top: auto !important;
+  z-index: 9999 !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
   width: 100% !important;
   max-width: 100% !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Asegurar que todos los nav elementos tengan position fixed */
+nav {
+  position: fixed !important;
 }
 
 /* Asegurar que la sección de filtros esté siempre fija */

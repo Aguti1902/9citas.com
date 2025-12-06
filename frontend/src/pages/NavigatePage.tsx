@@ -306,6 +306,11 @@ export default function NavigatePage() {
         latitude: lat,
         longitude: lng,
       })
+      
+      // Actualizar el estado del usuario para que persista
+      const { refreshUserData } = useAuthStore.getState()
+      await refreshUserData()
+      
       // Recargar perfiles con la nueva ubicación
       loadProfiles()
       showToast(`Ubicación actualizada a ${city}`, 'success')
