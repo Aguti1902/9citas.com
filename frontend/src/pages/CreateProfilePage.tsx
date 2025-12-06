@@ -596,33 +596,32 @@ export default function CreateProfilePage() {
               </label>
             </div>
 
-            {photoPreview.length > 0 && (
+            {photoPreview.filter(p => p.type === 'cover' || p.type === 'public').length > 0 && (
               <div className="grid grid-cols-4 gap-2">
-                {photoPreview.map((preview, index) => (
-                  <div key={index} className="relative aspect-square">
-                    <img
-                      src={preview.url}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                    >
-                      ×
-                    </button>
-                    <div className={`absolute bottom-1 left-1 text-white text-xs px-2 py-0.5 rounded ${
-                      preview.type === 'cover' ? 'bg-primary' :
-                      preview.type === 'private' ? 'bg-accent' :
-                      'bg-secondary'
-                    }`}>
-                      {preview.type === 'cover' ? '📷 Portada' : 
-                       preview.type === 'private' ? '🔒 Privada' : 
-                       '👁️ Pública'}
+                {photoPreview.filter(p => p.type === 'cover' || p.type === 'public').map((preview, index) => {
+                  const globalIndex = photoPreview.findIndex(p => p === preview)
+                  return (
+                    <div key={globalIndex} className="relative aspect-square">
+                      <img
+                        src={preview.url}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(globalIndex)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                      <div className={`absolute bottom-1 left-1 text-white text-xs px-2 py-0.5 rounded ${
+                        preview.type === 'cover' ? 'bg-primary' : 'bg-secondary'
+                      }`}>
+                        {preview.type === 'cover' ? '📷 Portada' : '👁️ Pública'}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
 
@@ -655,27 +654,30 @@ export default function CreateProfilePage() {
               </label>
             </div>
 
-            {photoPreview.length > 4 && (
+            {photoPreview.filter(p => p.type === 'private').length > 0 && (
               <div className="grid grid-cols-4 gap-2">
-                {photoPreview.slice(4).map((preview, index) => (
-                  <div key={index + 4} className="relative aspect-square">
-                    <img
-                      src={preview}
-                      alt={`Preview privada ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(index + 4)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                    >
-                      ×
-                    </button>
-                    <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                      🔒 Privada
+                {photoPreview.filter(p => p.type === 'private').map((preview, index) => {
+                  const globalIndex = photoPreview.findIndex(p => p === preview)
+                  return (
+                    <div key={globalIndex} className="relative aspect-square">
+                      <img
+                        src={preview.url}
+                        alt={`Preview privada ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(globalIndex)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                      <div className="absolute bottom-1 left-1 bg-accent text-black text-xs px-2 py-0.5 rounded flex items-center gap-1">
+                        🔒 Privada
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
 
