@@ -38,6 +38,11 @@ export default function RegisterPage() {
       // Guardar orientación en localStorage para usarla al crear el perfil
       localStorage.setItem('userOrientation', orientation!)
       
+      // Determinar género basado en orientación para hetero
+      // Hetero: el usuario elige si es hombre o mujer (por defecto hombre)
+      // Gay: tanto hombres como mujeres pueden ser gay
+      // Se guardará el género seleccionado más adelante
+      
       // Si requiere verificación, redirigir a página de confirmación
       if (result.requiresVerification) {
         navigate('/email-sent', {

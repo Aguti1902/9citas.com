@@ -84,7 +84,15 @@ export default function CreateProfilePage() {
   useEffect(() => {
     const savedOrientation = localStorage.getItem('userOrientation')
     if (savedOrientation) {
-      setFormData(prev => ({ ...prev, orientation: savedOrientation }))
+      setFormData(prev => ({
+        ...prev,
+        orientation: savedOrientation,
+        // Establecer género basado en orientación
+        // Para simplificar: hetero hombre busca mujer, hetero mujer busca hombre
+        // Gay: hombre busca hombre, mujer busca mujer
+        // Por defecto establecemos 'hombre', pero esto se puede ajustar según la lógica de negocio
+        gender: 'hombre' // Por defecto
+      }))
       localStorage.removeItem('userOrientation') // Limpiar después de usar
     }
 
@@ -337,10 +345,8 @@ export default function CreateProfilePage() {
       return
     }
 
-    if (!formData.gender) {
-      setError('Debes seleccionar tu género')
-      return
-    }
+    // El género se establece automáticamente según la orientación
+    // No necesitamos validarlo manualmente
 
     setIsLoading(true)
 
@@ -450,38 +456,7 @@ export default function CreateProfilePage() {
           />
 
           {/* Orientación oculta - ya se seleccionó en el registro */}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Género *
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="hombre"
-                  checked={formData.gender === 'hombre'}
-                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                  className="mr-2"
-                  required
-                />
-                <span className="text-white">Hombre</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="mujer"
-                  checked={formData.gender === 'mujer'}
-                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                  className="mr-2"
-                  required
-                />
-                <span className="text-white">Mujer</span>
-              </label>
-            </div>
-          </div>
+          {/* Género oculto - ya se seleccionó en el registro */}
 
           {/* Ubicación - Detección automática */}
           <div>
