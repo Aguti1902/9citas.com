@@ -14,7 +14,6 @@ export default function ProfileDetailPage() {
   const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLiked, setIsLiked] = useState(false)
-  const [hasMatch, setHasMatch] = useState(false)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   
   // Resetear índice cuando cambia el perfil o las fotos públicas
@@ -30,7 +29,6 @@ export default function ProfileDetailPage() {
   useEffect(() => {
     loadProfile()
     checkPrivatePhotoAccess()
-    checkMatch()
   }, [id])
 
   const loadProfile = async () => {
@@ -64,16 +62,6 @@ export default function ProfileDetailPage() {
     }
   }
 
-  const checkMatch = async () => {
-    try {
-      // Verificar si ambos se han dado like
-      const response = await api.get(`/likes/check/${id}`)
-      setHasMatch(response.data.hasMatch || false)
-    } catch (error) {
-      console.error('Error al verificar match:', error)
-    }
-  }
-
   const checkPrivatePhotoAccess = async () => {
     try {
       const response = await api.get(`/private-photos/check/${id}`)
@@ -102,7 +90,6 @@ export default function ProfileDetailPage() {
       if (isLiked) {
         await api.delete(`/likes/${id}`)
         setIsLiked(false)
-        setHasMatch(false)
       } else {
         // Dar like - el backend ahora retorna si hay match
         const response = await api.post(`/likes/${id}`)
@@ -112,14 +99,10 @@ export default function ProfileDetailPage() {
         // Si hay match → ¡MATCH! 💕
         if (response.data.isMatch) {
           console.log('🎉 MATCH detectado en handleLike!')
-          setHasMatch(true)
           setShowMatchModal(true)
           // La notificación de Socket.IO también debería aparecer
         }
       }
-      
-      // Actualizar estado de match después de dar/quitar like
-      await checkMatch()
     } catch (error: any) {
       console.error('❌ Error al dar like:', error)
       showToast(error.response?.data?.error || 'Error al dar like', 'error')
