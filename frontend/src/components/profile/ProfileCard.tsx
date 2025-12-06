@@ -108,14 +108,19 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
           <h3 className="text-white font-bold text-lg leading-tight mb-1">
             {profile.title}, {profile.age}
           </h3>
-          <div className="flex items-center gap-2 text-gray-300 text-sm">
-            <MapPin className="w-3.5 h-3.5" />
-            <span>{profile.city}</span>
-          </div>
-          {profile.distance !== null && profile.distance !== undefined && (
-            <p className="text-accent text-sm font-semibold mt-1">
-              📍 A {profile.distance} km
-            </p>
+          {/* Mostrar ubicación solo si showExactLocation es true */}
+          {profile.showExactLocation !== false && (
+            <>
+              <div className="flex items-center gap-2 text-gray-300 text-sm">
+                <MapPin className="w-3.5 h-3.5" />
+                <span>{profile.city}</span>
+              </div>
+              {profile.distance !== null && profile.distance !== undefined && (
+                <p className="text-accent text-sm font-semibold mt-1">
+                  📍 A {profile.distance} km
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -227,13 +227,16 @@ export default function SwipeCard({
               </h2>
               
               <div className="space-y-1 text-gray-200">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>{profile.city}</span>
-                  {profile.distance !== null && profile.distance !== undefined && (
-                    <span className="text-accent font-semibold">· {profile.distance} km</span>
-                  )}
-                </div>
+                {/* Mostrar ubicación solo si showExactLocation es true */}
+                {profile.showExactLocation !== false && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{profile.city}</span>
+                    {profile.distance !== null && profile.distance !== undefined && (
+                      <span className="text-accent font-semibold">· {profile.distance} km</span>
+                    )}
+                  </div>
+                )}
                 
                 {profile.occupation && (
                   <div className="flex items-center gap-2">

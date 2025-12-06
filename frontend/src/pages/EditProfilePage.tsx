@@ -31,6 +31,7 @@ export default function EditProfilePage() {
     pets: '',
     zodiacSign: '',
     education: '',
+    showExactLocation: true, // Nuevo campo: mostrar ubicación exacta (por defecto SÍ)
   })
   
   const [hobbies, setHobbies] = useState<string[]>([])
@@ -66,6 +67,7 @@ export default function EditProfilePage() {
         pets: profile.pets || '',
         zodiacSign: profile.zodiacSign || '',
         education: profile.education || '',
+        showExactLocation: profile.showExactLocation !== undefined ? profile.showExactLocation : true, // Por defecto true
       })
       setHobbies(profile.hobbies || [])
       setLanguages(profile.languages || [])
@@ -643,6 +645,47 @@ export default function EditProfilePage() {
               <option value="acuario">♒ Acuario</option>
               <option value="piscis">♓ Piscis</option>
             </select>
+          </div>
+        </div>
+
+        {/* PRIVACIDAD: Mostrar ubicación exacta */}
+        <div className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700">
+          <label className="block text-sm font-medium text-white mb-3">
+            🔒 Privacidad de ubicación
+          </label>
+          <div className="space-y-3">
+            <p className="text-sm text-gray-400">
+              ¿Quieres que otros usuarios vean tu ubicación exacta (ciudad y distancia)?
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, showExactLocation: true })}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
+                  formData.showExactLocation
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                ✅ Sí, mostrar ubicación
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, showExactLocation: false })}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
+                  !formData.showExactLocation
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                🔒 No, ocultar ubicación
+              </button>
+            </div>
+            <p className="text-xs text-gray-500">
+              {formData.showExactLocation 
+                ? '✅ Tu ciudad y distancia serán visibles para otros usuarios (excepto usuarios gratis que no pueden verlo)' 
+                : '🔒 Tu ubicación estará oculta. Solo se mostrará tu país o región general'}
+            </p>
           </div>
         </div>
 

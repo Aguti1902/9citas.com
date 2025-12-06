@@ -70,6 +70,7 @@ model Profile {
   city            String
   latitude        Float?
   longitude       Float?
+  showExactLocation Boolean @default(true) // Mostrar ubicación exacta a otros usuarios (por defecto SÍ)
   
   // Estado
   isOnline        Boolean   @default(false)

@@ -17,7 +17,7 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
 
     const { title, aboutMe, lookingFor, age, orientation, gender, city, latitude, longitude, 
           height, bodyType, relationshipStatus, occupation, education, smoking, drinking,
-          children, pets, zodiacSign, hobbies, languages } = req.body;
+          children, pets, zodiacSign, hobbies, languages, showExactLocation } = req.body;
 
     // Verificar que no tenga ya un perfil
     const existingProfile = await prisma.profile.findUnique({
@@ -41,6 +41,7 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
         city,
         latitude: latitude || null,
         longitude: longitude || null,
+        showExactLocation: showExactLocation !== undefined ? showExactLocation : true, // Por defecto SÍ
         height: height || null,
         bodyType: bodyType || null,
         relationshipStatus: relationshipStatus || null,
@@ -104,7 +105,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     const { title, aboutMe, lookingFor, age, orientation, gender, city, latitude, longitude,
           height, bodyType, relationshipStatus, occupation, education, smoking, drinking,
-          children, pets, zodiacSign, hobbies, languages } = req.body;
+          children, pets, zodiacSign, hobbies, languages, showExactLocation } = req.body;
 
     const updatedProfile = await prisma.profile.update({
       where: { userId: req.userId },
@@ -118,6 +119,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
         city,
         latitude: latitude || null,
         longitude: longitude || null,
+        showExactLocation: showExactLocation !== undefined ? showExactLocation : undefined, // Actualizar si se proporciona
         height: height || null,
         bodyType: bodyType || null,
         relationshipStatus: relationshipStatus || null,
