@@ -152,19 +152,19 @@ export default function OnboardingTutorial({ onComplete }: OnboardingTutorialPro
               <Button
                 variant="outline"
                 onClick={handlePrev}
-                className="flex-1"
+                className="flex-1 flex items-center justify-center gap-2"
               >
-                <ChevronLeft className="w-5 h-5 mr-1" />
-                Anterior
+                <ChevronLeft className="w-5 h-5" />
+                <span>Anterior</span>
               </Button>
             )}
             <Button
               variant="primary"
               onClick={handleNext}
-              className="flex-1"
+              className="flex-1 flex items-center justify-center gap-2"
             >
-              {isLastStep ? '¡Empezar!' : 'Siguiente'}
-              {!isLastStep && <ChevronRight className="w-5 h-5 ml-1" />}
+              <span>{isLastStep ? '¡Empezar!' : 'Siguiente'}</span>
+              {!isLastStep && <ChevronRight className="w-5 h-5" />}
             </Button>
           </div>
 

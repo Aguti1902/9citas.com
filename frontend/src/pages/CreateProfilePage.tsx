@@ -355,6 +355,10 @@ export default function CreateProfilePage() {
       }
 
       await refreshUserData()
+      
+      // Marcar que el usuario acaba de registrarse para mostrar el tutorial
+      sessionStorage.setItem('justRegistered', 'true')
+      
       navigate('/app')
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al crear perfil')

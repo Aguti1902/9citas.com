@@ -298,8 +298,9 @@ export default function NavigatePage() {
       return
     }
 
-    // Guardar posición del scroll ANTES de actualizar
+    // Guardar posición del scroll ANTES de cualquier cambio
     const scrollPosition = window.scrollY
+    const scrollElement = document.documentElement
 
     setCurrentCity(city)
     // Actualizar ubicación en el backend
@@ -317,10 +318,25 @@ export default function NavigatePage() {
       // Recargar perfiles con la nueva ubicación
       await loadProfiles()
       
-      // Restaurar posición del scroll DESPUÉS de cargar
+      // Restaurar posición del scroll INMEDIATAMENTE y forzar la posición
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosition)
+        scrollElement.scrollTop = scrollPosition
+        document.body.scrollTop = scrollPosition
+      })
+      
+      // Asegurar que la posición se mantiene después del render
       setTimeout(() => {
         window.scrollTo(0, scrollPosition)
+        scrollElement.scrollTop = scrollPosition
+        document.body.scrollTop = scrollPosition
       }, 0)
+      
+      setTimeout(() => {
+        window.scrollTo(0, scrollPosition)
+        scrollElement.scrollTop = scrollPosition
+        document.body.scrollTop = scrollPosition
+      }, 50)
       
       showToast(`Ubicación actualizada a ${city}`, 'success')
     } catch (error) {
