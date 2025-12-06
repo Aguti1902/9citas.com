@@ -13,8 +13,14 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
     }
 
     const { type } = req.body; // 'cover' | 'public' | 'private'
+    
+    console.log('📸 === SUBIR FOTO ===');
+    console.log('Tipo recibido:', type);
+    console.log('Body completo:', req.body);
+    console.log('Archivo:', req.file?.originalname);
 
     if (!['cover', 'public', 'private'].includes(type)) {
+      console.error(`❌ Tipo inválido recibido: "${type}"`);
       return res.status(400).json({ error: 'Tipo de foto inválido' });
     }
 
@@ -25,6 +31,8 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
         type,
       },
     });
+
+    console.log(`Fotos existentes de tipo "${type}":`, existingPhotos.length);
 
     // Límites: 1 cover, 3 public, 4 private
     const limits: any = { cover: 1, public: 3, private: 4 };
@@ -58,6 +66,8 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
         type,
       },
     });
+
+    console.log(`✅ Foto guardada correctamente como tipo "${type}":`, photo.id);
 
     res.status(201).json({
       message: 'Foto subida exitosamente',

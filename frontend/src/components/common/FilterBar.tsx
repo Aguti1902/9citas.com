@@ -41,6 +41,7 @@ export default function FilterBar({
   // Filtros base
   const baseFilters = [
     { id: 'all', label: 'TODOS', premium: false, Icon: Users },
+    { id: 'recent', label: 'RECIENTES', premium: false, Icon: Calendar }, // Online + conectados hace menos de 2h (GRATIS Y PREMIUM)
     { id: 'online', label: 'ONLINE', premium: true, Icon: Wifi },
     { id: 'age', label: 'EDAD', premium: true, Icon: Calendar, isModal: true },
     { id: 'distance', label: 'DISTANCIA', premium: false, Icon: MapPin, isModal: true },

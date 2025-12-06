@@ -248,6 +248,15 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         where.isOnline = true;
       }
     }
+    
+    // RECIENTES: Para TODOS (gratis y premium) - Online o conectados hace menos de 2h
+    if (filter === 'recent') {
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 horas atrás
+      where.OR = [
+        { isOnline: true }, // Usuarios online ahora
+        { lastSeenAt: { gte: twoHoursAgo } }, // Conectados en las últimas 2 horas
+      ];
+    }
 
     // Buscar perfiles
     let profiles = await prisma.profile.findMany({

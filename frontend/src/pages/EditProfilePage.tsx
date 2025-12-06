@@ -195,17 +195,23 @@ export default function EditProfilePage() {
         const coverExists = existingPhotos.some(p => p.type === 'cover')
         
         let type = 'public'
-        if (!coverExists && i === 0) type = 'cover'
-        else type = 'public'
+        if (!coverExists && i === 0) {
+          type = 'cover'
+        } else {
+          type = 'public'
+        }
         
+        console.log(`📸 Subiendo foto pública ${i+1}/${selectedFiles.length} como tipo: ${type}`)
         photoFormData.append('type', type)
         
         try {
-          await api.post('/photos/upload', photoFormData, {
+          const response = await api.post('/photos/upload', photoFormData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
-        } catch (photoErr) {
-          console.error('Error subiendo foto:', photoErr)
+          console.log(`✅ Foto pública ${i+1} subida correctamente:`, response.data)
+        } catch (photoErr: any) {
+          console.error('❌ Error subiendo foto pública:', photoErr)
+          console.error('Respuesta error:', photoErr.response?.data)
         }
       }
 
@@ -213,14 +219,23 @@ export default function EditProfilePage() {
       for (let i = 0; i < selectedPrivateFiles.length; i++) {
         const photoFormData = new FormData()
         photoFormData.append('photo', selectedPrivateFiles[i])
-        photoFormData.append('type', 'private')
+        photoFormData.append('type', 'private') // ASEGURAR que siempre sea 'private'
+        
+        console.log(`🔒 Subiendo foto PRIVADA ${i+1}/${selectedPrivateFiles.length}`)
         
         try {
-          await api.post('/photos/upload', photoFormData, {
+          const response = await api.post('/photos/upload', photoFormData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
-        } catch (photoErr) {
-          console.error('Error subiendo foto privada:', photoErr)
+          console.log(`✅ Foto PRIVADA ${i+1} subida correctamente:`, response.data)
+          
+          // Verificar que se guardó como privada
+          if (response.data.photo?.type !== 'private') {
+            console.error(`⚠️ ALERTA: La foto se guardó como '${response.data.photo?.type}' en vez de 'private'`)
+          }
+        } catch (photoErr: any) {
+          console.error('❌ Error subiendo foto privada:', photoErr)
+          console.error('Respuesta error:', photoErr.response?.data)
         }
       }
 

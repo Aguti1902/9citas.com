@@ -59,6 +59,22 @@ export default function IndexPage() {
             </a>
           </p>
         </div>
+
+        {/* Texto descriptivo SEO */}
+        <div className="text-center text-sm text-gray-400 space-y-3 pt-6 border-t border-gray-800 mt-6">
+          <h2 className="text-lg font-bold text-white flex items-center justify-center gap-2">
+            ⭐ 9citas.com – Conoce chicas y chicos cerca de ti
+          </h2>
+          <p className="text-gray-300">
+            9citas.com es una opción gratuita para descubrir y conectar con personas cerca de ti, ya sean chicas o chicos, heterosexuales o gays. Nuestra plataforma está pensada para que puedas conocer gente nueva de forma rápida, sencilla y sin complicaciones.
+          </p>
+          <p className="text-gray-300">
+            Crea tu perfil, explora usuarios cercanos y empieza a chatear con personas reales que buscan amistad, conversación o algo más. En 9citas.com, tú decides cómo y con quién conectar.
+          </p>
+          <p className="text-white font-semibold">
+            Fácil, accesible y para todos.
+          </p>
+        </div>
       </div>
     </div>
   )

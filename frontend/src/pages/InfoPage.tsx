@@ -91,7 +91,7 @@ export default function InfoPage() {
               <strong className="text-white">2. Completa tu perfil:</strong> Añade tu información, fotos y preferencias.
             </p>
             <p>
-              <strong className="text-white">3. Explora perfiles:</strong> Con el plan gratuito puedes ver hasta 81 perfiles en tu ciudad y chatear con ellos.
+              <strong className="text-white">3. Explora perfiles:</strong> Con el plan gratuito puedes ver hasta 50 perfiles en tu ciudad y chatear con ellos.
             </p>
             <p>
               <strong className="text-white">4. Dale "Me gusta":</strong> Marca los perfiles que te interesan y empieza a chatear.
@@ -109,7 +109,7 @@ export default function InfoPage() {
             <div>
               <h3 className="text-xl font-semibold text-white mb-2">Plan Gratis</h3>
               <ul className="text-gray-300 space-y-2 list-disc list-inside">
-                <li>Ver hasta 81 perfiles en tu ubicación actual</li>
+                <li>Ver hasta 50 perfiles en tu ubicación actual</li>
                 <li>Chatear solo con usuarios de tu ciudad</li>
                 <li>Ver los últimos 5 "Me gusta" recibidos</li>
                 <li>Funciones básicas de búsqueda</li>
@@ -121,7 +121,6 @@ export default function InfoPage() {
               <ul className="text-gray-300 space-y-2 list-disc list-inside">
                 <li>Perfiles ilimitados</li>
                 <li>Chatear sin restricciones de ubicación</li>
-                <li>Ver todos los "Me gusta" recibidos</li>
                 <li>Filtros por edad y usuarios online</li>
                 <li>Ver distancia a otros usuarios</li>
                 <li>Prioridad en búsquedas</li>

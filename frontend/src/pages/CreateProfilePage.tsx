@@ -491,11 +491,6 @@ export default function CreateProfilePage() {
                 <span className="text-white">Mujer</span>
               </label>
             </div>
-            <p className="text-gray-400 text-xs mt-1">
-              {formData.orientation === 'hetero' 
-                ? 'Los usuarios heteros verán solo perfiles del género opuesto'
-                : 'Los usuarios gays verán solo perfiles del mismo género'}
-            </p>
           </div>
 
           {/* Ubicación - NO se detecta automáticamente al crear perfil */}

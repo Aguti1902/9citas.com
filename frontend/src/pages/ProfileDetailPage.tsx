@@ -84,6 +84,7 @@ export default function ProfileDetailPage() {
   }
 
   const handleRequestPrivatePhotoAccess = async () => {
+    // YA NO REQUIERE MATCH - Cualquiera puede solicitar acceso a fotos privadas
     setIsRequestingAccess(true)
     try {
       await api.post(`/private-photos/request/${id}`)
