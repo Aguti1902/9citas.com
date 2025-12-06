@@ -187,8 +187,17 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-dark flex flex-col">
-      {/* Header - CONTROLADO POR CSS */}
-      <header className="dashboard-header bg-gray-900">
+      {/* Header - CONTROLADO POR CSS - SIN CLASES DE TAILWIND QUE INTERFIERAN */}
+      <header 
+        className="dashboard-header bg-gray-900" 
+        style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9998,
+        }}
+      >
         <div className="max-w-7xl mx-auto px-3 flex items-center justify-between h-14">
           <div className="flex-shrink-0">
             {/* Logo pequeño SOLO en el header interno */}
@@ -234,10 +243,17 @@ export default function DashboardLayout() {
         <Outlet />
       </main>
 
-      {/* Bottom navigation - CONTROLADO POR CSS */}
+      {/* Bottom navigation - CONTROLADO POR CSS - SIN CLASES DE TAILWIND QUE INTERFIERAN */}
       <nav 
         id="bottom-nav-fixed"
         className="dashboard-footer bg-gray-900 border-t border-gray-800"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+        }}
       >
         <div className="max-w-7xl mx-auto px-2">
           <div className="flex justify-around">

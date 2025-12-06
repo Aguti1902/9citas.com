@@ -17,10 +17,15 @@ body {
 }
 
 /* ====================================================
-   HEADER Y FOOTER ABSOLUTAMENTE FIJOS - NO SE MUEVEN NUNCA
+   HEADER Y FOOTER ABSOLUTAMENTE FIJOS - ULTRA REFORZADO
+   NADA LOS MUEVE - NI SCROLL NI NADA
    ==================================================== */
 
-/* HEADER - FORZADO A ESTAR ARRIBA SIEMPRE */
+/* HEADER - MAXIMA ESPECIFICIDAD */
+html body #root div.min-h-screen header.dashboard-header,
+html body #root div header.dashboard-header,
+body #root header.dashboard-header,
+#root header.dashboard-header,
 header.dashboard-header,
 header {
   position: fixed !important;
@@ -28,6 +33,7 @@ header {
   left: 0 !important;
   right: 0 !important;
   width: 100vw !important;
+  max-width: 100vw !important;
   z-index: 9998 !important;
   transform: translate3d(0, 0, 0) !important;
   -webkit-transform: translate3d(0, 0, 0) !important;
@@ -36,18 +42,25 @@ header {
   will-change: auto !important;
   margin: 0 !important;
   padding: 0 !important;
+  transition: none !important;
 }
 
-/* FOOTER - FORZADO A ESTAR ABAJO SIEMPRE */
+/* FOOTER - MAXIMA ESPECIFICIDAD */
+html body #root div.min-h-screen nav.dashboard-footer,
+html body #root div nav.dashboard-footer,
+body #root nav.dashboard-footer,
+#root nav.dashboard-footer,
 nav.dashboard-footer,
 nav#bottom-nav-fixed,
-nav[id="bottom-nav-fixed"] {
+nav[id="bottom-nav-fixed"],
+nav {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
   top: auto !important;
   width: 100vw !important;
+  max-width: 100vw !important;
   z-index: 9999 !important;
   transform: translate3d(0, 0, 0) !important;
   -webkit-transform: translate3d(0, 0, 0) !important;
@@ -56,25 +69,43 @@ nav[id="bottom-nav-fixed"] {
   will-change: auto !important;
   margin: 0 !important;
   padding: 0 !important;
+  transition: none !important;
 }
 
-/* Prevenir que cualquier padre afecte */
-body,
-html,
-#root {
-  position: relative !important;
+/* Desactivar CUALQUIER transformacion en scroll */
+@supports (-webkit-overflow-scrolling: touch) {
+  header, nav {
+    -webkit-overflow-scrolling: auto !important;
+  }
+}
+
+/* Prevenir sticky behavior */
+header, nav {
+  position: fixed !important;
+  position: -webkit-fixed !important;
+  position: -moz-fixed !important;
+}
+
+/* Prevenir que el body o html muevan header/footer */
+html {
   overflow-x: hidden !important;
+  position: relative !important;
+}
+
+body {
+  overflow-x: hidden !important;
+  position: relative !important;
+}
+
+#root {
+  overflow-x: hidden !important;
+  position: relative !important;
 }
 
 /* Asegurar que main no empuje footer */
 main {
   position: relative !important;
   z-index: 1 !important;
-}
-
-/* Todos los nav deben ser fixed */
-nav {
-  position: fixed !important;
 }
 
 /* ====================================================
