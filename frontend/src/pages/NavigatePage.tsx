@@ -298,6 +298,9 @@ export default function NavigatePage() {
       return
     }
 
+    // Guardar posición del scroll ANTES de actualizar
+    const scrollPosition = window.scrollY
+
     setCurrentCity(city)
     // Actualizar ubicación en el backend
     try {
@@ -312,7 +315,13 @@ export default function NavigatePage() {
       await refreshUserData()
       
       // Recargar perfiles con la nueva ubicación
-      loadProfiles()
+      await loadProfiles()
+      
+      // Restaurar posición del scroll DESPUÉS de cargar
+      setTimeout(() => {
+        window.scrollTo(0, scrollPosition)
+      }, 0)
+      
       showToast(`Ubicación actualizada a ${city}`, 'success')
     } catch (error) {
       console.error('Error al actualizar ubicación:', error)
