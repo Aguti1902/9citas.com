@@ -186,7 +186,7 @@ export default function DashboardLayout() {
   ]
 
   return (
-    <div className="min-h-screen bg-dark" style={{ height: '100vh', overflow: 'hidden', position: 'fixed', width: '100%' }}>
+    <div className="dashboard-layout min-h-screen bg-dark" style={{ height: '100vh', overflow: 'hidden', position: 'fixed', width: '100%' }}>
       {/* Header - FIJO ARRIBA - NO SE MUEVE */}
       <header 
         className="dashboard-header bg-gray-900" 

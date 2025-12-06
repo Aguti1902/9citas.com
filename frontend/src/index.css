@@ -18,35 +18,29 @@ body {
 
 /* ====================================================
    ESTRUCTURA: Solo main tiene scroll, body NO
+   PERO SOLO EN DASHBOARD (con clase .dashboard-layout)
    ==================================================== */
 
-html {
-  height: 100%;
-  overflow: hidden !important; /* Body NO hace scroll */
+/* Solo aplicar overflow hidden cuando estamos en dashboard */
+.dashboard-layout html,
+.dashboard-layout body {
+  overflow: hidden !important;
   position: fixed !important;
   width: 100%;
-}
-
-body {
   height: 100%;
-  overflow: hidden !important; /* Body NO hace scroll */
-  position: fixed !important;
-  width: 100%;
-  margin: 0;
-  padding: 0;
 }
 
-#root {
+.dashboard-layout #root {
   height: 100vh;
-  overflow: hidden !important; /* Root NO hace scroll */
+  overflow: hidden !important;
   position: fixed !important;
   width: 100%;
   top: 0;
   left: 0;
 }
 
-/* SOLO main hace scroll */
-main {
+/* SOLO main dentro de dashboard hace scroll */
+.dashboard-layout main {
   overflow-y: auto !important;
   overflow-x: hidden !important;
   height: calc(100vh - 56px - 64px) !important; /* altura total - header - footer */
