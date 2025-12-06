@@ -250,6 +250,7 @@ export default function DashboardLayout() {
           overflowY: 'auto',
           overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
+          paddingBottom: '80px', // Padding extra para que el footer no tape contenido
         }}
       >
         <Outlet />

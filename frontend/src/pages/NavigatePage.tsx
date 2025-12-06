@@ -494,8 +494,8 @@ export default function NavigatePage() {
         </div>
       </div>
 
-      {/* Contenido - Con padding para que se vea debajo de filtros */}
-      <div className={`max-w-7xl mx-auto px-4 ${viewMode === 'swipe' ? 'pt-32' : 'pt-32 pb-6'}`} style={{ minHeight: viewMode === 'swipe' ? 'calc(100vh - 120px)' : 'auto' }}>
+      {/* Contenido - Con padding para que se vea debajo de filtros Y para que footer no tape */}
+      <div className={`max-w-7xl mx-auto px-4 pb-20 ${viewMode === 'swipe' ? 'pt-32' : 'pt-32'}`} style={{ minHeight: viewMode === 'swipe' ? 'calc(100vh - 120px)' : 'auto' }}>
         {isLoading ? (
           <LoadingSpinner />
         ) : profiles.length === 0 ? (
