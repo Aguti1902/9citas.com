@@ -298,12 +298,8 @@ export default function NavigatePage() {
       return
     }
 
-    // Guardar posición del scroll ANTES de cualquier cambio
-    const scrollPosition = window.scrollY
-    const scrollElement = document.documentElement
-
     setCurrentCity(city)
-    // Actualizar ubicación en el backend
+    // Actualizar ubicación en el backend SIN recargar perfiles
     try {
       await api.put('/profile', {
         city,
@@ -315,28 +311,8 @@ export default function NavigatePage() {
       const { refreshUserData } = useAuthStore.getState()
       await refreshUserData()
       
-      // Recargar perfiles con la nueva ubicación
-      await loadProfiles()
-      
-      // Restaurar posición del scroll INMEDIATAMENTE y forzar la posición
-      requestAnimationFrame(() => {
-        window.scrollTo(0, scrollPosition)
-        scrollElement.scrollTop = scrollPosition
-        document.body.scrollTop = scrollPosition
-      })
-      
-      // Asegurar que la posición se mantiene después del render
-      setTimeout(() => {
-        window.scrollTo(0, scrollPosition)
-        scrollElement.scrollTop = scrollPosition
-        document.body.scrollTop = scrollPosition
-      }, 0)
-      
-      setTimeout(() => {
-        window.scrollTo(0, scrollPosition)
-        scrollElement.scrollTop = scrollPosition
-        document.body.scrollTop = scrollPosition
-      }, 50)
+      // NO llamar a loadProfiles() para evitar que la card se mueva
+      // Los perfiles se recargarán automáticamente cuando el usuario navegue
       
       showToast(`Ubicación actualizada a ${city}`, 'success')
     } catch (error) {
@@ -529,21 +505,38 @@ export default function NavigatePage() {
             </p>
           </div>
         ) : viewMode === 'swipe' ? (
-          // Vista Swipe tipo Tinder
-          <div className="relative max-w-md mx-auto h-[calc(100vh-280px)] pt-0 overflow-hidden">
+          // Vista Swipe tipo Tinder - CONTENEDOR FIJO
+          <div 
+            className="relative max-w-md mx-auto pt-0"
+            style={{
+              height: 'calc(100vh - 280px)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             {showPromoCard ? (
               // Card promocional de 9Plus
               <PremiumPromoCard onClose={handleClosePromoCard} />
             ) : currentProfile ? (
               <>
-                <SwipeCard
-                  key={currentProfile.id}
-                  profile={currentProfile}
-                  onSwipeLeft={handleSwipeLeft}
-                  onSwipeRight={handleSwipeRight}
-                  onProfileClick={() => navigate(`/app/profile/${currentProfile.id}`)}
-                  isPremium={isPremium}
-                />
+                <div 
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                >
+                  <SwipeCard
+                    key={currentProfile.id}
+                    profile={currentProfile}
+                    onSwipeLeft={handleSwipeLeft}
+                    onSwipeRight={handleSwipeRight}
+                    onProfileClick={() => navigate(`/app/profile/${currentProfile.id}`)}
+                    isPremium={isPremium}
+                  />
+                </div>
               </>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center">

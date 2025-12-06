@@ -16,7 +16,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header SIEMPRE fijo - NO SE MUEVE CON SCROLL */
+/* HEADER ABSOLUTAMENTE FIJO - NO SE MUEVE NUNCA */
 header {
   position: fixed !important;
   top: 0 !important;
@@ -27,9 +27,10 @@ header {
   -webkit-transform: translate3d(0, 0, 0) !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
+  will-change: auto !important;
 }
 
-/* Footer/Nav SIEMPRE fijo - NO SE MUEVE CON SCROLL */
+/* FOOTER ABSOLUTAMENTE FIJO - NO SE MUEVE NUNCA */
 nav#bottom-nav-fixed {
   position: fixed !important;
   bottom: 0 !important;
@@ -46,11 +47,24 @@ nav#bottom-nav-fixed {
   margin: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  will-change: auto !important;
 }
 
-/* Asegurar que todos los nav elementos tengan position fixed */
+/* Forzar que TODOS los nav sean fixed */
 nav {
   position: fixed !important;
+}
+
+/* Prevenir que body afecte el scroll */
+body {
+  position: relative !important;
+  overflow-x: hidden !important;
+}
+
+/* Asegurar que el contenido no empuje el footer */
+#root {
+  position: relative !important;
+  min-height: 100vh !important;
 }
 
 /* Asegurar que la sección de filtros esté siempre fija */
