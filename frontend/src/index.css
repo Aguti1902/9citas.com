@@ -77,6 +77,18 @@ nav {
   position: fixed !important;
 }
 
+/* ====================================================
+   CARD DE SWIPE ABSOLUTAMENTE FIJA
+   ==================================================== */
+.swipe-container-fixed {
+  position: fixed !important;
+  transform: translateX(-50%) translateZ(0) !important;
+  -webkit-transform: translateX(-50%) translateZ(0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  will-change: auto !important;
+}
+
 /* Asegurar que la sección de filtros esté siempre fija */
 div[class*="bg-gray-900"][class*="sticky top-14"],
 div[class*="bg-gray-900"][class*="fixed top-14"] {
