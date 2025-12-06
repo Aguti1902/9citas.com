@@ -40,6 +40,14 @@ export default function NavigatePage() {
   const isPremium = user?.subscription?.isActive || false
   const userOrientation = user?.profile?.orientation || 'hetero'
 
+  // Asegurar que main siempre tenga scroll al inicio al cargar la página
+  useEffect(() => {
+    const main = document.querySelector('main')
+    if (main) {
+      main.scrollTop = 0
+    }
+  }, [])
+
   // Lista de ciudades españolas (misma que LocationSelector)
   const SPANISH_CITIES = [
     { name: 'Madrid', lat: 40.4168, lng: -3.7038 },
