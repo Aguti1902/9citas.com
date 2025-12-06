@@ -395,7 +395,7 @@ export default function CreateProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark py-8 px-4">
+    <div className="bg-dark py-8 px-4" style={{ minHeight: '100%', paddingBottom: '100px' }}>
       <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         {/* Logo */}
         <div className="text-center">
