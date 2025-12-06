@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
-import { Heart, X, MapPin, Briefcase, Ruler } from 'lucide-react'
+import { Heart, X, MapPin, Briefcase, Ruler, Clock } from 'lucide-react'
+import { formatLastSeen } from '@/utils/timeUtils'
 
 interface SwipeCardProps {
   profile: any
@@ -227,6 +228,14 @@ export default function SwipeCard({
               </h2>
               
               <div className="space-y-1 text-gray-200">
+                {/* Última conexión - SIEMPRE VISIBLE */}
+                <div className="flex items-center gap-2 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span className={profile.isOnline ? 'text-green-400 font-semibold' : 'text-gray-300'}>
+                    {profile.isOnline ? '🟢 En línea' : formatLastSeen(profile.lastSeenAt)}
+                  </span>
+                </div>
+
                 {/* Mostrar ubicación solo si showExactLocation es true */}
                 {profile.showExactLocation !== false && (
                   <div className="flex items-center gap-2">

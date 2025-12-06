@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { api } from '@/services/api'
-import { Heart, MapPin } from 'lucide-react'
+import { Heart, MapPin, Clock } from 'lucide-react'
+import { formatLastSeen } from '@/utils/timeUtils'
 
 interface ProfileCardProps {
   profile: any
@@ -108,6 +109,15 @@ export default function ProfileCard({ profile, onLikeToggle }: ProfileCardProps)
           <h3 className="text-white font-bold text-lg leading-tight mb-1">
             {profile.title}, {profile.age}
           </h3>
+          
+          {/* Última conexión - SIEMPRE VISIBLE */}
+          <div className="flex items-center gap-1.5 text-gray-300 text-xs mb-1">
+            <Clock className="w-3 h-3" />
+            <span className={profile.isOnline ? 'text-green-400 font-semibold' : ''}>
+              {profile.isOnline ? '🟢 En línea' : formatLastSeen(profile.lastSeenAt)}
+            </span>
+          </div>
+
           {/* Mostrar ubicación solo si showExactLocation es true */}
           {profile.showExactLocation !== false && (
             <>
