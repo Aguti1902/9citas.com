@@ -357,6 +357,92 @@ export default function FilterBar({
           </div>
         </div>
       </Modal>
+
+      {/* Modal Filtro de Tipo de relación */}
+      <Modal
+        isOpen={showTypeModal}
+        onClose={() => setShowTypeModal(false)}
+        title="Filtrar por tipo de relación"
+        maxWidth="sm"
+      >
+        <div className="space-y-6 pb-2">
+          <div className="space-y-3">
+            <p className="text-gray-400 text-sm mb-4">
+              Selecciona qué tipo de relación buscas:
+            </p>
+            
+            <button
+              onClick={() => {
+                onRelationshipGoalChange?.('amistad')
+                setShowTypeModal(false)
+              }}
+              className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                relationshipGoalFilter === 'amistad'
+                  ? 'border-primary bg-primary/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">👥</span>
+                <div>
+                  <div className="font-semibold">Amistad</div>
+                  <div className="text-sm text-gray-400">Conocer gente nueva y hacer amigos</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                onRelationshipGoalChange?.('relacion_seria')
+                setShowTypeModal(false)
+              }}
+              className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                relationshipGoalFilter === 'relacion_seria'
+                  ? 'border-primary bg-primary/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">❤️</span>
+                <div>
+                  <div className="font-semibold">Relación seria</div>
+                  <div className="text-sm text-gray-400">Busco una relación estable y comprometida</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                onRelationshipGoalChange?.('solo_sexo')
+                setShowTypeModal(false)
+              }}
+              className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                relationshipGoalFilter === 'solo_sexo'
+                  ? 'border-primary bg-primary/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🔥</span>
+                <div>
+                  <div className="font-semibold">Solo sexo</div>
+                  <div className="text-sm text-gray-400">Encuentros casuales sin compromiso</div>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <div className="pt-2">
+            <Button
+              fullWidth
+              variant="outline"
+              onClick={() => setShowTypeModal(false)}
+            >
+              Cerrar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   )
 }
