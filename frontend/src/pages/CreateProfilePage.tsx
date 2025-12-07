@@ -24,6 +24,7 @@ export default function CreateProfilePage() {
     height: '',
     bodyType: '',
     relationshipStatus: 'soltero',
+    relationshipGoal: '', // Nuevo campo
     occupation: '',
     education: '',
     smoking: 'no',

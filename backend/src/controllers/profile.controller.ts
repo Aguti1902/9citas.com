@@ -16,7 +16,7 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
     }
 
     const { title, aboutMe, lookingFor, age, orientation, gender, city, latitude, longitude, 
-          height, bodyType, relationshipStatus, occupation, education, smoking, drinking,
+          height, bodyType, relationshipStatus, relationshipGoal, occupation, education, smoking, drinking,
           children, pets, zodiacSign, hobbies, languages, showExactLocation } = req.body;
 
     // Verificar que no tenga ya un perfil
@@ -104,7 +104,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     }
 
     const { title, aboutMe, lookingFor, age, orientation, gender, city, latitude, longitude,
-          height, bodyType, relationshipStatus, occupation, education, smoking, drinking,
+          height, bodyType, relationshipStatus, relationshipGoal, occupation, education, smoking, drinking,
           children, pets, zodiacSign, hobbies, languages, showExactLocation } = req.body;
 
     const updatedProfile = await prisma.profile.update({
@@ -123,6 +123,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
         height: height || null,
         bodyType: bodyType || null,
         relationshipStatus: relationshipStatus || null,
+        relationshipGoal: relationshipGoal || null, // Nuevo campo
         occupation: occupation || null,
         education: education || null,
         smoking: smoking || null,
@@ -149,7 +150,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 // Buscar perfiles (navegar) - SIMPLIFICADO AL MÁXIMO
 export const searchProfiles = async (req: AuthRequest, res: Response) => {
   try {
-    const { filter, city, ageMin, ageMax, distanceMin, distanceMax, page = 1, limit = 20, gender } = req.query;
+    const { filter, city, ageMin, ageMax, distanceMin, distanceMax, page = 1, limit = 20, gender, relationshipGoal } = req.query;
 
     // Obtener perfil actual
     const myProfile = await prisma.profile.findUnique({
@@ -248,6 +249,10 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       if (filter === 'online') {
         // ONLINE: Solo usuarios conectados AHORA (isOnline = true)
         where.isOnline = true;
+      }
+      // NUEVO: Filtro de relationshipGoal (solo 9Plus)
+      if (relationshipGoal) {
+        where.relationshipGoal = relationshipGoal;
       }
     }
     
