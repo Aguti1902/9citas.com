@@ -105,6 +105,8 @@ model Profile {
   photoAccessAsOwner   PrivatePhotoAccess[] @relation("PhotoAccessOwner")
   photoAccessAsViewer  PrivatePhotoAccess[] @relation("PhotoAccessViewer")
   roamSessions    RoamSession[]
+  reportsMade     Report[] @relation("ReporterProfile")
+  reportsReceived Report[] @relation("ReportedProfile")
   
   @@index([orientation])
   @@index([city])
@@ -273,5 +275,23 @@ model PrivatePhotoAccess {
   
   @@unique([ownerProfileId, viewerProfileId])
   @@map("private_photo_access")
+}
+
+// Denuncias de perfiles
+model Report {
+  id                String   @id @default(uuid())
+  reporterProfileId String   // Quien denuncia
+  reportedProfileId String   // Quien es denunciado
+  
+  reporterProfile   Profile  @relation("ReporterProfile", fields: [reporterProfileId], references: [id], onDelete: Cascade)
+  reportedProfile   Profile  @relation("ReportedProfile", fields: [reportedProfileId], references: [id], onDelete: Cascade)
+  
+  reason            String   // 'scam', 'inappropriate_photos', 'money_request', 'fake_photos', 'underage'
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([reporterProfileId, reportedProfileId]) // Un usuario solo puede denunciar a otro una vez
+  @@index([reportedProfileId])
+  @@map("reports")
 }
 

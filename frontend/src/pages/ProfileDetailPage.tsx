@@ -6,7 +6,8 @@ import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import MatchModal from '@/components/common/MatchModal'
-import { Lock, Eye } from 'lucide-react'
+import ReportModal from '@/components/common/ReportModal'
+import { Lock, Eye, AlertTriangle } from 'lucide-react'
 
 export default function ProfileDetailPage() {
   const { id } = useParams()
@@ -25,10 +26,21 @@ export default function ProfileDetailPage() {
   const [isRequestingAccess, setIsRequestingAccess] = useState(false)
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [showMatchModal, setShowMatchModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportCount, setReportCount] = useState(0)
+  const [reportCountsByReason, setReportCountsByReason] = useState({
+    scam: 0,
+    inappropriate_photos: 0,
+    money_request: 0,
+    fake_photos: 0,
+    underage: 0,
+  })
+  const [hasReported, setHasReported] = useState(false)
 
   useEffect(() => {
     loadProfile()
     checkPrivatePhotoAccess()
+    loadReportData()
   }, [id])
 
   const loadProfile = async () => {
@@ -68,6 +80,27 @@ export default function ProfileDetailPage() {
       setPrivatePhotoAccess(response.data)
     } catch (error) {
       console.error('Error al verificar acceso:', error)
+    }
+  }
+
+  const loadReportData = async () => {
+    try {
+      // Cargar contador de denuncias (total y por motivo)
+      const countResponse = await api.get(`/reports/count/${id}`)
+      setReportCount(countResponse.data.total || 0)
+      setReportCountsByReason(countResponse.data.byReason || {
+        scam: 0,
+        inappropriate_photos: 0,
+        money_request: 0,
+        fake_photos: 0,
+        underage: 0,
+      })
+
+      // Verificar si ya denunciamos
+      const checkResponse = await api.get(`/reports/check/${id}`)
+      setHasReported(checkResponse.data.hasReported || false)
+    } catch (error) {
+      console.error('Error al cargar datos de denuncias:', error)
     }
   }
 
@@ -486,7 +519,77 @@ export default function ProfileDetailPage() {
             ← Volver
           </button>
         </div>
+
+        {/* Sección de denuncias */}
+        <div className="mt-8 pt-6 border-t border-gray-800">
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            {/* Contador de denuncias */}
+            {reportCount > 0 && (
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                  <AlertTriangle className="text-green-500" size={20} />
+                  Este perfil ha sido denunciado por:
+                </h3>
+                <div className="space-y-2 mb-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">- Engaño o estafa:</span>
+                    <span className="font-bold text-white">{reportCountsByReason.scam} {reportCountsByReason.scam === 1 ? 'vez' : 'veces'}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">- Fotos públicas inapropiadas:</span>
+                    <span className="font-bold text-white">{reportCountsByReason.inappropriate_photos} {reportCountsByReason.inappropriate_photos === 1 ? 'vez' : 'veces'}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">- Pide dinero a cambio de sexo:</span>
+                    <span className="font-bold text-white">{reportCountsByReason.money_request} {reportCountsByReason.money_request === 1 ? 'vez' : 'veces'}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">- Fotos falsas:</span>
+                    <span className="font-bold text-white">{reportCountsByReason.fake_photos} {reportCountsByReason.fake_photos === 1 ? 'vez' : 'veces'}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">- Es menor de edad:</span>
+                    <span className="font-bold text-white">{reportCountsByReason.underage} {reportCountsByReason.underage === 1 ? 'vez' : 'veces'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Botón de denunciar */}
+            <button
+              onClick={() => setShowReportModal(true)}
+              disabled={hasReported}
+              className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors ${
+                hasReported
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-red-500 hover:bg-red-600 text-white'
+              }`}
+            >
+              <AlertTriangle size={20} />
+              {hasReported ? 'Ya has denunciado este perfil' : 'Denunciar perfil'}
+            </button>
+
+            {!hasReported && (
+              <p className="text-xs text-gray-500 text-center mt-2">
+                Solo puedes denunciar a cada perfil una vez
+              </p>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Modal de denuncia */}
+      {showReportModal && (
+        <ReportModal
+          profileId={id!}
+          profileTitle={profile?.title || 'Usuario'}
+          onClose={() => setShowReportModal(false)}
+          onReportSent={() => {
+            showToast('Denuncia enviada correctamente', 'success')
+            loadReportData() // Recargar datos de denuncias
+          }}
+        />
+      )}
 
       {/* Modal fotos privadas */}
       <Modal

@@ -22,6 +22,7 @@ import subscriptionRoutes from './routes/subscription.routes';
 import roamRoutes from './routes/roam.routes';
 import adminRoutes from './routes/admin.routes';
 import privatePhotoRoutes from './routes/privatePhoto.routes';
+import reportRoutes from './routes/report.routes';
 
 // Importar servicios
 import { setupSocketHandlers } from './services/socket.service';
@@ -151,6 +152,7 @@ app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/roam', roamRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/private-photos', privatePhotoRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Ruta de health check
 app.get('/api/health', (req, res) => {
