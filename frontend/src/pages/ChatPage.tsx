@@ -288,7 +288,7 @@ export default function ChatPage() {
           top: '56px', // Debajo del header global (56px de altura)
           left: 0,
           right: 0,
-          zIndex: 45,
+          zIndex: 9999, // z-index muy alto
           height: '64px',
         }}
       >
@@ -339,7 +339,7 @@ export default function ChatPage() {
       </div>
 
       {/* Mensajes - Con padding para header global + header del chat + input */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingTop: '140px', paddingBottom: '120px' }}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingTop: '140px', paddingBottom: '100px' }}>
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400">No hay mensajes aún</p>
@@ -406,7 +406,7 @@ export default function ChatPage() {
           bottom: 0,
           left: 0,
           right: 0,
-          zIndex: 45,
+          zIndex: 10000, // z-index muy alto para estar por encima de todo
           padding: '12px 16px',
           paddingBottom: `max(12px, calc(12px + env(safe-area-inset-bottom)))`, // Safe area para iOS
         }}
