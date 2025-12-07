@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 
 interface ReportModalProps {
   profileId: string;
