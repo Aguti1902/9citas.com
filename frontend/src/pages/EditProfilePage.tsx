@@ -24,6 +24,7 @@ export default function EditProfilePage() {
     height: '',
     bodyType: '',
     relationshipStatus: '',
+    relationshipGoal: '', // Nuevo campo
     occupation: '',
     smoking: '',
     drinking: '',
@@ -60,6 +61,7 @@ export default function EditProfilePage() {
         height: profile.height?.toString() || '',
         bodyType: profile.bodyType || '',
         relationshipStatus: profile.relationshipStatus || '',
+        relationshipGoal: profile.relationshipGoal || '', // Nuevo campo
         occupation: profile.occupation || '',
         smoking: profile.smoking || '',
         drinking: profile.drinking || '',
@@ -186,6 +188,7 @@ export default function EditProfilePage() {
         height: formData.height ? parseInt(formData.height) : null,
         hobbies,
         languages,
+        relationshipGoal: formData.relationshipGoal, // Nuevo campo
       })
 
       // Subir nuevas fotos públicas
@@ -563,6 +566,71 @@ export default function EditProfilePage() {
               <option value="complicado">Complicado</option>
               <option value="abierto">Relación abierta</option>
             </select>
+          </div>
+
+          {/* Tipo de relación que busca */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              💕 Tipo de relación que buscas
+            </label>
+            <div className="grid grid-cols-1 gap-3">
+              <label className="flex items-center bg-gray-800 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors">
+                <input
+                  type="radio"
+                  name="relationshipGoal"
+                  value="amistad"
+                  checked={formData.relationshipGoal === 'amistad'}
+                  onChange={(e) => setFormData({ ...formData, relationshipGoal: e.target.value })}
+                  className="mr-3"
+                />
+                <div>
+                  <span className="text-white font-medium">👥 Amistad</span>
+                  <p className="text-xs text-gray-400 mt-1">Conocer gente nueva y hacer amigos</p>
+                </div>
+              </label>
+              <label className="flex items-center bg-gray-800 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors">
+                <input
+                  type="radio"
+                  name="relationshipGoal"
+                  value="relacion_seria"
+                  checked={formData.relationshipGoal === 'relacion_seria'}
+                  onChange={(e) => setFormData({ ...formData, relationshipGoal: e.target.value })}
+                  className="mr-3"
+                />
+                <div>
+                  <span className="text-white font-medium">❤️ Relación seria</span>
+                  <p className="text-xs text-gray-400 mt-1">Busco una relación estable y comprometida</p>
+                </div>
+              </label>
+              <label className="flex items-center bg-gray-800 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors">
+                <input
+                  type="radio"
+                  name="relationshipGoal"
+                  value="solo_sexo"
+                  checked={formData.relationshipGoal === 'solo_sexo'}
+                  onChange={(e) => setFormData({ ...formData, relationshipGoal: e.target.value })}
+                  className="mr-3"
+                />
+                <div>
+                  <span className="text-white font-medium">🔥 Solo sexo</span>
+                  <p className="text-xs text-gray-400 mt-1">Encuentros casuales sin compromiso</p>
+                </div>
+              </label>
+              <label className="flex items-center bg-gray-800 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors">
+                <input
+                  type="radio"
+                  name="relationshipGoal"
+                  value=""
+                  checked={formData.relationshipGoal === ''}
+                  onChange={(e) => setFormData({ ...formData, relationshipGoal: e.target.value })}
+                  className="mr-3"
+                />
+                <div>
+                  <span className="text-white font-medium">🤷 No especificado</span>
+                  <p className="text-xs text-gray-400 mt-1">Prefiero no decirlo</p>
+                </div>
+              </label>
+            </div>
           </div>
 
           <div>
