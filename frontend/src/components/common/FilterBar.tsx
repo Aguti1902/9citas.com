@@ -38,22 +38,22 @@ export default function FilterBar({
   const [tempDistanceMin, setTempDistanceMin] = useState(distanceRange.min)
   const [tempDistanceMax, setTempDistanceMax] = useState(distanceRange.max)
 
-  // Filtros base
+  // Filtros base - ORDEN CORRECTO
   const baseFilters = [
     { id: 'all', label: 'TODOS', premium: false, Icon: Users },
-    { id: 'recent', label: 'RECIENTES', premium: false, Icon: Calendar }, // Online + conectados hace menos de 2h (GRATIS Y PREMIUM)
+    { id: 'recent', label: 'RECIENTES', premium: false, Icon: Calendar }, 
+    { id: 'new', label: 'NUEVOS', premium: false, Icon: Sparkles },
+    { id: 'distance', label: 'DISTANCIA', premium: true, Icon: MapPin, isModal: true },
     { id: 'online', label: 'ONLINE', premium: true, Icon: Wifi },
     { id: 'age', label: 'EDAD', premium: true, Icon: Calendar, isModal: true },
-    { id: 'distance', label: 'DISTANCIA', premium: false, Icon: MapPin, isModal: true },
-    { id: 'new', label: 'NUEVOS', premium: false, Icon: Sparkles },
   ]
 
-  // Agregar filtro de GÉNERO solo para usuarios HETERO
+  // Agregar filtro de GÉNERO solo para usuarios HETERO (después de ONLINE)
   const filters = userOrientation === 'hetero' 
     ? [
-        ...baseFilters.slice(0, 2), // TODOS y ONLINE
-        { id: 'gender', label: 'GÉNERO', premium: true, Icon: UserCircle, isModal: true }, // Nuevo filtro
-        ...baseFilters.slice(2), // EDAD, DISTANCIA, NUEVOS
+        ...baseFilters.slice(0, 5), // TODOS, RECIENTES, NUEVOS, DISTANCIA, ONLINE
+        { id: 'gender', label: 'GÉNERO', premium: true, Icon: UserCircle, isModal: true },
+        ...baseFilters.slice(5), // EDAD
       ]
     : baseFilters
 
