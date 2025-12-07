@@ -36,6 +36,8 @@ export default function NavigatePage() {
   const [ageRange, setAgeRange] = useState({ min: 18, max: 99 })
   const [distanceRange, setDistanceRange] = useState({ min: 0, max: 500 })
   const [selectedGender, setSelectedGender] = useState<string | null>(null)
+  const [relationshipGoalFilter, setRelationshipGoalFilter] = useState<string>('') // Nuevo filtro
+  const [showPremiumModal, setShowPremiumModal] = useState(false) // Modal 9Plus
 
   const isPremium = user?.subscription?.isActive || false
   const userOrientation = user?.profile?.orientation || 'hetero'
@@ -236,6 +238,11 @@ export default function NavigatePage() {
         queryParams.filter = 'all'
       }
       
+      // Filtro de relationshipGoal (solo si es premium)
+      if (relationshipGoalFilter && isPremium) {
+        queryParams.relationshipGoal = relationshipGoalFilter
+      }
+      
       // Añadir filtros de edad si está activo
       if (activeFilters.includes('age')) {
         queryParams.ageMin = ageRange.min
@@ -279,7 +286,7 @@ export default function NavigatePage() {
     loadRoamStatus()
     const interval = setInterval(loadRoamStatus, 30000) // Check every 30s
     return () => clearInterval(interval)
-  }, [activeFilters, ageRange, distanceRange, selectedGender])
+  }, [activeFilters, ageRange, distanceRange, selectedGender, relationshipGoalFilter])
 
   const loadRoamStatus = async () => {
     try {
@@ -481,7 +488,80 @@ export default function NavigatePage() {
         </div>
 
         {/* Fila 2: Filtros - Mejorado visualmente */}
-        <div className="px-2 pb-2 border-t border-gray-800 pt-2">
+        <div className="px-2 pb-2 border-t border-gray-800 pt-2 space-y-2">
+          {/* Filtro de tipo de relación - NUEVO */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">Busco:</span>
+            <button
+              onClick={() => {
+                if (isPremium || relationshipGoalFilter === '') {
+                  setRelationshipGoalFilter('')
+                  loadProfiles()
+                } else {
+                  setShowPremiumModal(true)
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                relationshipGoalFilter === ''
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => {
+                if (isPremium) {
+                  setRelationshipGoalFilter('amistad')
+                  loadProfiles()
+                } else {
+                  setShowPremiumModal(true)
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                relationshipGoalFilter === 'amistad'
+                  ? 'bg-primary text-white'
+                  : `bg-gray-700 text-gray-300 hover:bg-gray-600 ${!isPremium ? 'opacity-50' : ''}`
+              }`}
+            >
+              👥 Amistad {!isPremium && '🔒'}
+            </button>
+            <button
+              onClick={() => {
+                if (isPremium) {
+                  setRelationshipGoalFilter('relacion_seria')
+                  loadProfiles()
+                } else {
+                  setShowPremiumModal(true)
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                relationshipGoalFilter === 'relacion_seria'
+                  ? 'bg-primary text-white'
+                  : `bg-gray-700 text-gray-300 hover:bg-gray-600 ${!isPremium ? 'opacity-50' : ''}`
+              }`}
+            >
+              ❤️ Relación {!isPremium && '🔒'}
+            </button>
+            <button
+              onClick={() => {
+                if (isPremium) {
+                  setRelationshipGoalFilter('solo_sexo')
+                  loadProfiles()
+                } else {
+                  setShowPremiumModal(true)
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                relationshipGoalFilter === 'solo_sexo'
+                  ? 'bg-primary text-white'
+                  : `bg-gray-700 text-gray-300 hover:bg-gray-600 ${!isPremium ? 'opacity-50' : ''}`
+              }`}
+            >
+              🔥 Sexo {!isPremium && '🔒'}
+            </button>
+          </div>
+
           <FilterBar
             activeFilters={activeFilters}
             onFilterChange={handleFilterChange}
