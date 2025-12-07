@@ -141,6 +141,20 @@ export default function ProfileCard({ profile, onLikeToggle, isPremium = false }
               <span>🔒 Oculta (9Plus)</span>
             </div>
           )}
+
+          {/* Género - SIEMPRE VISIBLE */}
+          {profile.gender && (
+            <div className="text-gray-300 text-xs mt-1">
+              {formatGender(profile.gender)}
+            </div>
+          )}
+
+          {/* Tipo de relación - SIEMPRE VISIBLE */}
+          {profile.relationshipGoal && (
+            <div className="text-gray-300 text-xs mt-1">
+              {formatRelationshipGoal(profile.relationshipGoal)}
+            </div>
+          )}
         </div>
       </div>
     </div>

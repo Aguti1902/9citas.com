@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { Heart, X, MapPin, Briefcase, Ruler, Clock } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
+import { formatRelationshipGoal, formatGender } from '@/utils/profileUtils'
 
 interface SwipeCardProps {
   profile: any
@@ -254,6 +255,20 @@ export default function SwipeCard({
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <MapPin className="w-4 h-4" />
                     <span>🔒 Ubicación oculta (9Plus)</span>
+                  </div>
+                )}
+
+                {/* Género - SIEMPRE VISIBLE */}
+                {profile.gender && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span>{formatGender(profile.gender)}</span>
+                  </div>
+                )}
+
+                {/* Tipo de relación que busca - SIEMPRE VISIBLE */}
+                {profile.relationshipGoal && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span>{formatRelationshipGoal(profile.relationshipGoal)}</span>
                   </div>
                 )}
                 
