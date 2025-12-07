@@ -486,64 +486,8 @@ export default function NavigatePage() {
           </div>
         </div>
 
-        {/* Fila 2: Filtros - Mejorado visualmente */}
-        <div className="px-2 pb-2 border-t border-gray-800 pt-2 space-y-2">
-          {/* Filtro de tipo de relación - NUEVO (Solo 9Plus) */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-            <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">Busco:</span>
-            <button
-              onClick={() => {
-                if (isPremium) {
-                  setRelationshipGoalFilter('amistad')
-                  loadProfiles()
-                } else {
-                  setShowPremiumModal(true)
-                }
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                relationshipGoalFilter === 'amistad'
-                  ? 'bg-primary text-white'
-                  : `bg-gray-700 text-gray-300 hover:bg-gray-600 ${!isPremium ? 'opacity-50' : ''}`
-              }`}
-            >
-              👥 Amistad {!isPremium && '🔒'}
-            </button>
-            <button
-              onClick={() => {
-                if (isPremium) {
-                  setRelationshipGoalFilter('relacion_seria')
-                  loadProfiles()
-                } else {
-                  setShowPremiumModal(true)
-                }
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                relationshipGoalFilter === 'relacion_seria'
-                  ? 'bg-primary text-white'
-                  : `bg-gray-700 text-gray-300 hover:bg-gray-600 ${!isPremium ? 'opacity-50' : ''}`
-              }`}
-            >
-              ❤️ Relación {!isPremium && '🔒'}
-            </button>
-            <button
-              onClick={() => {
-                if (isPremium) {
-                  setRelationshipGoalFilter('solo_sexo')
-                  loadProfiles()
-                } else {
-                  setShowPremiumModal(true)
-                }
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                relationshipGoalFilter === 'solo_sexo'
-                  ? 'bg-primary text-white'
-                  : `bg-gray-700 text-gray-300 hover:bg-gray-600 ${!isPremium ? 'opacity-50' : ''}`
-              }`}
-            >
-              🔥 Sexo {!isPremium && '🔒'}
-            </button>
-          </div>
-
+        {/* Fila 2: Filtros */}
+        <div className="px-2 pb-2 border-t border-gray-800 pt-2">
           <FilterBar
             activeFilters={activeFilters}
             onFilterChange={handleFilterChange}
@@ -560,6 +504,10 @@ export default function NavigatePage() {
             userOrientation={userOrientation}
             selectedGender={selectedGender}
             onGenderChange={setSelectedGender}
+            relationshipGoalFilter={relationshipGoalFilter}
+            onRelationshipGoalChange={(goal) => {
+              setRelationshipGoalFilter(goal)
+            }}
           />
         </div>
       </div>
