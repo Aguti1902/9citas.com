@@ -99,7 +99,7 @@ export const createReport = async (req: AuthRequest, res: Response) => {
 /**
  * Obtener número de denuncias de un perfil (total y por motivo)
  */
-export const getReportCount = async (req: Request, res: Response) => {
+export const getReportCount = async (req: AuthRequest, res: Response) => {
   try {
     const { profileId } = req.params;
 
