@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { api } from '@/services/api'
 import { Heart, MapPin, Clock } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
+import { formatRelationshipGoal, formatGender } from '@/utils/profileUtils'
 
 interface ProfileCardProps {
   profile: any

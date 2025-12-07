@@ -37,7 +37,6 @@ export default function NavigatePage() {
   const [distanceRange, setDistanceRange] = useState({ min: 0, max: 500 })
   const [selectedGender, setSelectedGender] = useState<string | null>(null)
   const [relationshipGoalFilter, setRelationshipGoalFilter] = useState<string>('') // Nuevo filtro
-  const [showPremiumModal, setShowPremiumModal] = useState(false) // Modal 9Plus
 
   const isPremium = user?.subscription?.isActive || false
   const userOrientation = user?.profile?.orientation || 'hetero'
