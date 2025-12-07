@@ -571,7 +571,7 @@ export default function EditProfilePage() {
           {/* Tipo de relación que busca */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              💕 Tipo de relación que buscas
+              Tipo de relación
             </label>
             <select
               value={formData.relationshipGoal}
