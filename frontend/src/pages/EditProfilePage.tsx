@@ -333,14 +333,6 @@ export default function EditProfilePage() {
           </div>
         </div>
 
-        <Input
-          label="Ciudad"
-          type="text"
-          value={formData.city}
-          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-          required
-        />
-
         {/* FOTOS PÚBLICAS */}
         <div className="bg-gray-800 rounded-lg p-4">
           <label className="block text-sm font-medium text-white mb-3">
