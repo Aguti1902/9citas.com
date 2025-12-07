@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, Wifi, Calendar, MapPin, Sparkles, Star, UserCircle } from 'lucide-react'
+import { Users, Wifi, Calendar, MapPin, Sparkles, Star, UserCircle, Heart } from 'lucide-react'
 import Modal from './Modal'
 import Button from './Button'
 
@@ -15,6 +15,8 @@ interface FilterBarProps {
   userOrientation?: string
   selectedGender?: string | null
   onGenderChange?: (gender: string | null) => void
+  relationshipGoalFilter?: string // Nuevo
+  onRelationshipGoalChange?: (goal: string) => void // Nuevo
 }
 
 export default function FilterBar({
@@ -29,10 +31,13 @@ export default function FilterBar({
   userOrientation = 'hetero',
   selectedGender = null,
   onGenderChange,
+  relationshipGoalFilter = '', // Nuevo
+  onRelationshipGoalChange, // Nuevo
 }: FilterBarProps) {
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [showDistanceModal, setShowDistanceModal] = useState(false)
   const [showGenderModal, setShowGenderModal] = useState(false)
+  const [showTypeModal, setShowTypeModal] = useState(false) // Nuevo
   const [tempAgeMin, setTempAgeMin] = useState(ageRange.min)
   const [tempAgeMax, setTempAgeMax] = useState(ageRange.max)
   const [tempDistanceMin, setTempDistanceMin] = useState(distanceRange.min)
@@ -46,6 +51,7 @@ export default function FilterBar({
     { id: 'distance', label: 'DISTANCIA', premium: true, Icon: MapPin, isModal: true },
     { id: 'online', label: 'ONLINE', premium: true, Icon: Wifi },
     { id: 'age', label: 'EDAD', premium: true, Icon: Calendar, isModal: true },
+    { id: 'type', label: 'TIPO', premium: true, Icon: Heart, isModal: true }, // NUEVO FILTRO
   ]
 
   // Agregar filtro de GÉNERO solo para usuarios HETERO (después de ONLINE)
@@ -53,7 +59,7 @@ export default function FilterBar({
     ? [
         ...baseFilters.slice(0, 5), // TODOS, RECIENTES, NUEVOS, DISTANCIA, ONLINE
         { id: 'gender', label: 'GÉNERO', premium: true, Icon: UserCircle, isModal: true },
-        ...baseFilters.slice(5), // EDAD
+        ...baseFilters.slice(5), // EDAD, TIPO
       ]
     : baseFilters
 
@@ -71,6 +77,8 @@ export default function FilterBar({
         setShowDistanceModal(true)
       } else if (filterId === 'gender') {
         setShowGenderModal(true)
+      } else if (filterId === 'type') {
+        setShowTypeModal(true)
       }
       return
     }
