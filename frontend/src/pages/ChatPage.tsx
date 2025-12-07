@@ -403,12 +403,12 @@ export default function ChatPage() {
         className="bg-gray-900 border-t border-gray-800 flex-shrink-0"
         style={{
           position: 'fixed',
-          bottom: 0,
+          bottom: '64px', // Espacio para el footer del dashboard (64px)
           left: 0,
           right: 0,
-          zIndex: 10000, // z-index muy alto para estar por encima de todo
+          zIndex: 50000, // z-index MUY alto para estar por encima de TODO
           padding: '12px 16px',
-          paddingBottom: `max(12px, calc(12px + env(safe-area-inset-bottom)))`, // Safe area para iOS
+          backgroundColor: '#111827', // bg-gray-900
         }}
       >
         <div className="flex gap-2 items-center w-full">
