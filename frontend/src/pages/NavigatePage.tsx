@@ -489,26 +489,9 @@ export default function NavigatePage() {
 
         {/* Fila 2: Filtros - Mejorado visualmente */}
         <div className="px-2 pb-2 border-t border-gray-800 pt-2 space-y-2">
-          {/* Filtro de tipo de relación - NUEVO */}
+          {/* Filtro de tipo de relación - NUEVO (Solo 9Plus) */}
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
             <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">Busco:</span>
-            <button
-              onClick={() => {
-                if (isPremium || relationshipGoalFilter === '') {
-                  setRelationshipGoalFilter('')
-                  loadProfiles()
-                } else {
-                  setShowPremiumModal(true)
-                }
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                relationshipGoalFilter === ''
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              Todos
-            </button>
             <button
               onClick={() => {
                 if (isPremium) {
