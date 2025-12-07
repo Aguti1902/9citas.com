@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 const prisma = new PrismaClient();
 
@@ -21,9 +22,9 @@ const EMAIL_THRESHOLDS = [15, 30, 45, 60];
 /**
  * Crear una denuncia
  */
-export const createReport = async (req: Request, res: Response) => {
+export const createReport = async (req: AuthRequest, res: Response) => {
   try {
-    const reporterProfileId = req.profile?.id;
+    const reporterProfileId = req.profileId;
     const { reportedProfileId, reason } = req.body;
 
     if (!reporterProfileId) {
@@ -146,9 +147,9 @@ export const getReportCount = async (req: Request, res: Response) => {
 /**
  * Verificar si el usuario actual ya denunció un perfil
  */
-export const checkIfReported = async (req: Request, res: Response) => {
+export const checkIfReported = async (req: AuthRequest, res: Response) => {
   try {
-    const reporterProfileId = req.profile?.id;
+    const reporterProfileId = req.profileId;
     const { profileId } = req.params;
 
     if (!reporterProfileId) {
