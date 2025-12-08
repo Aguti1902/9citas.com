@@ -45,6 +45,7 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
         height: height || null,
         bodyType: bodyType || null,
         relationshipStatus: relationshipStatus || null,
+        relationshipGoal: relationshipGoal || null, // NUEVO: Guardar tipo de relación
         occupation: occupation || null,
         education: education || null,
         smoking: smoking || null,
