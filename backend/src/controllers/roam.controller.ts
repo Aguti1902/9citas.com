@@ -1,10 +1,11 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { PrismaClient } from '@prisma/client'
+import { AuthRequest } from '../middleware/auth.middleware'
 
 const prisma = new PrismaClient()
 
 // Activar Roam
-export const activateRoam = async (req: Request, res: Response) => {
+export const activateRoam = async (req: AuthRequest, res: Response) => {
   try {
     const profileId = req.profileId
     const { duration = 60 } = req.body // duración en minutos (default 1 hora)
@@ -46,9 +47,21 @@ export const activateRoam = async (req: Request, res: Response) => {
     const endTime = new Date(startTime.getTime() + duration * 60 * 1000)
 
     // Obtener métricas actuales (vistas y likes antes del Roam)
-    const currentViews = await prisma.profile.count({
-      where: { id: profileId },
+    // Para vistas: usar el contador de la sesión activa anterior si existe, o 0
+    const previousSession = await prisma.roamSession.findFirst({
+      where: {
+        profileId,
+        isActive: false,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
+    
+    const currentViews = previousSession 
+      ? (previousSession.viewsBeforeRoam + (previousSession.viewsDuringRoam || 0))
+      : 0
+    
     const currentLikes = await prisma.like.count({
       where: { toProfileId: profileId },
     })
@@ -101,7 +114,7 @@ export const activateRoam = async (req: Request, res: Response) => {
 }
 
 // Obtener estado del Roam actual
-export const getRoamStatus = async (req: Request, res: Response) => {
+export const getRoamStatus = async (req: AuthRequest, res: Response) => {
   try {
     const profileId = req.profileId
 
@@ -165,7 +178,7 @@ export const getRoamStatus = async (req: Request, res: Response) => {
 }
 
 // Finalizar Roam y obtener resumen
-export const finishRoam = async (req: Request, res: Response) => {
+export const finishRoam = async (req: AuthRequest, res: Response) => {
   try {
     const profileId = req.profileId
 
@@ -186,15 +199,12 @@ export const finishRoam = async (req: Request, res: Response) => {
     }
 
     // Obtener métricas actuales
-    const currentViews = await prisma.profile.count({
-      where: { id: profileId },
-    })
     const currentLikes = await prisma.like.count({
       where: { toProfileId: profileId },
     })
 
-    // Calcular métricas durante el Roam
-    const viewsDuringRoam = Math.max(0, currentViews - activeSession.viewsBeforeRoam)
+    // Usar las vistas que ya se han trackeado durante el Roam
+    const viewsDuringRoam = activeSession.viewsDuringRoam || 0
     const likesDuringRoam = Math.max(0, currentLikes - activeSession.likesBeforeRoam)
 
     // Actualizar sesión

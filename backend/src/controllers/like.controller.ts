@@ -53,20 +53,30 @@ export const likeProfile = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'No puedes dar like a este perfil' });
     }
 
-    // Crear like (o ignorar si ya existe)
-    const like = await prisma.like.upsert({
+    // Verificar si el like ya existe
+    const existingLike = await prisma.like.findUnique({
       where: {
         fromProfileId_toProfileId: {
           fromProfileId: req.profileId!,
           toProfileId: profileId,
         },
       },
-      update: {},
-      create: {
+    });
+
+    // Crear like (o ignorar si ya existe)
+    const like = existingLike || await prisma.like.create({
+      data: {
         fromProfileId: req.profileId!,
         toProfileId: profileId,
       },
     });
+
+    // Incrementar contador de likes si el perfil tiene Roam activo
+    // Solo si es un like nuevo (no existía antes)
+    if (!existingLike) {
+      const { incrementProfileLike } = await import('../controllers/roam.controller')
+      await incrementProfileLike(profileId)
+    }
 
     // Verificar si hay MATCH (la otra persona ya me había dado like)
     const theirLike = await prisma.like.findFirst({

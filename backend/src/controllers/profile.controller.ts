@@ -421,6 +421,13 @@ export const getProfileById = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Perfil no encontrado' });
     }
 
+    // Incrementar contador de vistas si el perfil tiene Roam activo
+    // Solo si no es el propio perfil
+    if (req.profileId && req.profileId !== id) {
+      const { incrementProfileView } = await import('../controllers/roam.controller')
+      await incrementProfileView(id)
+    }
+
     // Verificar acceso a fotos privadas
     const privatePhotoAccess = await prisma.privatePhotoAccess.findUnique({
       where: {
