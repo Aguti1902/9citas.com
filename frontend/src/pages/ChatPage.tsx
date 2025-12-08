@@ -18,6 +18,9 @@ export default function ChatPage() {
   const [profile, setProfile] = useState<any>(null)
   const [messages, setMessages] = useState<any[]>([])
   const [newMessage, setNewMessage] = useState('')
+  
+  // Verificar si es usuario 9Plus
+  const isPremium = user?.subscription?.isActive || false
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -380,7 +383,28 @@ export default function ChatPage() {
                       </a>
                     </div>
                   )}
-                  <p className="text-xs opacity-70 mt-1">{time}</p>
+                  
+                  {/* Hora y confirmación de lectura */}
+                  <div className="flex items-center gap-2 text-xs opacity-70 mt-1">
+                    <span>{time}</span>
+                    {isOwn && (
+                      isPremium ? (
+                        // Usuario 9Plus: Mostrar estado de lectura
+                        <span className="flex items-center gap-1">
+                          {message.isRead ? (
+                            <span className="text-blue-400 font-semibold">✓✓ leído</span>
+                          ) : (
+                            <span className="text-gray-400">✓ enviado</span>
+                          )}
+                        </span>
+                      ) : (
+                        // Usuario FREE: Mensaje de upgrade
+                        <span className="text-yellow-400 text-[10px] cursor-pointer" onClick={() => navigate('/app/plus')} title="Contrata 9Plus">
+                          🔒 9Plus
+                        </span>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
             )
