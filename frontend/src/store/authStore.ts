@@ -21,7 +21,7 @@ interface AuthState {
   setToken: (accessToken: string, refreshToken: string) => void
   setTokens: (accessToken: string, refreshToken: string) => void
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, orientation: string) => Promise<{ requiresVerification: boolean, email: string, orientation: string }>
+  register: (email: string, password: string, orientation: string, captchaToken?: string) => Promise<{ requiresVerification: boolean, email: string, orientation: string }>
   logout: () => Promise<void>
   initAuth: () => Promise<void>
   refreshUserData: () => Promise<void>
@@ -66,9 +66,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  register: async (email, password, orientation) => {
+  register: async (email, password, orientation, captchaToken) => {
     try {
-      const response = await api.post('/auth/register', { email, password, orientation })
+      const response = await api.post('/auth/register', { email, password, orientation, captchaToken })
       
       // Verificar si requiere verificación de email
       if (response.data.requiresVerification) {

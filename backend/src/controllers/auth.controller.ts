@@ -17,7 +17,42 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, orientation } = req.body;
+    const { email, password, orientation, captchaToken } = req.body;
+
+    // Validar CAPTCHA
+    if (captchaToken) {
+      const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+      
+      if (recaptchaSecret) {
+        try {
+          const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+          const verifyResponse = await fetch(verifyUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `secret=${recaptchaSecret}&response=${captchaToken}`,
+          });
+
+          const verifyData = await verifyResponse.json();
+
+          if (!verifyData.success) {
+            return res.status(400).json({ 
+              error: 'Verificación CAPTCHA fallida. Por favor, inténtalo de nuevo.',
+              captchaError: true,
+            });
+          }
+
+          console.log('✅ CAPTCHA verificado correctamente');
+        } catch (captchaError) {
+          console.error('Error al verificar CAPTCHA:', captchaError);
+          // No bloqueamos el registro si falla la verificación del CAPTCHA (modo degradado)
+          console.warn('⚠️ Modo degradado: Permitiendo registro sin verificar CAPTCHA');
+        }
+      } else {
+        console.warn('⚠️ RECAPTCHA_SECRET_KEY no configurada - CAPTCHA deshabilitado');
+      }
+    }
 
     // Verificar si el email ya existe
     const existingUser = await prisma.user.findUnique({
