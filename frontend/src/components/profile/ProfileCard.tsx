@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { api } from '@/services/api'
-import { Heart, MapPin, Clock } from 'lucide-react'
+import { Heart, MapPin, Clock, Zap } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
 import { formatRelationshipGoal, formatGender, formatRole } from '@/utils/profileUtils'
 
@@ -86,11 +86,20 @@ export default function ProfileCard({ profile, onLikeToggle, isPremium = false }
         {/* Overlay oscuro sutil en hover */}
         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
 
+        {/* Icono RoAM activo */}
+        {profile.isRoaming && profile.roamingUntil && new Date(profile.roamingUntil) > new Date() && (
+          <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm rounded-full p-2 shadow-lg z-20 flex items-center justify-center">
+            <div className="w-7 h-7 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+              <Zap className="w-4 h-4 text-gray-900" fill="currentColor" strokeWidth={0} />
+            </div>
+          </div>
+        )}
+
         {/* Botón de like */}
         <button
           onClick={handleLike}
           disabled={isLiking}
-          className="absolute top-3 right-3 bg-black bg-opacity-60 backdrop-blur-sm rounded-full p-2.5 hover:bg-opacity-80 hover:scale-110 transition-all shadow-lg z-10"
+          className={`absolute top-3 ${profile.isRoaming && profile.roamingUntil && new Date(profile.roamingUntil) > new Date() ? 'right-14' : 'right-3'} bg-black bg-opacity-60 backdrop-blur-sm rounded-full p-2.5 hover:bg-opacity-80 hover:scale-110 transition-all shadow-lg z-10`}
         >
           <Heart
             className={`w-5 h-5 ${isLiked ? 'fill-primary text-primary' : 'text-white'}`}

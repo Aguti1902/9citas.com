@@ -317,11 +317,16 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
             )
           : null;
 
+      // Verificar si el perfil tiene RoAM activo
+      const isRoaming = profile.isRoaming && profile.roamingUntil && new Date(profile.roamingUntil) > new Date();
+
       return {
         ...profile,
         distance,
         isLiked: profile.receivedLikes.length > 0,
         receivedLikes: undefined,
+        isRoaming, // Añadir estado de RoAM
+        roamingUntil: profile.roamingUntil, // Añadir fecha de expiración
       };
     });
 
@@ -335,6 +340,19 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         return profile.distance >= min && profile.distance <= max;
       });
     }
+
+    // IMPORTANTE: Filtrar perfiles con RoAM activo - solo aparecen dentro de 20 km
+    const ROAM_MAX_DISTANCE = 20; // km
+    filteredProfiles = filteredProfiles.filter(profile => {
+      // Si el perfil tiene RoAM activo
+      if (profile.isRoaming && profile.roamingUntil && new Date(profile.roamingUntil) > new Date()) {
+        // Solo mostrar si está dentro de 20 km
+        if (profile.distance === null || profile.distance > ROAM_MAX_DISTANCE) {
+          return false; // Ocultar perfiles con RoAM fuera del radio
+        }
+      }
+      return true; // Mostrar todos los demás perfiles normalmente
+    });
 
     // Eliminar duplicados
     const uniqueProfiles = filteredProfiles.filter((profile, index, self) =>

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Heart, X, MapPin, Briefcase, Ruler, Clock } from 'lucide-react'
+import { Heart, X, MapPin, Briefcase, Ruler, Clock, Zap } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
 import { formatRelationshipGoal, formatGender, formatRole } from '@/utils/profileUtils'
 
@@ -220,8 +220,17 @@ export default function SwipeCard({
               </div>
             )}
 
+            {/* Icono RoAM activo */}
+            {profile.isRoaming && profile.roamingUntil && new Date(profile.roamingUntil) > new Date() && (
+              <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-full p-2 shadow-lg z-20 flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-gray-900" fill="currentColor" strokeWidth={0} />
+                </div>
+              </div>
+            )}
+
             {/* Contador de fotos */}
-            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold z-10">
+            <div className={`absolute top-4 ${profile.isRoaming && profile.roamingUntil && new Date(profile.roamingUntil) > new Date() ? 'right-16' : 'right-4'} bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold z-10`}>
               {currentPhotoIndex + 1} / {photos.length}
             </div>
 
