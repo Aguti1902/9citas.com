@@ -91,7 +91,7 @@ export default function InfoPage() {
               <strong className="text-white">2. Completa tu perfil:</strong> Añade tu información, fotos y preferencias.
             </p>
             <p>
-              <strong className="text-white">3. Explora perfiles:</strong> Con el plan gratuito puedes ver hasta 50 perfiles en tu ciudad y chatear con ellos.
+              <strong className="text-white">3. Explora perfiles:</strong> Con el plan gratuito puedes ver hasta 50 perfiles y chatear con cualquiera.
             </p>
             <p>
               <strong className="text-white">4. Dale "Me gusta":</strong> Marca los perfiles que te interesan y empieza a chatear.

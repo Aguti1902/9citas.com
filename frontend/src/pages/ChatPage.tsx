@@ -180,11 +180,7 @@ export default function ChatPage() {
       setMessages([...messages, response.data.data])
       setNewMessage('')
     } catch (error: any) {
-      if (error.response?.data?.requiresPremium) {
-        alert('Solo puedes chatear con usuarios de tu ciudad. Suscríbete a 9Plus para chatear con cualquiera.')
-      } else {
-        alert(error.response?.data?.error || 'Error al enviar mensaje')
-      }
+      alert(error.response?.data?.error || 'Error al enviar mensaje')
     } finally {
       setIsSending(false)
     }
@@ -201,11 +197,7 @@ export default function ChatPage() {
       setMessages([...messages, response.data.data])
       setShowPhotoModal(false)
     } catch (error: any) {
-      if (error.response?.data?.requiresPremium) {
-        alert('Solo puedes chatear con usuarios de tu ciudad. Suscríbete a 9Plus para chatear con cualquiera.')
-      } else {
-        alert(error.response?.data?.error || 'Error al enviar foto')
-      }
+      alert(error.response?.data?.error || 'Error al enviar foto')
     } finally {
       setIsSending(false)
     }
