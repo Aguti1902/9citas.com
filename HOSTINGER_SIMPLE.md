@@ -60,14 +60,16 @@ nano .env
 
 ```env
 # Base de datos Railway (de Railway)
-DATABASE_URL="postgresql://postgres:lPKzXGDXgdcQqXFYmirvfDkyVWDYvNPy@postgres.railway.internal:5432/railway"
+# ⚠️ IMPORTANTE: Usa la URL EXTERNA, no la interna (.railway.internal)
+# Obtén la URL externa en Railway → PostgreSQL → Connect → Public Network
+DATABASE_URL="postgresql://postgres:lPKzXGDXgdcQqXFYmirvfDkyVWDYvNPy@[HOST_EXTERNO_DE_RAILWAY]:[PUERTO]/railway"
 
 # JWT Secrets (de Railway)
 JWT_SECRET="9citas_jwt_secret_super_seguro_production_2024"
 JWT_REFRESH_SECRET="9citas_refresh_jwt_secret_super_seguro_production_2024"
 
 # IMPORTANTE: Genera JWT_ACCESS_SECRET nuevo (ejecuta: openssl rand -base64 32)
-JWT_ACCESS_SECRET="GENERA_ESTE_NUEVO_CON_openssl_rand_-base64_32"
+JWT_ACCESS_SECRET="NGwhEqUIWmY46L+GuIXxFjRbBHKGSDcSu00TYkFLNg4="
 
 # Puerto del servidor
 PORT=5000
@@ -84,7 +86,7 @@ SMTP_PASS=tu_app_password_gmail
 REPORTS_EMAIL=denuncias@9citas.com
 
 # Google reCAPTCHA
-RECAPTCHA_SECRET_KEY=tu_recaptcha_secret_key
+RECAPTCHA_SECRET_KEY=6LfNiSUsAAAAAFvWXJ1dLuemBAIyw7Z8AzapAAXC
 
 # Cloudinary (de Railway - ya están tus datos)
 CLOUDINARY_CLOUD_NAME="dmrdydsjv"
@@ -92,7 +94,7 @@ CLOUDINARY_API_KEY="957942125576369"
 CLOUDINARY_API_SECRET="kJWwXcg0x0MTfNq3ux4nXE_RMVw"
 
 # Admin - CREA UNA CONTRASEÑA SEGURA AQUÍ
-ADMIN_PASSWORD=tu_contraseña_admin_segura
+ADMIN_PASSWORD=9CITAS2025
 
 # Entorno
 NODE_ENV=production
@@ -112,7 +114,7 @@ nano .env.production
 ```env
 VITE_API_URL=https://api.9citas.com
 VITE_SOCKET_URL=https://api.9citas.com
-VITE_RECAPTCHA_SITE_KEY=tu_recaptcha_site_key
+VITE_RECAPTCHA_SITE_KEY=6LfNiSUsAAAAAJ1X4PbLa4jN4TMg2uX8u7DuPQt7
 ```
 
 **Para guardar:** `Ctrl + X`, luego `Y`, luego `Enter`
