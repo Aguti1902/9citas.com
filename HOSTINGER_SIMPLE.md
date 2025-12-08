@@ -62,7 +62,7 @@ nano .env
 # Base de datos Railway (de Railway)
 # ⚠️ IMPORTANTE: Usa la URL EXTERNA, no la interna (.railway.internal)
 # Obtén la URL externa en Railway → PostgreSQL → Connect → Public Network
-DATABASE_URL="postgresql://postgres:lPKzXGDXgdcQqXFYmirvfDkyVWDYvNPy@[HOST_EXTERNO_DE_RAILWAY]:[PUERTO]/railway"
+DATABASE_URL="postgresql://postgres:lPKzXGDXgdcQqXFYmirvfDkyVWDYvNPy@shortline.proxy.rlwy.net:43947/railway"
 
 # JWT Secrets (de Railway)
 JWT_SECRET="9citas_jwt_secret_super_seguro_production_2024"
@@ -282,10 +282,13 @@ certbot --nginx -d api.9citas.com
 ```
 
 Certbot te hará algunas preguntas:
-- Email: pon tu email
-- Términos: acepta (Y)
-- Compartir email: puedes decir No (N)
-- Redirigir HTTP a HTTPS: Sí (2)
+- **Email:** Pon cualquier email válido que uses (ejemplo: `tu-email@gmail.com`). 
+  - Este email se usa SOLO para notificaciones sobre la renovación del certificado SSL
+  - Puede ser tu email personal o el que uses para administrar el sitio
+  - No tiene que ser un email relacionado con el dominio 9citas.com
+- **Términos:** Acepta (Y)
+- **Compartir email:** Puedes decir No (N)
+- **Redirigir HTTP a HTTPS:** Sí (2)
 
 ---
 
