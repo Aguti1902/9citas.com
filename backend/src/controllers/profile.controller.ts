@@ -256,12 +256,17 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       }
     }
     
-    // RECIENTES: Para TODOS (gratis y premium) - Online o conectados hace menos de 2h
+    // RECIENTES: Para TODOS (gratis y premium) - FORZAR Online o conectados hace menos de 2h
     if (filter === 'recent') {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 horas atrás
-      where.OR = [
-        { isOnline: true }, // Usuarios online ahora
-        { lastSeenAt: { gte: twoHoursAgo } }, // Conectados en las últimas 2 horas
+      // Usar AND con OR para asegurar que se aplica correctamente
+      where.AND = [
+        {
+          OR: [
+            { isOnline: true }, // Usuarios online ahora
+            { lastSeenAt: { gte: twoHoursAgo } }, // Conectados en las últimas 2 horas
+          ]
+        }
       ];
     }
 
@@ -345,7 +350,13 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
     // Normalizar URLs de fotos
     const normalizedProfiles = normalizeProfilesPhotos(finalProfiles);
 
-    console.log(`   📊 Resultado final: ${finalProfiles.length} perfiles\n`);
+    console.log(`   📊 Resultado final: ${finalProfiles.length} perfiles`);
+    console.log(`   📸 Fotos por perfil:`, normalizedProfiles.slice(0, 3).map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      photosCount: p.photos?.length || 0,
+      photoTypes: p.photos?.map((ph: any) => ph.type)
+    })));
 
     res.json({
       profiles: normalizedProfiles,
