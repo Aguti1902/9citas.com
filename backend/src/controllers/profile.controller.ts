@@ -15,7 +15,7 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, aboutMe, lookingFor, age, orientation, gender, city, latitude, longitude, 
+    const { title, aboutMe, lookingFor, age, orientation, gender, role, city, latitude, longitude, 
           height, bodyType, relationshipStatus, relationshipGoal, occupation, education, smoking, drinking,
           children, pets, zodiacSign, hobbies, languages, showExactLocation } = req.body;
 
@@ -38,6 +38,7 @@ export const createProfile = async (req: AuthRequest, res: Response) => {
         age,
         orientation,
         gender: gender || 'hombre', // Default si no se especifica
+        role: role || null, // ROL solo para usuarios gay
         city,
         latitude: latitude || null,
         longitude: longitude || null,
@@ -104,7 +105,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, aboutMe, lookingFor, age, orientation, gender, city, latitude, longitude,
+    const { title, aboutMe, lookingFor, age, orientation, gender, role, city, latitude, longitude,
           height, bodyType, relationshipStatus, relationshipGoal, occupation, education, smoking, drinking,
           children, pets, zodiacSign, hobbies, languages, showExactLocation } = req.body;
 
@@ -117,6 +118,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
         age,
         orientation,
         gender, // Permitir cambiar género
+        role: role !== undefined ? role : undefined, // Actualizar ROL si se proporciona
         city,
         latitude: latitude || null,
         longitude: longitude || null,
@@ -151,7 +153,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 // Buscar perfiles (navegar) - SIMPLIFICADO AL MÁXIMO
 export const searchProfiles = async (req: AuthRequest, res: Response) => {
   try {
-    const { filter, city, ageMin, ageMax, distanceMin, distanceMax, page = 1, limit = 20, gender, relationshipGoal } = req.query;
+    const { filter, city, ageMin, ageMax, distanceMin, distanceMax, page = 1, limit = 20, gender, relationshipGoal, role } = req.query;
 
     // Obtener perfil actual
     const myProfile = await prisma.profile.findUnique({
@@ -254,6 +256,10 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       // NUEVO: Filtro de relationshipGoal (solo 9Plus)
       if (relationshipGoal) {
         where.relationshipGoal = relationshipGoal;
+      }
+      // NUEVO: Filtro de role (solo 9Plus, solo para usuarios gay)
+      if (role && myProfile.orientation === 'gay') {
+        where.role = role;
       }
     }
     

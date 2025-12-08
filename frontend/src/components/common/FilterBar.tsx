@@ -17,6 +17,8 @@ interface FilterBarProps {
   onGenderChange?: (gender: string | null) => void
   relationshipGoalFilter?: string // Nuevo
   onRelationshipGoalChange?: (goal: string) => void // Nuevo
+  roleFilter?: string // Filtro de ROL solo para usuarios gay
+  onRoleChange?: (role: string) => void // Cambio de ROL
 }
 
 export default function FilterBar({
@@ -33,11 +35,14 @@ export default function FilterBar({
   onGenderChange,
   relationshipGoalFilter = '', // Nuevo
   onRelationshipGoalChange, // Nuevo
+  roleFilter = '', // Filtro de ROL
+  onRoleChange, // Cambio de ROL
 }: FilterBarProps) {
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [showDistanceModal, setShowDistanceModal] = useState(false)
   const [showGenderModal, setShowGenderModal] = useState(false)
   const [showTypeModal, setShowTypeModal] = useState(false) // Nuevo
+  const [showRoleModal, setShowRoleModal] = useState(false) // Modal de ROL
   const [tempAgeMin, setTempAgeMin] = useState(ageRange.min)
   const [tempAgeMax, setTempAgeMax] = useState(ageRange.max)
   const [tempDistanceMin, setTempDistanceMin] = useState(distanceRange.min)
@@ -55,13 +60,17 @@ export default function FilterBar({
   ]
 
   // Agregar filtro de GÉNERO solo para usuarios HETERO (después de ONLINE)
+  // Agregar filtro de ROL solo para usuarios GAY (después de TIPO)
   const filters = userOrientation === 'hetero' 
     ? [
         ...baseFilters.slice(0, 5), // TODOS, RECIENTES, NUEVOS, DISTANCIA, ONLINE
         { id: 'gender', label: 'GÉNERO', premium: true, Icon: UserCircle, isModal: true },
         ...baseFilters.slice(5), // EDAD, TIPO
       ]
-    : baseFilters
+    : [
+        ...baseFilters, // TODOS, RECIENTES, NUEVOS, DISTANCIA, ONLINE, EDAD, TIPO
+        { id: 'role', label: 'ROL', premium: true, Icon: UserCircle, isModal: true }, // ROL solo para GAY
+      ]
 
   const toggleFilter = (filterId: string, premium: boolean, isModal?: boolean) => {
     if (premium && !isPremium) {
@@ -79,6 +88,8 @@ export default function FilterBar({
         setShowGenderModal(true)
       } else if (filterId === 'type') {
         setShowTypeModal(true)
+      } else if (filterId === 'role') {
+        setShowRoleModal(true)
       }
       return
     }
@@ -443,6 +454,114 @@ export default function FilterBar({
           </div>
         </div>
       </Modal>
+
+      {/* Modal Filtro de ROL (solo para usuarios GAY y 9PLUS) */}
+      {userOrientation === 'gay' && (
+        <Modal
+          isOpen={showRoleModal}
+          onClose={() => setShowRoleModal(false)}
+          title="Filtrar por ROL"
+          maxWidth="sm"
+        >
+          <div className="space-y-6 pb-2">
+            <div className="space-y-3">
+              <p className="text-gray-400 text-sm mb-4">
+                Selecciona el ROL que quieres ver:
+              </p>
+              
+              <button
+                onClick={() => {
+                  onRoleChange?.('')
+                  setShowRoleModal(false)
+                }}
+                className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                  roleFilter === ''
+                    ? 'border-primary bg-primary/10 text-white'
+                    : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <UserCircle className="w-6 h-6" />
+                  <div>
+                    <div className="font-semibold">Todos los ROLes</div>
+                    <div className="text-sm text-gray-400">Ver activos, pasivos y versátiles</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  onRoleChange?.('activo')
+                  setShowRoleModal(false)
+                }}
+                className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                  roleFilter === 'activo'
+                    ? 'border-green-500 bg-green-500/10 text-white'
+                    : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🔵</span>
+                  <div>
+                    <div className="font-semibold">Activo</div>
+                    <div className="text-sm text-gray-400">Ver solo perfiles activos</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  onRoleChange?.('pasivo')
+                  setShowRoleModal(false)
+                }}
+                className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                  roleFilter === 'pasivo'
+                    ? 'border-blue-500 bg-blue-500/10 text-white'
+                    : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🔴</span>
+                  <div>
+                    <div className="font-semibold">Pasivo</div>
+                    <div className="text-sm text-gray-400">Ver solo perfiles pasivos</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  onRoleChange?.('versatil')
+                  setShowRoleModal(false)
+                }}
+                className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-all ${
+                  roleFilter === 'versatil'
+                    ? 'border-purple-500 bg-purple-500/10 text-white'
+                    : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⚪</span>
+                  <div>
+                    <div className="font-semibold">Versátil</div>
+                    <div className="text-sm text-gray-400">Ver solo perfiles versátiles</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                fullWidth
+                variant="outline"
+                onClick={() => setShowRoleModal(false)}
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   )
 }

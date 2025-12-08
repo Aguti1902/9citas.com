@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { Heart, X, MapPin, Briefcase, Ruler, Clock } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
-import { formatRelationshipGoal, formatGender } from '@/utils/profileUtils'
+import { formatRelationshipGoal, formatGender, formatRole } from '@/utils/profileUtils'
 
 interface SwipeCardProps {
   profile: any
@@ -271,6 +271,13 @@ export default function SwipeCard({
                 {profile.relationshipGoal && (
                   <div className="flex items-center gap-2 text-sm">
                     <span>{formatRelationshipGoal(profile.relationshipGoal)}</span>
+                  </div>
+                )}
+
+                {/* Mostrar ROL solo para usuarios gay */}
+                {profile.orientation === 'gay' && profile.role && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span>{formatRole(profile.role)}</span>
                   </div>
                 )}
                 

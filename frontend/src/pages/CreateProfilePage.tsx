@@ -18,6 +18,7 @@ export default function CreateProfilePage() {
     age: '',
     orientation: 'hetero',
     gender: '',
+    role: '', // ROL solo para usuarios gay
     city: '',
     latitude: null as number | null,
     longitude: null as number | null,
@@ -339,7 +340,13 @@ export default function CreateProfilePage() {
     }
 
     if (!formData.gender) {
-      setError('Debes seleccionar tu género (Hombre o Mujer)')
+      setError('Debes seleccionar tu género')
+      return
+    }
+
+    // Validar ROL solo para usuarios gay
+    if (formData.orientation === 'gay' && !formData.role) {
+      setError('Debes seleccionar tu ROL (Activo, Pasivo o Versátil)')
       return
     }
 
@@ -496,6 +503,50 @@ export default function CreateProfilePage() {
               )}
             </div>
           </div>
+
+          {/* Selector de ROL - OBLIGATORIO solo para usuarios GAY */}
+          {formData.orientation === 'gay' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                ROL *
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'activo' })}
+                  className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                    formData.role === 'activo'
+                      ? 'bg-green-500 text-white shadow-lg scale-105'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                  }`}
+                >
+                  🔵 Activo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'pasivo' })}
+                  className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                    formData.role === 'pasivo'
+                      ? 'bg-blue-500 text-white shadow-lg scale-105'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                  }`}
+                >
+                  🔴 Pasivo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'versatil' })}
+                  className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                    formData.role === 'versatil'
+                      ? 'bg-purple-500 text-white shadow-lg scale-105'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                  }`}
+                >
+                  ⚪ Versátil
+                </button>
+              </div>
+            </div>
+          )}
 
           <Textarea
             label="Descríbete"

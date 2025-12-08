@@ -13,6 +13,7 @@ export default function EditProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const [userOrientation, setUserOrientation] = useState<string>('hetero')
 
   const [formData, setFormData] = useState({
     title: '',
@@ -20,6 +21,7 @@ export default function EditProfilePage() {
     lookingFor: '',
     age: '',
     gender: '',
+    role: '', // ROL solo para usuarios gay
     city: '',
     height: '',
     bodyType: '',
@@ -51,12 +53,14 @@ export default function EditProfilePage() {
     try {
       const response = await api.get('/profile/me')
       const profile = response.data
+      setUserOrientation(profile.orientation || 'hetero')
       setFormData({
         title: profile.title,
         aboutMe: profile.aboutMe,
         lookingFor: profile.lookingFor,
         age: profile.age.toString(),
         gender: profile.gender || '',
+        role: profile.role || '', // ROL solo para usuarios gay
         city: profile.city,
         height: profile.height?.toString() || '',
         bodyType: profile.bodyType || '',
@@ -541,6 +545,50 @@ export default function EditProfilePage() {
             ✨ Esto ayudará a otros usuarios a saber qué buscas
           </p>
         </div>
+
+        {/* Selector de ROL - Solo para usuarios GAY */}
+        {userOrientation === 'gay' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              ROL *
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, role: 'activo' })}
+                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                  formData.role === 'activo'
+                    ? 'bg-green-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                }`}
+              >
+                🔵 Activo
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, role: 'pasivo' })}
+                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                  formData.role === 'pasivo'
+                    ? 'bg-blue-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                }`}
+              >
+                🔴 Pasivo
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, role: 'versatil' })}
+                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                  formData.role === 'versatil'
+                    ? 'bg-purple-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                }`}
+              >
+                ⚪ Versátil
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-4">
           <div>

@@ -37,6 +37,7 @@ export default function NavigatePage() {
   const [distanceRange, setDistanceRange] = useState({ min: 0, max: 500 })
   const [selectedGender, setSelectedGender] = useState<string | null>(null)
   const [relationshipGoalFilter, setRelationshipGoalFilter] = useState<string>('') // Nuevo filtro
+  const [roleFilter, setRoleFilter] = useState<string>('') // Filtro de ROL solo para usuarios gay
 
   const isPremium = user?.subscription?.isActive || false
   const userOrientation = user?.profile?.orientation || 'hetero'
@@ -242,6 +243,11 @@ export default function NavigatePage() {
         queryParams.relationshipGoal = relationshipGoalFilter
       }
       
+      // Filtro de ROL (solo si es premium y es usuario gay)
+      if (roleFilter && isPremium && userOrientation === 'gay') {
+        queryParams.role = roleFilter
+      }
+      
       // Añadir filtros de edad si está activo
       if (activeFilters.includes('age')) {
         queryParams.ageMin = ageRange.min
@@ -285,7 +291,7 @@ export default function NavigatePage() {
     loadRoamStatus()
     const interval = setInterval(loadRoamStatus, 30000) // Check every 30s
     return () => clearInterval(interval)
-  }, [activeFilters, ageRange, distanceRange, selectedGender, relationshipGoalFilter])
+  }, [activeFilters, ageRange, distanceRange, selectedGender, relationshipGoalFilter, roleFilter])
 
   const loadRoamStatus = async () => {
     try {
@@ -507,6 +513,10 @@ export default function NavigatePage() {
             relationshipGoalFilter={relationshipGoalFilter}
             onRelationshipGoalChange={(goal) => {
               setRelationshipGoalFilter(goal)
+            }}
+            roleFilter={roleFilter}
+            onRoleChange={(role) => {
+              setRoleFilter(role)
             }}
           />
         </div>

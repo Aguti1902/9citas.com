@@ -25,3 +25,15 @@ export const formatGender = (gender: string | null | undefined): string => {
   return genders[gender] || '';
 };
 
+export const formatRole = (role: string | null | undefined): string => {
+  if (!role) return '';
+  
+  const roles: Record<string, string> = {
+    'activo': '🔵 Activo',
+    'pasivo': '🔴 Pasivo',
+    'versatil': '⚪ Versátil',
+  };
+  
+  return roles[role] || '';
+};
+

@@ -47,6 +47,7 @@ model Profile {
   // Datos básicos
   orientation     String    // 'hetero' | 'gay'
   gender          String    @default("hombre") // 'hombre' | 'mujer' - para match correcto
+  role            String?   // 'activo' | 'pasivo' | 'versatil' - Solo para usuarios gay
   title           String    // Máx 15 caracteres
   aboutMe         String    @db.Text
   lookingFor      String    @db.Text

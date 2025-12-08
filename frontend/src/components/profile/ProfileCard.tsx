@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { api } from '@/services/api'
 import { Heart, MapPin, Clock } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
-import { formatRelationshipGoal, formatGender } from '@/utils/profileUtils'
+import { formatRelationshipGoal, formatGender, formatRole } from '@/utils/profileUtils'
 
 interface ProfileCardProps {
   profile: any
@@ -155,6 +155,13 @@ export default function ProfileCard({ profile, onLikeToggle, isPremium = false }
           {profile.relationshipGoal && (
             <div className="text-gray-300 text-xs mt-1">
               {formatRelationshipGoal(profile.relationshipGoal)}
+            </div>
+          )}
+
+          {/* Mostrar ROL solo para usuarios gay */}
+          {profile.orientation === 'gay' && profile.role && (
+            <div className="text-gray-300 text-xs mt-1">
+              {formatRole(profile.role)}
             </div>
           )}
         </div>
