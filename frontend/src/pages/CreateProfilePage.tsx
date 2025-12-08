@@ -341,6 +341,11 @@ export default function CreateProfilePage() {
       return
     }
 
+    if (!formData.relationshipGoal) {
+      setError('Debes seleccionar el tipo de relación que buscas')
+      return
+    }
+
     if (selectedFiles.length === 0) {
       setError('Debes subir al menos 1 foto de portada')
       return
@@ -449,12 +454,13 @@ export default function CreateProfilePage() {
           {/* Tipo de relación que busca */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Tipo de relación
+              Tipo de relación *
             </label>
             <select
               value={formData.relationshipGoal}
               onChange={(e) => setFormData({ ...formData, relationshipGoal: e.target.value })}
               className="input-field"
+              required
             >
               <option value="">Seleccionar...</option>
               <option value="amistad">👥 Amistad</option>
