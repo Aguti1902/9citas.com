@@ -8,6 +8,7 @@ import Modal from '@/components/common/Modal'
 import MatchModal from '@/components/common/MatchModal'
 import ReportModal from '@/components/common/ReportModal'
 import { Lock, Eye, AlertTriangle } from 'lucide-react'
+import { formatRelationshipGoal } from '@/utils/profileUtils'
 
 export default function ProfileDetailPage() {
   const { id } = useParams()
@@ -301,6 +302,13 @@ export default function ProfileDetailPage() {
             <div className="bg-gray-800 rounded-lg p-3">
               <p className="text-gray-400 text-sm">Estado civil</p>
               <p className="text-white font-semibold capitalize">{profile.relationshipStatus}</p>
+            </div>
+          )}
+          
+          {profile.relationshipGoal && (
+            <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-lg p-3 border border-pink-500/30">
+              <p className="text-gray-400 text-sm">Busca</p>
+              <p className="text-white font-semibold">{formatRelationshipGoal(profile.relationshipGoal)}</p>
             </div>
           )}
           
