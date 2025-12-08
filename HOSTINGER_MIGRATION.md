@@ -13,13 +13,22 @@ Esta guía te ayudará a migrar tu proyecto 9citas.com a Hostinger, incluyendo l
 
 ## 🔧 Paso 1: Preparar el Servidor VPS
 
-### 1.1 Conectarse al servidor
+### 1.1 Acceder a la Terminal
 
+**Opción A: Terminal integrada de Hostinger (RECOMENDADO)**
+1. En el panel de Hostinger, ve a tu VPS
+2. Haz clic en el botón **"Terminal"** (arriba a la derecha)
+3. Se abrirá una terminal web directamente en tu navegador
+4. Ya estás conectado como `root` - ¡no necesitas SSH!
+
+**Opción B: SSH tradicional (alternativa)**
 ```bash
 ssh root@TU_IP_SERVIDOR
 # o
 ssh root@9citas.com
 ```
+
+> 💡 **Recomendación:** Usa la terminal integrada de Hostinger, es más fácil y no necesitas configurar SSH en tu máquina local.
 
 ### 1.2 Actualizar el sistema
 
@@ -112,12 +121,23 @@ git clone https://github.com/Aguti1902/9citas.com.git
 cd 9citas.com
 ```
 
-### 3.2 Opción B: Usando SCP (desde tu máquina local)
+### 3.2 Opción B: Usando Git directamente en la terminal de Hostinger
 
 ```bash
-# Desde tu máquina local
-scp -r /Users/guti/Desktop/CURSOR\ WEBS/9CITAS root@TU_IP_SERVIDOR:/var/www/9citas.com
+# En la terminal de Hostinger
+cd /var/www
+git clone https://github.com/Aguti1902/9citas.com.git
+cd 9citas.com
 ```
+
+### 3.3 Opción C: Subir archivos manualmente (si no usas Git)
+
+1. En el panel de Hostinger, ve a "File Manager" o "Administrador de archivos"
+2. Navega a `/var/www/`
+3. Crea la carpeta `9citas.com`
+4. Sube los archivos usando el gestor de archivos o comprime y sube un ZIP
+
+> 💡 **Recomendación:** Usa Git (Opción A o B) para mantener el código actualizado fácilmente.
 
 ### 3.3 Estructura de directorios
 
@@ -440,17 +460,30 @@ certbot renew --dry-run
 
 ### 10.1 Exportar datos de la base de datos local
 
+**Si tienes datos en Railway/local:**
 ```bash
-# Desde tu máquina local
-pg_dump -h localhost -U postgres -d 9citas > backup.sql
+# Desde tu máquina local o desde Railway
+pg_dump -h TU_HOST -U TU_USUARIO -d 9citas > backup.sql
 ```
+
+**O desde el panel de Hostinger:**
+1. Ve a "Bases de datos" en el panel
+2. Selecciona tu base de datos actual
+3. Exporta la base de datos (si tienes acceso)
 
 ### 10.2 Importar datos al servidor
 
+**Opción A: Desde la terminal de Hostinger**
 ```bash
-# En el servidor
-psql -h localhost -U 9citas_user -d 9citas < backup.sql
+# Sube el archivo backup.sql usando el File Manager
+# Luego en la terminal:
+psql -h localhost -U 9citas_user -d 9citas < /ruta/al/backup.sql
 ```
+
+**Opción B: Desde el panel de Hostinger**
+1. Ve a "Bases de datos" en el panel
+2. Selecciona tu nueva base de datos PostgreSQL
+3. Importa el archivo backup.sql
 
 ---
 
