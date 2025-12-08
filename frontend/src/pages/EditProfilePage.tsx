@@ -303,36 +303,6 @@ export default function EditProfilePage() {
           max={99}
         />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Género *
-          </label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="gender"
-                value="hombre"
-                checked={formData.gender === 'hombre'}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="mr-2"
-              />
-              <span className="text-white">Hombre</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="gender"
-                value="mujer"
-                checked={formData.gender === 'mujer'}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="mr-2"
-              />
-              <span className="text-white">Mujer</span>
-            </label>
-          </div>
-        </div>
-
         {/* FOTOS PÚBLICAS */}
         <div className="bg-gray-800 rounded-lg p-4">
           <label className="block text-sm font-medium text-white mb-3">
