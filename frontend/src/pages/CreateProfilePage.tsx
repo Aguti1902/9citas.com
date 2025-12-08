@@ -433,7 +433,25 @@ export default function CreateProfilePage() {
             placeholder="Ej: Carlos, 28"
           />
 
-          {/* Tipo de relación que busca - DESPLEGABLE DESTACADO */}
+          <Textarea
+            label="Descríbete"
+            value={formData.aboutMe}
+            onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })}
+            required
+            rows={4}
+            placeholder="Cuéntanos sobre ti, tus intereses, hobbies..."
+          />
+
+          <Textarea
+            label="Lo que buscas"
+            value={formData.lookingFor}
+            onChange={(e) => setFormData({ ...formData, lookingFor: e.target.value })}
+            required
+            rows={4}
+            placeholder="¿Qué tipo de conexión o relación buscas?"
+          />
+
+          {/* Tipo de relación que busca - DESPLEGABLE DESTACADO EN SU PROPIA SECCIÓN */}
           <div className="bg-gradient-to-br from-pink-500/30 via-purple-500/30 to-red-500/30 rounded-2xl p-6 border-2 border-pink-500 shadow-xl">
             <label className="block text-xl font-bold text-white mb-4 text-center flex items-center justify-center gap-2">
               <span className="text-3xl">💕</span>
@@ -462,24 +480,6 @@ export default function CreateProfilePage() {
               ✨ Esto ayudará a otros usuarios a saber qué buscas
             </p>
           </div>
-
-          <Textarea
-            label="Descríbete"
-            value={formData.aboutMe}
-            onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })}
-            required
-            rows={4}
-            placeholder="Cuéntanos sobre ti, tus intereses, hobbies..."
-          />
-
-          <Textarea
-            label="Lo que buscas"
-            value={formData.lookingFor}
-            onChange={(e) => setFormData({ ...formData, lookingFor: e.target.value })}
-            required
-            rows={4}
-            placeholder="¿Qué tipo de conexión o relación buscas?"
-          />
 
           <Input
             label="Edad (18-99 años)"
