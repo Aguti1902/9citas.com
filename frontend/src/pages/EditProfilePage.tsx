@@ -516,7 +516,6 @@ export default function EditProfilePage() {
         {/* Tipo de relación que busca - DESPLEGABLE DESTACADO EN SU PROPIA SECCIÓN */}
         <div className="bg-gradient-to-br from-pink-500/30 via-purple-500/30 to-red-500/30 rounded-2xl p-6 border-2 border-pink-500 shadow-xl">
           <label className="block text-xl font-bold text-white mb-4 text-center flex items-center justify-center gap-2">
-            <span className="text-3xl">💕</span>
             <span>¿Qué tipo de relación buscas?</span>
             <span className="text-red-500">*</span>
           </label>
