@@ -359,13 +359,24 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       index === self.findIndex(p => p.id === profile.id)
     );
 
-    // Ordenar por distancia: más cercano primero (ascendente)
+    // Ordenar: PRIMERO perfiles con RoAM activo, luego el resto
     uniqueProfiles.sort((a, b) => {
-      // Perfiles con distancia van primero
+      // Verificar si tienen RoAM activo
+      const aHasRoam = a.isRoaming && a.roamingUntil && new Date(a.roamingUntil) > new Date()
+      const bHasRoam = b.isRoaming && b.roamingUntil && new Date(b.roamingUntil) > new Date()
+
+      // PRIORIDAD 1: Perfiles con RoAM activo van PRIMERO
+      if (aHasRoam && !bHasRoam) return -1 // a va primero
+      if (!aHasRoam && bHasRoam) return 1  // b va primero
+
+      // Si ambos tienen RoAM o ambos no tienen, ordenar por distancia
+      // PRIORIDAD 2: Perfiles con distancia van primero
       if (a.distance === null && b.distance === null) return 0
       if (a.distance === null) return 1 // Sin distancia al final
       if (b.distance === null) return -1 // Con distancia primero
-      return a.distance - b.distance // Ordenar de menor a mayor distancia
+      
+      // PRIORIDAD 3: Ordenar por distancia (más cercano primero)
+      return a.distance - b.distance
     })
 
     // Limitar resultados (50 para gratuitos)
