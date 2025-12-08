@@ -6,8 +6,8 @@ Esta guía te ayudará a migrar tu proyecto 9citas.com a Hostinger, incluyendo l
 
 - ✅ VPS de Hostinger configurado
 - ✅ Dominio apuntando al servidor
-- ✅ Acceso SSH al servidor
-- ✅ Base de datos PostgreSQL creada en Hostinger
+- ✅ Acceso a la terminal integrada de Hostinger (botón "Terminal" en el panel)
+- ⚠️ **NO necesitas contratar base de datos separada** - La instalaremos en el VPS (gratis)
 
 ---
 
@@ -75,37 +75,100 @@ systemctl enable nginx
 
 ---
 
-## 🗄️ Paso 2: Configurar Base de Datos PostgreSQL
+## 🗄️ Paso 2: Instalar y Configurar PostgreSQL
 
-### 2.1 Crear base de datos en Hostinger
+### 2.1 Instalar PostgreSQL en el VPS (GRATIS)
 
-1. Accede al panel de Hostinger
-2. Ve a "Bases de datos" o "Databases"
-3. Crea una nueva base de datos PostgreSQL
-4. Anota:
-   - Nombre de la base de datos
-   - Usuario
-   - Contraseña
-   - Host (generalmente `localhost` o la IP del servidor)
-   - Puerto (generalmente `5432`)
-
-### 2.2 Configurar PostgreSQL localmente (si es necesario)
+**No necesitas contratar una base de datos separada.** Puedes instalar PostgreSQL directamente en tu VPS:
 
 ```bash
-# Acceder a PostgreSQL
-sudo -u postgres psql
+# Actualizar paquetes
+apt update
 
-# Crear base de datos
+# Instalar PostgreSQL
+apt install postgresql postgresql-contrib -y
+
+# Iniciar PostgreSQL
+systemctl start postgresql
+systemctl enable postgresql
+
+# Verificar que está corriendo
+systemctl status postgresql
+```
+
+### 2.2 Configurar PostgreSQL
+
+```bash
+# Acceder a PostgreSQL como usuario postgres
+sudo -u postgres psql
+```
+
+Una vez dentro de PostgreSQL, ejecuta estos comandos:
+
+```sql
+-- Crear base de datos
 CREATE DATABASE "9citas";
 
-# Crear usuario
-CREATE USER "9citas_user" WITH PASSWORD 'TU_CONTRASEÑA_SEGURA';
+-- Crear usuario
+CREATE USER "9citas_user" WITH PASSWORD 'TU_CONTRASEÑA_MUY_SEGURA_AQUI';
 
-# Dar permisos
+-- Dar permisos completos
 GRANT ALL PRIVILEGES ON DATABASE "9citas" TO "9citas_user";
 
-# Salir
+-- Salir de PostgreSQL
 \q
+```
+
+### 2.3 Configurar acceso remoto (opcional)
+
+Si quieres acceder desde fuera, edita el archivo de configuración:
+
+```bash
+# Editar configuración de PostgreSQL
+nano /etc/postgresql/*/main/postgresql.conf
+
+# Buscar y cambiar:
+# listen_addresses = 'localhost'  →  listen_addresses = '*'
+```
+
+```bash
+# Editar configuración de autenticación
+nano /etc/postgresql/*/main/pg_hba.conf
+
+# Añadir al final:
+host    all             all             0.0.0.0/0               md5
+```
+
+```bash
+# Reiniciar PostgreSQL
+systemctl restart postgresql
+```
+
+> 💡 **Nota:** Para mayor seguridad, es mejor mantener PostgreSQL solo accesible desde localhost (por defecto). Solo cambia esto si realmente necesitas acceso remoto.
+
+### 2.4 Verificar la conexión
+
+```bash
+# Probar conexión
+psql -h localhost -U 9citas_user -d 9citas
+
+# Debería pedirte la contraseña y conectarte
+# Escribe \q para salir
+```
+
+### 2.5 Información para el archivo .env
+
+Anota esta información para configurar el `.env`:
+
+- **Host:** `localhost`
+- **Puerto:** `5432`
+- **Base de datos:** `9citas`
+- **Usuario:** `9citas_user`
+- **Contraseña:** La que hayas puesto en el paso 2.2
+
+**URL de conexión:**
+```
+postgresql://9citas_user:TU_CONTRASEÑA@localhost:5432/9citas?schema=public
 ```
 
 ---
