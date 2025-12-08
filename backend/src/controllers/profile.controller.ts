@@ -256,12 +256,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       }
     }
     
-    // RECIENTES: Para TODOS (gratis y premium) - Online o conectados hace menos de 1h
+    // RECIENTES: Para TODOS (gratis y premium) - Online o conectados hace menos de 2h
     if (filter === 'recent') {
-      const oneHourAgo = new Date(Date.now() - 1 * 60 * 60 * 1000); // 1 hora atrás
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 horas atrás
       where.OR = [
         { isOnline: true }, // Usuarios online ahora
-        { lastSeenAt: { gte: oneHourAgo } }, // Conectados en la última hora
+        { lastSeenAt: { gte: twoHoursAgo } }, // Conectados en las últimas 2 horas
       ];
     }
 
@@ -270,8 +270,9 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       where,
       include: {
         photos: {
-          where: { type: 'cover' },
-          take: 1,
+          where: { 
+            type: { not: 'private' } // Incluir cover y public, NO private
+          },
         },
         receivedLikes: {
           where: { fromProfileId: req.profileId! },
