@@ -175,23 +175,29 @@ postgresql://9citas_user:TU_CONTRASEÑA@localhost:5432/9citas?schema=public
 
 ## 📦 Paso 3: Subir el Código al Servidor
 
-### 3.1 Opción A: Usando Git (Recomendado)
+### 3.1 Opción A: Clonar en el directorio home (MÁS FÁCIL)
 
 ```bash
-# En el servidor
-cd /var/www
+# En la terminal de Hostinger (ya estás en ~)
 git clone https://github.com/Aguti1902/9citas.com.git
 cd 9citas.com
 ```
 
-### 3.2 Opción B: Usando Git directamente en la terminal de Hostinger
+### 3.2 Opción B: Crear /var/www y clonar ahí (OPCIONAL)
+
+Si prefieres usar `/var/www` (directorio tradicional para sitios web):
 
 ```bash
-# En la terminal de Hostinger
+# Crear directorio
+mkdir -p /var/www
 cd /var/www
+
+# Clonar repositorio
 git clone https://github.com/Aguti1902/9citas.com.git
 cd 9citas.com
 ```
+
+> 💡 **Recomendación:** Usa la Opción A (directorio home `~`). Es más simple y funciona igual de bien.
 
 ### 3.3 Opción C: Subir archivos manualmente (si no usas Git)
 
@@ -205,11 +211,13 @@ cd 9citas.com
 ### 3.3 Estructura de directorios
 
 ```
-/var/www/9citas.com/
+~/9citas.com/  (o /var/www/9citas.com/ si usaste esa opción)
 ├── backend/
 ├── frontend/
 └── ...
 ```
+
+> ✅ **Perfecto!** Ya tienes el código clonado. Continúa con el siguiente paso.
 
 ---
 
@@ -218,7 +226,12 @@ cd 9citas.com
 ### 4.1 Backend - Crear archivo `.env`
 
 ```bash
-cd /var/www/9citas.com/backend
+# Si clonaste en ~ (directorio home)
+cd ~/9citas.com/backend
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com/backend
+
 nano .env
 ```
 
@@ -265,7 +278,12 @@ SOCKET_IO_PORT=5001
 ### 4.2 Frontend - Crear archivo `.env.production`
 
 ```bash
-cd /var/www/9citas.com/frontend
+# Si clonaste en ~ (directorio home)
+cd ~/9citas.com/frontend
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com/frontend
+
 nano .env.production
 ```
 
@@ -284,7 +302,12 @@ VITE_RECAPTCHA_SITE_KEY=TU_RECAPTCHA_SITE_KEY
 ### 5.1 Instalar dependencias
 
 ```bash
-cd /var/www/9citas.com/backend
+# Si clonaste en ~
+cd ~/9citas.com/backend
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com/backend
+
 npm install
 ```
 
@@ -318,7 +341,12 @@ npx prisma studio
 ### 6.1 Instalar dependencias
 
 ```bash
-cd /var/www/9citas.com/frontend
+# Si clonaste en ~
+cd ~/9citas.com/frontend
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com/frontend
+
 npm install
 ```
 
@@ -337,7 +365,13 @@ Esto creará una carpeta `dist/` con los archivos estáticos.
 ### 7.1 Crear archivo de configuración PM2
 
 ```bash
-cd /var/www/9citas.com/backend
+# Si clonaste en ~
+cd ~/9citas.com/backend
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com/backend
+
+# El archivo ecosystem.config.js ya existe, pero puedes editarlo si necesitas
 nano ecosystem.config.js
 ```
 
@@ -443,7 +477,7 @@ server {
     # Redirigir HTTP a HTTPS (después de configurar SSL)
     # return 301 https://$server_name$request_uri;
 
-    root /var/www/9citas.com/frontend/dist;
+    root /root/9citas.com/frontend/dist;  # Cambia a /var/www/9citas.com/frontend/dist si usaste /var/www
     index index.html;
 
     # Gzip compression
@@ -565,8 +599,11 @@ curl http://localhost:5000/api/health
 ### 11.2 Verificar frontend
 
 ```bash
-# Verificar que los archivos están en su lugar
-ls -la /var/www/9citas.com/frontend/dist
+# Si clonaste en ~
+ls -la ~/9citas.com/frontend/dist
+
+# O si clonaste en /var/www
+# ls -la /var/www/9citas.com/frontend/dist
 ```
 
 ### 11.3 Verificar Nginx
@@ -587,7 +624,12 @@ tail -f /var/log/nginx/access.log
 ### 12.1 Actualizar código
 
 ```bash
-cd /var/www/9citas.com
+# Si clonaste en ~
+cd ~/9citas.com
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com
+
 git pull origin main
 
 # Backend
@@ -606,7 +648,12 @@ npm run build
 ### 12.2 Actualizar base de datos
 
 ```bash
-cd /var/www/9citas.com/backend
+# Si clonaste en ~
+cd ~/9citas.com/backend
+
+# O si clonaste en /var/www
+# cd /var/www/9citas.com/backend
+
 npx prisma db push
 ```
 
