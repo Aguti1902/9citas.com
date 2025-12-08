@@ -88,11 +88,8 @@ export default function CreateProfilePage() {
       setFormData(prev => ({
         ...prev,
         orientation: savedOrientation,
-        // Establecer género basado en orientación
-        // Para simplificar: hetero hombre busca mujer, hetero mujer busca hombre
-        // Gay: hombre busca hombre, mujer busca mujer
-        // Por defecto establecemos 'hombre', pero esto se puede ajustar según la lógica de negocio
-        gender: 'hombre' // Por defecto
+        // NO establecer género por defecto - el usuario debe elegir
+        gender: ''
       }))
       localStorage.removeItem('userOrientation') // Limpiar después de usar
     }
@@ -341,6 +338,11 @@ export default function CreateProfilePage() {
       return
     }
 
+    if (!formData.gender) {
+      setError('Debes seleccionar tu género (Hombre o Mujer)')
+      return
+    }
+
     if (!formData.relationshipGoal) {
       setError('Debes seleccionar el tipo de relación que buscas')
       return
@@ -432,6 +434,37 @@ export default function CreateProfilePage() {
             maxLength={15}
             placeholder="Ej: Carlos, 28"
           />
+
+          {/* Selector de género - OBLIGATORIO (sin selección por defecto) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Género *
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, gender: 'hombre' })}
+                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                  formData.gender === 'hombre'
+                    ? 'bg-blue-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                }`}
+              >
+                👨 Hombre
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, gender: 'mujer' })}
+                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                  formData.gender === 'mujer'
+                    ? 'bg-pink-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                }`}
+              >
+                👩 Mujer
+              </button>
+            </div>
+          </div>
 
           <Textarea
             label="Descríbete"
