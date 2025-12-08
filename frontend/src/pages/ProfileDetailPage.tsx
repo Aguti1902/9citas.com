@@ -37,11 +37,14 @@ export default function ProfileDetailPage() {
     underage: 0,
   })
   const [hasReported, setHasReported] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [showBlockModal, setShowBlockModal] = useState(false)
 
   useEffect(() => {
     loadProfile()
     checkPrivatePhotoAccess()
     loadReportData()
+    checkBlockStatus()
   }, [id])
 
   const loadProfile = async () => {
@@ -102,6 +105,42 @@ export default function ProfileDetailPage() {
       setHasReported(checkResponse.data.hasReported || false)
     } catch (error) {
       console.error('Error al cargar datos de denuncias:', error)
+    }
+  }
+
+  const checkBlockStatus = async () => {
+    try {
+      const response = await api.get('/blocks')
+      const blockedIds = response.data.blocks.map((b: any) => b.blockedProfile.id)
+      setIsBlocked(blockedIds.includes(id))
+    } catch (error) {
+      console.error('Error al verificar bloqueo:', error)
+    }
+  }
+
+  const handleBlock = async () => {
+    try {
+      await api.post(`/blocks/${id}`)
+      setIsBlocked(true)
+      setShowBlockModal(false)
+      showToast('Usuario bloqueado correctamente', 'success')
+      
+      // Redirigir a la página de navegación después de 1 segundo
+      setTimeout(() => {
+        navigate('/app')
+      }, 1000)
+    } catch (error: any) {
+      showToast(error.response?.data?.error || 'Error al bloquear usuario', 'error')
+    }
+  }
+
+  const handleUnblock = async () => {
+    try {
+      await api.delete(`/blocks/${id}`)
+      setIsBlocked(false)
+      showToast('Usuario desbloqueado correctamente', 'success')
+    } catch (error: any) {
+      showToast(error.response?.data?.error || 'Error al desbloquear usuario', 'error')
     }
   }
 
@@ -518,6 +557,27 @@ export default function ProfileDetailPage() {
           </Button>
         </div>
 
+        {/* Botón de bloquear */}
+        <div className="mt-4">
+          {isBlocked ? (
+            <button
+              onClick={handleUnblock}
+              className="w-full py-3 px-4 rounded-lg bg-gray-700 text-white font-medium hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>🔓</span>
+              <span>Desbloquear usuario</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowBlockModal(true)}
+              className="w-full py-3 px-4 rounded-lg bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>🚫</span>
+              <span>Bloquear usuario</span>
+            </button>
+          )}
+        </div>
+
         {/* Botón volver */}
         <div className="text-center pt-4">
           <button
@@ -689,6 +749,52 @@ export default function ProfileDetailPage() {
         onClose={() => setShowMatchModal(false)}
         matchedProfile={profile}
       />
+
+      {/* Modal de confirmación de bloqueo */}
+      <Modal
+        isOpen={showBlockModal}
+        onClose={() => setShowBlockModal(false)}
+        title="Bloquear usuario"
+        maxWidth="sm"
+      >
+        <div className="text-center py-4">
+          <div className="text-6xl mb-4">🚫</div>
+          <h3 className="text-xl font-bold text-white mb-3">
+            ¿Bloquear a {profile?.title}?
+          </h3>
+          <p className="text-gray-400 mb-6">
+            Si bloqueas a este usuario:
+          </p>
+          <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
+            <ul className="text-gray-300 text-sm space-y-2">
+              <li>❌ No podrás ver su perfil</li>
+              <li>❌ No podrá ver tu perfil</li>
+              <li>❌ No podrán enviarse mensajes</li>
+              <li>❌ Se eliminará de tus matches</li>
+            </ul>
+          </div>
+          <p className="text-gray-500 text-sm mb-6">
+            Podrás desbloquear al usuario cuando quieras desde tu perfil bloqueado.
+          </p>
+          <div className="flex gap-3">
+            <Button
+              fullWidth
+              variant="outline"
+              onClick={() => setShowBlockModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              fullWidth
+              variant="secondary"
+              onClick={handleBlock}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Bloquear
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
