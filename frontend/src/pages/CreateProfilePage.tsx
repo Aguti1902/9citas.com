@@ -523,6 +523,35 @@ export default function CreateProfilePage() {
             )}
           </div>
 
+          {/* Toggle para mostrar ubicación exacta */}
+          <div className="bg-gray-800 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <label className="text-white font-medium block mb-1">
+                  🔒 Privacidad de ubicación
+                </label>
+                <p className="text-sm text-gray-400">
+                  {formData.showExactLocation 
+                    ? 'Otros usuarios verán tu ciudad y distancia exacta' 
+                    : 'Otros usuarios no verán tu ubicación exacta'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, showExactLocation: !formData.showExactLocation })}
+                className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                  formData.showExactLocation ? 'bg-primary' : 'bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.showExactLocation ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
           {/* FOTOS PÚBLICAS */}
           <div className="bg-gray-800 rounded-lg p-4">
             <label className="block text-sm font-medium text-white mb-3">
