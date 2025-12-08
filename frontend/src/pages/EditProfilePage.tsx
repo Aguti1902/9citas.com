@@ -530,46 +530,34 @@ export default function EditProfilePage() {
             </select>
           </div>
 
-          {/* Tipo de relación que busca - DESTACADO */}
-          <div className="bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl p-6 border-2 border-primary/30">
-            <label className="block text-lg font-bold text-white mb-4 text-center">
-              💕 ¿Qué tipo de relación buscas? *
+          {/* Tipo de relación que busca - DESPLEGABLE DESTACADO */}
+          <div className="bg-gradient-to-br from-pink-500/30 via-purple-500/30 to-red-500/30 rounded-2xl p-6 border-2 border-pink-500 shadow-xl">
+            <label className="block text-xl font-bold text-white mb-4 text-center flex items-center justify-center gap-2">
+              <span className="text-3xl">💕</span>
+              <span>¿Qué tipo de relación buscas?</span>
+              <span className="text-red-500">*</span>
             </label>
-            <div className="grid grid-cols-1 gap-3">
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, relationshipGoal: 'amistad' })}
-                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
-                  formData.relationshipGoal === 'amistad'
-                    ? 'bg-blue-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                👥 Amistad
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, relationshipGoal: 'relacion_seria' })}
-                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
-                  formData.relationshipGoal === 'relacion_seria'
-                    ? 'bg-pink-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                ❤️ Relación seria
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, relationshipGoal: 'solo_sexo' })}
-                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
-                  formData.relationshipGoal === 'solo_sexo'
-                    ? 'bg-red-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                🔥 Solo sexo
-              </button>
-            </div>
+            <select
+              value={formData.relationshipGoal}
+              onChange={(e) => setFormData({ ...formData, relationshipGoal: e.target.value })}
+              className="w-full bg-gray-900 text-white border-2 border-pink-500 rounded-xl px-6 py-4 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-pink-500/50 focus:border-pink-400 transition-all cursor-pointer"
+              required
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 1rem center',
+                backgroundSize: '1.5rem',
+                paddingRight: '3rem',
+              }}
+            >
+              <option value="" disabled>Selecciona una opción...</option>
+              <option value="amistad">👥 Amistad</option>
+              <option value="relacion_seria">❤️ Relación seria</option>
+              <option value="solo_sexo">🔥 Solo sexo</option>
+            </select>
+            <p className="text-center text-sm text-gray-300 mt-3">
+              ✨ Esto ayudará a otros usuarios a saber qué buscas
+            </p>
           </div>
 
           <div>
