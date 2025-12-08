@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import Logo from '@/components/common/Logo'
 import Input from '@/components/common/Input'
 import Button from '@/components/common/Button'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterPage() {
   const { orientation } = useParams<{ orientation: 'hetero' | 'gay' }>()
@@ -13,6 +14,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -90,23 +93,63 @@ export default function RegisterPage() {
             placeholder="tu@email.com"
           />
 
-          <Input
-            label="Contraseña"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="Mínimo 6 caracteres"
-          />
+          {/* Campo de contraseña con icono para mostrar/ocultar */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Contraseña
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Mínimo 6 caracteres"
+                className="input-field pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
 
-          <Input
-            label="Confirmar contraseña"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            placeholder="Repite tu contraseña"
-          />
+          {/* Campo de confirmar contraseña con icono para mostrar/ocultar */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Confirmar contraseña
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="Repite tu contraseña"
+                className="input-field pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
 
           <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-400">
             <p className="mb-2">
