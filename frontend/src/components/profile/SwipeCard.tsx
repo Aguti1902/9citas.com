@@ -24,7 +24,8 @@ export default function SwipeCard({
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const photos = profile.photos || []
+  // SOLO mostrar fotos públicas (cover y public), NO privadas
+  const photos = profile.photos?.filter((p: any) => p.type !== 'private') || []
   const currentPhoto = photos[currentPhotoIndex] || photos[0]
 
   const handleTouchStart = (e: React.TouchEvent) => {
