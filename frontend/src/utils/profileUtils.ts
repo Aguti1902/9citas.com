@@ -18,6 +18,8 @@ export const formatGender = (gender: string | null | undefined): string => {
   const genders: Record<string, string> = {
     'hombre': '👨 Hombre',
     'mujer': '👩 Mujer',
+    'gay': '🏳️‍🌈 Gay',
+    'trans': '🏳️‍⚧️ Trans',
   };
   
   return genders[gender] || '';

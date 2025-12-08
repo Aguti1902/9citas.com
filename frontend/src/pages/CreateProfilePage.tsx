@@ -441,28 +441,59 @@ export default function CreateProfilePage() {
               Género *
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, gender: 'hombre' })}
-                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
-                  formData.gender === 'hombre'
-                    ? 'bg-blue-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
-                }`}
-              >
-                👨 Hombre
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, gender: 'mujer' })}
-                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
-                  formData.gender === 'mujer'
-                    ? 'bg-pink-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
-                }`}
-              >
-                👩 Mujer
-              </button>
+              {formData.orientation === 'hetero' ? (
+                <>
+                  {/* Opciones para HETERO: Hombre o Mujer */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'hombre' })}
+                    className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                      formData.gender === 'hombre'
+                        ? 'bg-blue-500 text-white shadow-lg scale-105'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                    }`}
+                  >
+                    👨 Hombre
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'mujer' })}
+                    className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                      formData.gender === 'mujer'
+                        ? 'bg-pink-500 text-white shadow-lg scale-105'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                    }`}
+                  >
+                    👩 Mujer
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Opciones para GAY: Gay o Trans */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'gay' })}
+                    className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                      formData.gender === 'gay'
+                        ? 'bg-purple-500 text-white shadow-lg scale-105'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                    }`}
+                  >
+                    🏳️‍🌈 Gay
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'trans' })}
+                    className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
+                      formData.gender === 'trans'
+                        ? 'bg-gradient-to-r from-pink-400 via-white to-blue-400 text-gray-900 shadow-lg scale-105'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700'
+                    }`}
+                  >
+                    🏳️‍⚧️ Trans
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
