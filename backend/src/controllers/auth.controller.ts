@@ -34,7 +34,7 @@ export const register = async (req: Request, res: Response) => {
             body: `secret=${recaptchaSecret}&response=${captchaToken}`,
           });
 
-          const verifyData = await verifyResponse.json();
+          const verifyData = await verifyResponse.json() as { success: boolean; challenge_ts?: string; hostname?: string; 'error-codes'?: string[] };
 
           if (!verifyData.success) {
             return res.status(400).json({ 
