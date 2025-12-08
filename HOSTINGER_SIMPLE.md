@@ -59,13 +59,15 @@ nano .env
 **Copia y pega esto (y cambia los valores):**
 
 ```env
-# Base de datos Railway (usa la URL que tienes en Railway)
-DATABASE_URL="TU_URL_DE_RAILWAY_AQUI"
+# Base de datos Railway (de Railway)
+DATABASE_URL="postgresql://postgres:lPKzXGDXgdcQqXFYmirvfDkyVWDYvNPy@postgres.railway.internal:5432/railway"
 
-# JWT Secrets (genera 3 secrets diferentes con este comando: openssl rand -base64 32)
-JWT_SECRET="pega_aqui_el_primer_secret"
-JWT_ACCESS_SECRET="pega_aqui_el_segundo_secret"
-JWT_REFRESH_SECRET="pega_aqui_el_tercer_secret"
+# JWT Secrets (de Railway)
+JWT_SECRET="9citas_jwt_secret_super_seguro_production_2024"
+JWT_REFRESH_SECRET="9citas_refresh_jwt_secret_super_seguro_production_2024"
+
+# IMPORTANTE: Genera JWT_ACCESS_SECRET nuevo (ejecuta: openssl rand -base64 32)
+JWT_ACCESS_SECRET="GENERA_ESTE_NUEVO_CON_openssl_rand_-base64_32"
 
 # Puerto del servidor
 PORT=5000
@@ -84,13 +86,16 @@ REPORTS_EMAIL=denuncias@9citas.com
 # Google reCAPTCHA
 RECAPTCHA_SECRET_KEY=tu_recaptcha_secret_key
 
-# Cloudinary (para imágenes) - Los mismos que usas en Railway
-CLOUDINARY_CLOUD_NAME=tu_cloud_name
-CLOUDINARY_API_KEY=tu_api_key
-CLOUDINARY_API_SECRET=tu_api_secret
+# Cloudinary (de Railway - ya están tus datos)
+CLOUDINARY_CLOUD_NAME="dmrdydsjv"
+CLOUDINARY_API_KEY="957942125576369"
+CLOUDINARY_API_SECRET="kJWwXcg0x0MTfNq3ux4nXE_RMVw"
 
-# Admin
+# Admin - CREA UNA CONTRASEÑA SEGURA AQUÍ
 ADMIN_PASSWORD=tu_contraseña_admin_segura
+
+# Entorno
+NODE_ENV=production
 ```
 
 **Para guardar en nano:** Presiona `Ctrl + X`, luego `Y`, luego `Enter`
