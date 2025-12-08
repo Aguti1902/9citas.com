@@ -121,13 +121,14 @@ export default function ProfileCard({ profile, onLikeToggle, isPremium = false }
           </div>
 
           {/* Mostrar ubicación SOLO si es usuario PREMIUM (9Plus) */}
-          {isPremium && profile.showExactLocation !== false && (
+          {isPremium && (
             <>
               <div className="flex items-center gap-2 text-gray-300 text-sm">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>{profile.city}</span>
               </div>
-              {profile.distance !== null && profile.distance !== undefined && (
+              {/* Mostrar distancia SOLO si el perfil tiene showExactLocation activado */}
+              {profile.showExactLocation !== false && profile.distance !== null && profile.distance !== undefined && (
                 <p className="text-accent text-sm font-semibold mt-1">
                   📍 A {profile.distance} km
                 </p>

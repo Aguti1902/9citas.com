@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '@/services/api'
 import { showToast } from '@/store/toastStore'
+import { useAuthStore } from '@/store/authStore'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
@@ -13,6 +14,8 @@ import { formatRelationshipGoal } from '@/utils/profileUtils'
 export default function ProfileDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuthStore()
+  const isPremium = user?.subscription?.isActive || false
   const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLiked, setIsLiked] = useState(false)
@@ -288,9 +291,15 @@ export default function ProfileDetailPage() {
               {profile.title}, {profile.age}
               {profile.isOnline && <span className="online-indicator"></span>}
             </h1>
-            <p className="text-gray-400 mt-1">{profile.city}</p>
-            {profile.distance && (
-              <p className="text-gray-500 text-sm">A {profile.distance} km de ti</p>
+            {/* Mostrar ubicación SOLO si es usuario PREMIUM (9Plus) */}
+            {isPremium && (
+              <>
+                <p className="text-gray-400 mt-1">{profile.city}</p>
+                {/* Mostrar distancia SOLO si el perfil tiene showExactLocation activado */}
+                {profile.showExactLocation !== false && profile.distance && (
+                  <p className="text-gray-500 text-sm">A {profile.distance} km de ti</p>
+                )}
+              </>
             )}
           </div>
         </div>

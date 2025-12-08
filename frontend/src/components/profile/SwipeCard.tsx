@@ -241,11 +241,12 @@ export default function SwipeCard({
                 </div>
 
                 {/* Mostrar ubicación SOLO si es usuario PREMIUM (9Plus) */}
-                {isPremium && profile.showExactLocation !== false && (
+                {isPremium && (
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     <span>{profile.city}</span>
-                    {profile.distance !== null && profile.distance !== undefined && (
+                    {/* Mostrar distancia SOLO si el perfil tiene showExactLocation activado */}
+                    {profile.showExactLocation !== false && profile.distance !== null && profile.distance !== undefined && (
                       <span className="text-accent font-semibold">· {profile.distance} km</span>
                     )}
                   </div>
