@@ -110,20 +110,25 @@ export default function InfoPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Plan Gratis</h3>
               <ul className="text-gray-300 space-y-2 list-disc list-inside">
                 <li>Ver hasta 50 perfiles en tu ubicación actual</li>
-                <li>Chatear solo con usuarios de tu ciudad</li>
+                <li>Chatear con cualquier usuario (sin restricciones)</li>
                 <li>Ver los últimos 5 "Me gusta" recibidos</li>
-                <li>Funciones básicas de búsqueda</li>
+                <li>Filtros básicos: TODOS, RECIENTES, NUEVOS</li>
+                <li>Solicitar y compartir fotos privadas</li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-xl font-semibold text-accent mb-2">Plan 9Plus - 5 €/mes</h3>
               <ul className="text-gray-300 space-y-2 list-disc list-inside">
-                <li>Perfiles ilimitados</li>
-                <li>Chatear sin restricciones de ubicación</li>
-                <li>Filtros por edad y usuarios online</li>
-                <li>Ver distancia a otros usuarios</li>
-                <li>Prioridad en búsquedas</li>
+                <li>Perfiles ilimitados (sin límite de 50)</li>
+                <li>Filtros avanzados: distancia, edad, género, tipo de relación, ROL (gay)</li>
+                <li>Ver distancia exacta en km a cada usuario</li>
+                <li>Ver ciudad de todos los usuarios</li>
+                <li>Ver todos los "Me gusta" recibidos (sin límite)</li>
+                <li>Confirmación de lectura de mensajes (✓✓ leído)</li>
+                <li>Función RoAM: boost de visibilidad 10x (6,49€/hora)</li>
+                <li>Cambiar ubicación manualmente cuando quieras</li>
+                <li>Prioridad en resultados de búsqueda</li>
               </ul>
             </div>
           </div>
