@@ -35,23 +35,25 @@ REPORTS_EMAIL=denuncias@9citas.com
 
 ---
 
-## 📝 Paso a Paso: Configurar Gmail
+## 📝 Paso a Paso: Configurar Email de Hostinger
 
-### 1. Obtener App Password de Gmail
+### 1. Configurar Email en Hostinger
 
-1. **Activar verificación en 2 pasos:**
-   - Ve a: https://myaccount.google.com/security
-   - Activa "Verificación en 2 pasos"
+1. **Accede al panel de Hostinger:**
+   - Ve a: https://hpanel.hostinger.com
+   - Inicia sesión con tu cuenta
 
-2. **Generar App Password:**
-   - Ve a: https://myaccount.google.com/apppasswords
-   - Selecciona "Correo" y "Otro (nombre personalizado)"
-   - Escribe: "9citas Backend"
-   - Copia la contraseña generada (16 caracteres sin espacios)
+2. **Crear/Verificar email:**
+   - Ve a "Email" → "Cuentas de Email"
+   - Crea o verifica que existe: `support@9citas.com`
+   - Anota la contraseña del email (la que configuraste al crearlo)
 
-3. **Usar la App Password:**
-   - En Railway, pon `SMTP_PASS` = la contraseña de 16 caracteres
-   - **NO uses tu contraseña normal de Gmail**
+3. **Obtener configuración SMTP:**
+   - Hostinger usa estos valores SMTP:
+     - **SMTP_HOST:** `smtp.hostinger.com` o `smtp.titan.email`
+     - **SMTP_PORT:** `587` (recomendado) o `465` (SSL)
+     - **SMTP_USER:** `support@9citas.com`
+     - **SMTP_PASS:** La contraseña del email que creaste
 
 ### 2. Configurar Variables en Railway
 
@@ -60,14 +62,26 @@ REPORTS_EMAIL=denuncias@9citas.com
 3. Agrega cada variable:
 
 ```
-SMTP_HOST = smtp.gmail.com
+SMTP_HOST = smtp.hostinger.com
 SMTP_PORT = 587
-SMTP_USER = tu-email@gmail.com
-SMTP_PASS = xxxx xxxx xxxx xxxx (16 caracteres sin espacios)
+SMTP_USER = support@9citas.com
+SMTP_PASS = tu-contraseña-del-email
 FRONTEND_URL = https://9citas.com
+REPORTS_EMAIL = support@9citas.com
 ```
 
 4. **Reinicia el servicio** para que tome las nuevas variables
+
+### 3. Verificar Configuración
+
+**Nota:** Si `smtp.hostinger.com` no funciona, prueba con:
+- `smtp.titan.email` (para planes con Titan Email)
+- `mail.9citas.com` (si tienes DNS configurado)
+
+**Puertos disponibles:**
+- `587` - TLS (recomendado)
+- `465` - SSL
+- `25` - No recomendado (puede estar bloqueado)
 
 ---
 
@@ -94,16 +108,26 @@ FRONTEND_URL = https://9citas.com
 ### ❌ "Error al enviar email"
 
 **Causas comunes:**
-1. **App Password incorrecta**
-   - Verifica que copiaste los 16 caracteres sin espacios
-   - Regenera la App Password si es necesario
+1. **Contraseña incorrecta (Hostinger)**
+   - Verifica que la contraseña del email sea correcta
+   - Prueba cambiar la contraseña en Hostinger y actualizar en Railway
 
-2. **Verificación en 2 pasos no activada**
-   - Debes activarla antes de generar App Password
+2. **SMTP_HOST incorrecto**
+   - Prueba con `smtp.hostinger.com`
+   - Si no funciona, prueba `smtp.titan.email`
+   - Verifica en el panel de Hostinger cuál es el servidor SMTP correcto
 
-3. **Variables no configuradas**
+3. **Puerto bloqueado**
+   - Prueba cambiar de `587` a `465` (SSL)
+   - O viceversa
+
+4. **Variables no configuradas**
    - Verifica que todas las variables estén en Railway
    - Reinicia el servicio después de agregar variables
+
+5. **Email no verificado en Hostinger**
+   - Asegúrate de que el email `support@9citas.com` esté activo
+   - Verifica que puedas acceder al email desde el webmail de Hostinger
 
 ### ❌ "Email no llega"
 
@@ -131,6 +155,30 @@ Si ves en los logs:
 
 ## 📧 Otros Proveedores de Email
 
+### Hostinger (Tu configuración actual) ⭐
+
+```env
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=587
+SMTP_USER=support@9citas.com
+SMTP_PASS=tu-contraseña-del-email
+```
+
+**Alternativas si no funciona:**
+- `smtp.titan.email` (para planes con Titan Email)
+- `mail.9citas.com` (si tienes DNS configurado)
+
+### Gmail
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=tu-email@gmail.com
+SMTP_PASS=app-password-16-caracteres
+```
+
+**Nota:** Requiere App Password (no contraseña normal)
+
 ### Outlook/Hotmail
 
 ```env
@@ -140,11 +188,7 @@ SMTP_USER=tu-email@outlook.com
 SMTP_PASS=tu-contraseña
 ```
 
-### SendGrid (Recomendado para producción)
-
-1. Crea cuenta en SendGrid
-2. Genera API Key
-3. Configura:
+### SendGrid (Recomendado para producción masiva)
 
 ```env
 SMTP_HOST=smtp.sendgrid.net
