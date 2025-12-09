@@ -7,13 +7,6 @@ const prisma = new PrismaClient();
 export interface AuthRequest extends Request {
   userId?: string;
   profileId?: string;
-  body?: any;
-  params?: any;
-  query?: any;
-  file?: any;
-  files?: any;
-  cookies?: any;
-  headers?: any;
 }
 
 // Middleware para verificar token JWT
