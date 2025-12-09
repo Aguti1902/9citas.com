@@ -145,6 +145,10 @@ export const stripeWebhook = async (req: any, res: Response) => {
     return res.status(500).send('Webhook secret no configurado');
   }
 
+  if (!stripe) {
+    return res.status(500).send('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
   let event;
 
   try {
