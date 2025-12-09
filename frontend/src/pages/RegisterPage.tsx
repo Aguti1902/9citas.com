@@ -10,20 +10,11 @@ import { Eye, EyeOff } from 'lucide-react'
 const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
 const hasRealRecaptchaKey = recaptchaSiteKey && recaptchaSiteKey !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
 
-// Importar ReCAPTCHA solo si hay clave real (evita cargar el script innecesariamente)
-let ReCAPTCHA: any = null
-if (hasRealRecaptchaKey) {
-  // Dynamic import solo cuando se necesita
-  import('react-google-recaptcha').then((module) => {
-    ReCAPTCHA = module.default
-  })
-}
-
 export default function RegisterPage() {
   const { orientation } = useParams<{ orientation: 'hetero' | 'gay' }>()
   const navigate = useNavigate()
   const { register } = useAuthStore()
-  const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const recaptchaRef = useRef<any>(null)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -33,10 +24,6 @@ export default function RegisterPage() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-
-  // Verificar si hay una clave de reCAPTCHA real configurada
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
-  const hasRealRecaptchaKey = recaptchaSiteKey && recaptchaSiteKey !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
