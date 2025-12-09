@@ -52,11 +52,14 @@ const io = new Server(httpServer, {
 setIO(io);
 
 // Middleware CORS - Configuración simplificada y permisiva
-// Permitir todos los orígenes de Vercel y localhost
+// Permitir todos los orígenes de Vercel, localhost y dominio de producción
 const allowedOrigins = [
   'http://localhost:3000',
   'https://9citas-com-fyij.vercel.app',
   'https://9citas-com-hev9.vercel.app',
+  // Dominios de producción
+  'https://9citas.com',
+  'https://www.9citas.com',
   // Añadir cualquier origen de Vercel
   /^https:\/\/.*\.vercel\.app$/,
 ];
@@ -93,9 +96,12 @@ app.use(cors({
       console.log(`✅ CORS permitido para: ${origin}`);
       callback(null, true);
     } else {
-      // En producción, permitir temporalmente cualquier origen de Vercel
-      if (process.env.NODE_ENV === 'production' && origin.includes('vercel.app')) {
-        console.log(`⚠️  Permitiendo origen de Vercel temporalmente: ${origin}`);
+      // En producción, permitir temporalmente cualquier origen de Vercel o 9citas.com
+      if (process.env.NODE_ENV === 'production' && (
+        origin.includes('vercel.app') || 
+        origin.includes('9citas.com')
+      )) {
+        console.log(`⚠️  Permitiendo origen de producción temporalmente: ${origin}`);
         callback(null, true);
       } else {
         console.warn(`⚠️  CORS bloqueado para: ${origin}`);
