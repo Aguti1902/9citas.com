@@ -14,14 +14,13 @@ export default function RegisterPage() {
   const { orientation } = useParams<{ orientation: 'hetero' | 'gay' }>()
   const navigate = useNavigate()
   const { register } = useAuthStore()
-  const recaptchaRef = useRef<any>(null)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaToken] = useState<string | null>(null) // Solo se usa si hay clave real
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
