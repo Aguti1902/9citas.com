@@ -5,7 +5,19 @@ import Logo from '@/components/common/Logo'
 import Input from '@/components/common/Input'
 import Button from '@/components/common/Button'
 import { Eye, EyeOff } from 'lucide-react'
-import ReCAPTCHA from 'react-google-recaptcha'
+
+// Verificar si hay una clave de reCAPTCHA real configurada
+const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
+const hasRealRecaptchaKey = recaptchaSiteKey && recaptchaSiteKey !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+
+// Importar ReCAPTCHA solo si hay clave real (evita cargar el script innecesariamente)
+let ReCAPTCHA: any = null
+if (hasRealRecaptchaKey) {
+  // Dynamic import solo cuando se necesita
+  import('react-google-recaptcha').then((module) => {
+    ReCAPTCHA = module.default
+  })
+}
 
 export default function RegisterPage() {
   const { orientation } = useParams<{ orientation: 'hetero' | 'gay' }>()
@@ -165,24 +177,7 @@ export default function RegisterPage() {
           </div>
 
           {/* CAPTCHA - Verificación anti-robots (solo si hay clave real configurada) */}
-          {hasRealRecaptchaKey && (
-            <div className="flex justify-center">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={recaptchaSiteKey}
-                onChange={(token) => {
-                  setCaptchaToken(token)
-                  setError('')
-                }}
-                onExpired={() => setCaptchaToken(null)}
-                onErrored={() => {
-                  setCaptchaToken(null)
-                  setError('Error al cargar CAPTCHA. Recarga la página.')
-                }}
-                theme="dark"
-              />
-            </div>
-          )}
+          {/* No renderizar nada si no hay clave - evita cargar el script de reCAPTCHA */}
 
           <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-400">
             <p className="mb-2">
