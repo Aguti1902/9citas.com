@@ -48,7 +48,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const result = await register(email, password, orientation!, captchaToken)
+      const result = await register(email, password, orientation!, captchaToken || undefined)
       
       // Guardar orientación en localStorage para usarla al crear el perfil
       localStorage.setItem('userOrientation', orientation!)
