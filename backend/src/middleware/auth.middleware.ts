@@ -4,10 +4,9 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export interface AuthRequest extends Request {
-  userId?: string;
-  profileId?: string;
-}
+// AuthRequest es simplemente un alias de Request
+// Las propiedades userId y profileId están definidas en express-extensions.d.ts
+export type AuthRequest = Request;
 
 // Middleware para verificar token JWT
 export const authenticateToken = async (
