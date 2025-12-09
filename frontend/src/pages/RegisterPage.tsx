@@ -36,7 +36,11 @@ export default function RegisterPage() {
       return
     }
 
-    if (!captchaToken) {
+    // Solo requerir CAPTCHA si hay una clave configurada (no es la de prueba)
+    const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    const isTestKey = recaptchaSiteKey === '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    
+    if (!isTestKey && !captchaToken) {
       setError('Por favor, completa el CAPTCHA para verificar que no eres un robot')
       return
     }
@@ -159,23 +163,26 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* CAPTCHA - Verificación anti-robots */}
-          <div className="flex justify-center">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'} // Key de prueba por defecto
-              onChange={(token) => {
-                setCaptchaToken(token)
-                setError('')
-              }}
-              onExpired={() => setCaptchaToken(null)}
-              onErrored={() => {
-                setCaptchaToken(null)
-                setError('Error al cargar CAPTCHA. Recarga la página.')
-              }}
-              theme="dark"
-            />
-          </div>
+          {/* CAPTCHA - Verificación anti-robots (solo si hay clave configurada) */}
+          {import.meta.env.VITE_RECAPTCHA_SITE_KEY && 
+           import.meta.env.VITE_RECAPTCHA_SITE_KEY !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' && (
+            <div className="flex justify-center">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                onChange={(token) => {
+                  setCaptchaToken(token)
+                  setError('')
+                }}
+                onExpired={() => setCaptchaToken(null)}
+                onErrored={() => {
+                  setCaptchaToken(null)
+                  setError('Error al cargar CAPTCHA. Recarga la página.')
+                }}
+                theme="dark"
+              />
+            </div>
+          )}
 
           <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-400">
             <p className="mb-2">
