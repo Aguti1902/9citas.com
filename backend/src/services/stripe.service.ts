@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 // Inicializar Stripe
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-11-17.clover',
 });
 
 // Precios configurados
@@ -282,8 +282,15 @@ const handleSubscriptionUpdate = async (subscription: Stripe.Subscription) => {
   }
 
   const isActive = subscription.status === 'active';
-  const startDate = new Date(subscription.current_period_start * 1000);
-  const endDate = new Date(subscription.current_period_end * 1000);
+  // Acceder a las propiedades del periodo de facturación
+  const currentPeriodStart = (subscription as any).current_period_start;
+  const currentPeriodEnd = (subscription as any).current_period_end;
+  const startDate = currentPeriodStart 
+    ? new Date(currentPeriodStart * 1000)
+    : new Date();
+  const endDate = currentPeriodEnd
+    ? new Date(currentPeriodEnd * 1000)
+    : new Date();
 
   await prisma.subscription.upsert({
     where: { userId },
@@ -331,7 +338,10 @@ const handleSubscriptionCanceled = async (subscription: Stripe.Subscription) => 
 
 // Manejar pago de factura exitoso
 const handleInvoicePaymentSucceeded = async (invoice: Stripe.Invoice) => {
-  const subscriptionId = invoice.subscription as string;
+  // invoice.subscription puede ser string o Subscription object
+  const subscriptionId = typeof (invoice as any).subscription === 'string' 
+    ? (invoice as any).subscription 
+    : (invoice as any).subscription?.id;
   if (!subscriptionId) return;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -340,7 +350,10 @@ const handleInvoicePaymentSucceeded = async (invoice: Stripe.Invoice) => {
 
 // Manejar pago de factura fallido
 const handleInvoicePaymentFailed = async (invoice: Stripe.Invoice) => {
-  const subscriptionId = invoice.subscription as string;
+  // invoice.subscription puede ser string o Subscription object
+  const subscriptionId = typeof (invoice as any).subscription === 'string' 
+    ? (invoice as any).subscription 
+    : (invoice as any).subscription?.id;
   if (!subscriptionId) return;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
