@@ -3,10 +3,17 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Inicializar Stripe
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-11-17.clover',
-});
+// Inicializar Stripe solo si la clave está configurada
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  console.warn('⚠️  STRIPE_SECRET_KEY no configurada. Las funciones de pago no estarán disponibles.');
+}
+
+export const stripe = stripeSecretKey 
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: '2025-11-17.clover',
+    })
+  : null as any; // Type assertion para evitar errores de tipo cuando no está configurado
 
 // Precios configurados
 export const STRIPE_PRICES = {
@@ -25,6 +32,10 @@ export const STRIPE_PRICES = {
 
 // Crear o obtener cliente de Stripe
 export const getOrCreateStripeCustomer = async (userId: string, email: string) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
   // Buscar si ya tiene un customerId
   const subscription = await prisma.subscription.findUnique({
     where: { userId },
@@ -74,6 +85,10 @@ export const createSubscriptionCheckoutSession = async (
   successUrl: string,
   cancelUrl: string
 ) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
   const customer = await getOrCreateStripeCustomer(userId, email);
 
   const session = await stripe.checkout.sessions.create({
@@ -111,6 +126,10 @@ export const createRoamCheckoutSession = async (
   successUrl: string,
   cancelUrl: string
 ) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
   const customer = await getOrCreateStripeCustomer(userId, email);
 
   // Determinar precio según duración
@@ -165,6 +184,10 @@ export const createRoamCheckoutSession = async (
 
 // Manejar webhook de Stripe
 export const handleStripeWebhook = async (event: Stripe.Event) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
