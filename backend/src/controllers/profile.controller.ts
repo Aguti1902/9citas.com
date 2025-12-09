@@ -196,8 +196,15 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
         targetGender = null;
       }
     } else if (myProfile.orientation === 'gay') {
-      // GAY: Solo mismo género (lógica original)
-      targetGender = myProfile.gender;
+      // GAY: Ver TODOS los usuarios gay (gay y trans) - NO filtrar por género específico
+      // Los usuarios gay pueden ver a otros usuarios gay independientemente de si son "gay" o "trans"
+      if (isPlus && gender) {
+        // 9PLUS: Puede filtrar por género específico (gay o trans)
+        targetGender = gender as string;
+      } else {
+        // FREE o 9PLUS sin filtro: Ver TODOS los géneros dentro de orientación gay (gay + trans)
+        targetGender = null;
+      }
     } else {
       return res.status(400).json({ error: 'Orientación no válida' });
     }
