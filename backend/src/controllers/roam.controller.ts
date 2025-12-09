@@ -4,7 +4,8 @@ import { AuthRequest } from '../middleware/auth.middleware'
 
 const prisma = new PrismaClient()
 
-// Activar Roam
+// Activar Roam (DEPRECATED - Ahora se usa Stripe Checkout)
+// Este endpoint se mantiene por compatibilidad, pero debería redirigir a Stripe
 export const activateRoam = async (req: AuthRequest, res: Response) => {
   try {
     const profileId = req.profileId
@@ -42,6 +43,13 @@ export const activateRoam = async (req: AuthRequest, res: Response) => {
         roamingUntil: profile.roamingUntil,
       })
     }
+
+    // NOTA: Este endpoint ya no activa RoAM directamente
+    // Debe usar /api/payments/roam/checkout para crear una sesión de Stripe
+    return res.status(400).json({ 
+      error: 'Este endpoint está deprecado. Usa /api/payments/roam/checkout para pagar con Stripe',
+      useStripeCheckout: true,
+    })
 
     const startTime = new Date()
     const endTime = new Date(startTime.getTime() + duration * 60 * 1000)

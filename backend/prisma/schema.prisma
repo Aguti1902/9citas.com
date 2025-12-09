@@ -209,32 +209,42 @@ model Block {
 
 // Suscripciones
 model Subscription {
-  id        String    @id @default(uuid())
-  userId    String    @unique
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String    @id @default(uuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  plan      String    // '9plus'
-  isActive  Boolean   @default(false)
-  startDate DateTime?
-  endDate   DateTime?
+  plan                String    // '9plus'
+  isActive            Boolean   @default(false)
+  startDate           DateTime?
+  endDate             DateTime?
   
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  // Stripe
+  stripeCustomerId    String?   @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId       String?   // ID del precio en Stripe
+  stripeStatus        String?   // active, canceled, past_due, etc.
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
   
   @@map("subscriptions")
 }
 
 // Roam purchases (histórico)
 model RoamPurchase {
-  id          String   @id @default(uuid())
-  profileId   String
+  id              String   @id @default(uuid())
+  profileId       String
   
-  duration    Int      // minutos
-  price       Float
-  startTime   DateTime
-  endTime     DateTime
+  duration        Int      // minutos
+  price           Float
+  startTime       DateTime
+  endTime         DateTime
   
-  createdAt   DateTime @default(now())
+  // Stripe
+  stripePaymentIntentId String?  @unique
+  stripeSessionId       String?  @unique
+  
+  createdAt       DateTime @default(now())
   
   @@index([profileId])
   @@map("roam_purchases")

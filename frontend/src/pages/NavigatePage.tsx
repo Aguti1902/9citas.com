@@ -50,6 +50,23 @@ export default function NavigatePage() {
     }
   }, [])
 
+  // Manejar redirección desde Stripe
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const roamSuccess = params.get('roam')
+    
+    if (roamSuccess === 'success') {
+      showToast('¡RoAM activado exitosamente!', 'success')
+      // Limpiar parámetro de URL
+      window.history.replaceState({}, '', window.location.pathname)
+      // Recargar estado de RoAM
+      loadRoamStatus()
+    } else if (roamSuccess === 'canceled') {
+      showToast('Pago cancelado', 'info')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
   // Lista de ciudades españolas (misma que LocationSelector)
   const SPANISH_CITIES = [
     { name: 'Madrid', lat: 40.4168, lng: -3.7038 },
@@ -733,18 +750,22 @@ export default function NavigatePage() {
             variant="accent"
             onClick={async () => {
               try {
-                await api.post('/roam/activate', { duration: 60 })
-                setShowRoamModal(false)
-                setShowRoamSuccessModal(true)
-                setTimeout(() => {
-                  window.location.reload() // Recargar para mostrar el widget
-                }, 2000)
+                // Crear sesión de checkout de Stripe para RoAM
+                const response = await api.post('/payments/roam/checkout', { duration: 60 })
+                const { url } = response.data
+                
+                // Redirigir a Stripe Checkout
+                if (url) {
+                  window.location.href = url
+                } else {
+                  throw new Error('No se recibió URL de checkout')
+                }
               } catch (error: any) {
                 if (error.response?.data?.requiresPremium) {
                   setShowRoamModal(false)
                   setShowPremiumModal(true)
                 } else {
-                  showToast(error.response?.data?.error || 'Error al activar Roam', 'error')
+                  showToast(error.response?.data?.error || 'Error al iniciar el proceso de pago', 'error')
                 }
               }
             }}

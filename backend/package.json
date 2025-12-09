@@ -40,6 +40,7 @@
     "openai": "^6.9.1",
     "prisma": "^5.7.1",
     "socket.io": "^4.6.0",
+    "stripe": "^20.0.0",
     "typescript": "^5.3.3"
   },
   "devDependencies": {

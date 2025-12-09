@@ -23,6 +23,7 @@ import roamRoutes from './routes/roam.routes';
 import adminRoutes from './routes/admin.routes';
 import privatePhotoRoutes from './routes/privatePhoto.routes';
 import reportRoutes from './routes/report.routes';
+import paymentRoutes from './routes/payment.routes';
 
 // Importar servicios
 import { setupSocketHandlers } from './services/socket.service';
@@ -130,6 +131,11 @@ app.options('*', (req, res) => {
   res.sendStatus(204);
 });
 
+// IMPORTANTE: El webhook de Stripe necesita el body raw, así que lo configuramos antes
+// Configurar express.raw para el webhook de Stripe
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
+// Middleware normal para el resto de rutas
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -159,6 +165,7 @@ app.use('/api/roam', roamRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/private-photos', privatePhotoRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Ruta de health check
 app.get('/api/health', (req, res) => {

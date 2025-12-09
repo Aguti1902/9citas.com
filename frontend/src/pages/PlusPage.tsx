@@ -15,13 +15,19 @@ export default function PlusPage() {
   const handleActivate = async () => {
     setIsActivating(true)
     try {
-      await api.post('/subscriptions/activate')
-      await refreshUserData()
-      alert('¡Suscripción 9Plus activada exitosamente!')
-    } catch (error) {
-      console.error('Error al activar suscripción:', error)
-      alert('Error al activar suscripción')
-    } finally {
+      // Crear sesión de checkout de Stripe
+      const response = await api.post('/payments/subscription/checkout')
+      const { url } = response.data
+      
+      // Redirigir a Stripe Checkout
+      if (url) {
+        window.location.href = url
+      } else {
+        throw new Error('No se recibió URL de checkout')
+      }
+    } catch (error: any) {
+      console.error('Error al crear sesión de checkout:', error)
+      alert(error.response?.data?.error || 'Error al iniciar el proceso de pago')
       setIsActivating(false)
     }
   }
@@ -29,14 +35,19 @@ export default function PlusPage() {
   const handleCancel = async () => {
     setIsCanceling(true)
     try {
-      await api.post('/subscriptions/cancel')
-      await refreshUserData()
-      setShowCancelModal(false)
-      alert('Suscripción cancelada. Puedes seguir disfrutando de 9Plus hasta el final del periodo de facturación.')
-    } catch (error) {
-      console.error('Error al cancelar suscripción:', error)
-      alert('Error al cancelar suscripción')
-    } finally {
+      // Crear sesión del portal de cliente de Stripe
+      const response = await api.post('/payments/customer-portal')
+      const { url } = response.data
+      
+      // Redirigir al portal de Stripe donde puede cancelar
+      if (url) {
+        window.location.href = url
+      } else {
+        throw new Error('No se recibió URL del portal')
+      }
+    } catch (error: any) {
+      console.error('Error al crear sesión del portal:', error)
+      alert(error.response?.data?.error || 'Error al acceder al portal de gestión')
       setIsCanceling(false)
     }
   }
@@ -214,7 +225,7 @@ export default function PlusPage() {
           </Button>
 
           <p className="text-gray-500 text-sm mt-4">
-            * En esta demo, la suscripción se activa automáticamente sin pago real
+            * Pago seguro con Stripe • Sin permanencia • Cancela cuando quieras
           </p>
         </div>
       ) : (
