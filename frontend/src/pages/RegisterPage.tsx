@@ -22,6 +22,10 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
+  // Verificar si hay una clave de reCAPTCHA real configurada
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
+  const hasRealRecaptchaKey = recaptchaSiteKey && recaptchaSiteKey !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -36,11 +40,8 @@ export default function RegisterPage() {
       return
     }
 
-    // Solo requerir CAPTCHA si hay una clave configurada (no es la de prueba)
-    const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-    const isTestKey = recaptchaSiteKey === '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-    
-    if (!isTestKey && !captchaToken) {
+    // Solo requerir CAPTCHA si hay una clave real configurada
+    if (hasRealRecaptchaKey && !captchaToken) {
       setError('Por favor, completa el CAPTCHA para verificar que no eres un robot')
       return
     }
@@ -163,13 +164,12 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* CAPTCHA - Verificación anti-robots (solo si hay clave configurada) */}
-          {import.meta.env.VITE_RECAPTCHA_SITE_KEY && 
-           import.meta.env.VITE_RECAPTCHA_SITE_KEY !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' && (
+          {/* CAPTCHA - Verificación anti-robots (solo si hay clave real configurada) */}
+          {hasRealRecaptchaKey && (
             <div className="flex justify-center">
               <ReCAPTCHA
                 ref={recaptchaRef}
-                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                sitekey={recaptchaSiteKey}
                 onChange={(token) => {
                   setCaptchaToken(token)
                   setError('')
