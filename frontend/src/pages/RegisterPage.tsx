@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import Logo from '@/components/common/Logo'
 import Input from '@/components/common/Input'
 import Button from '@/components/common/Button'
 import { Eye, EyeOff } from 'lucide-react'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 // Verificar si hay una clave de reCAPTCHA real configurada
 const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
@@ -14,14 +15,14 @@ export default function RegisterPage() {
   const { orientation } = useParams<{ orientation: 'hetero' | 'gay' }>()
   const navigate = useNavigate()
   const { register } = useAuthStore()
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  // captchaToken solo se usa si hay clave real de reCAPTCHA configurada
-  const captchaToken: string | null = null
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -164,7 +165,26 @@ export default function RegisterPage() {
           </div>
 
           {/* CAPTCHA - Verificación anti-robots (solo si hay clave real configurada) */}
-          {/* No renderizar nada si no hay clave - evita cargar el script de reCAPTCHA */}
+          {hasRealRecaptchaKey && recaptchaSiteKey && (
+            <div className="flex justify-center">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={recaptchaSiteKey}
+                onChange={(token) => {
+                  setCaptchaToken(token)
+                  setError('')
+                }}
+                onExpired={() => {
+                  setCaptchaToken(null)
+                }}
+                onErrored={() => {
+                  setCaptchaToken(null)
+                  setError('Error al cargar CAPTCHA. Recarga la página.')
+                }}
+                theme="dark"
+              />
+            </div>
+          )}
 
           <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-400">
             <p className="mb-2">
