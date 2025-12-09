@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import Button from '@/components/common/Button'
@@ -11,6 +11,23 @@ export default function PlusPage() {
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)
   const isPremium = user?.subscription?.isActive || false
+
+  // Manejar redirección desde Stripe
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const success = params.get('success')
+    const canceled = params.get('canceled')
+    
+    if (success === 'true') {
+      // Recargar datos del usuario para actualizar estado de suscripción
+      refreshUserData()
+      // Limpiar parámetro de URL
+      window.history.replaceState({}, '', window.location.pathname)
+    } else if (canceled === 'true') {
+      // Limpiar parámetro de URL
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [refreshUserData])
 
   const handleActivate = async () => {
     setIsActivating(true)
