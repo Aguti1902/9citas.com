@@ -20,7 +20,8 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [captchaToken] = useState<string | null>(null) // Solo se usa si hay clave real
+  // captchaToken solo se usa si hay clave real de reCAPTCHA configurada
+  const captchaToken: string | null = null
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
