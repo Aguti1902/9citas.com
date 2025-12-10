@@ -56,22 +56,6 @@ export default function DashboardLayout() {
       loadNotifications()
     }, 100)
     
-    // Verificar si es la primera vez del usuario (mostrar tutorial)
-    // O si el usuario quiere ver el tutorial de nuevo
-    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding')
-    const isJustRegistered = sessionStorage.getItem('justRegistered') === 'true'
-    const showTutorial = sessionStorage.getItem('showTutorial') === 'true'
-    
-    if ((!hasSeenOnboarding && isJustRegistered && user?.id) || (showTutorial && user?.id)) {
-      // Limpiar los flags
-      sessionStorage.removeItem('justRegistered')
-      sessionStorage.removeItem('showTutorial')
-      // Esperar 1 segundo para que cargue todo antes de mostrar el tutorial
-      setTimeout(() => {
-        setShowOnboarding(true)
-      }, 1000)
-    }
-    
     const interval = setInterval(() => {
       loadPendingRequests()
       loadRoamStatus()
@@ -79,6 +63,25 @@ export default function DashboardLayout() {
     }, 30000) // Check every 30s
     return () => clearInterval(interval)
   }, [user?.id])
+
+  // Verificar si mostrar el tutorial (separado para que se ejecute cuando cambia la ruta)
+  useEffect(() => {
+    if (!user?.id) return
+
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding')
+    const isJustRegistered = sessionStorage.getItem('justRegistered') === 'true'
+    const showTutorial = sessionStorage.getItem('showTutorial') === 'true'
+    
+    if ((!hasSeenOnboarding && isJustRegistered) || showTutorial) {
+      // Limpiar los flags
+      sessionStorage.removeItem('justRegistered')
+      sessionStorage.removeItem('showTutorial')
+      // Esperar un momento para que cargue todo antes de mostrar el tutorial
+      setTimeout(() => {
+        setShowOnboarding(true)
+      }, 1500)
+    }
+  }, [user?.id, location.pathname])
 
   // Escuchar eventos de Socket.IO para notificaciones en tiempo real
   useEffect(() => {
