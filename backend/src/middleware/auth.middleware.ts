@@ -92,10 +92,15 @@ export const require9Plus = async (
     }
 
     // Verificar que la suscripción no ha expirado
+    // Si está cancelada pero aún no ha expirado el período, permitir acceso
     if (subscription.endDate && subscription.endDate < new Date()) {
+      // El período terminó, desactivar la suscripción
       await prisma.subscription.update({
         where: { userId: req.userId },
-        data: { isActive: false },
+        data: { 
+          isActive: false,
+          stripeStatus: 'canceled',
+        },
       });
       return res.status(403).json({ 
         error: 'Tu suscripción 9Plus ha expirado',

@@ -74,38 +74,49 @@ export const cancelSubscription = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'No tienes una suscripción activa' });
     }
 
-    // Si hay una suscripción de Stripe activa, cancelarla
+    // Si hay una suscripción de Stripe activa, cancelarla al final del período
     if (subscription.stripeSubscriptionId) {
       try {
-        // Cancelar la suscripción en Stripe
-        // Al cancelar inmediatamente, el usuario pierde acceso al final del periodo actual
-        await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+        // Cancelar la suscripción en Stripe al final del período actual
+        // Esto mantiene la suscripción activa hasta que termine el período de facturación
+        const canceledSubscription = await stripe.subscriptions.update(
+          subscription.stripeSubscriptionId,
+          {
+            cancel_at_period_end: true,
+          }
+        );
         
-        // El webhook customer.subscription.deleted actualizará la BD automáticamente
-        // Pero también lo actualizamos aquí por si acaso
+        // Actualizar estado: mantener isActive como true hasta que termine el período
+        // El stripeStatus puede ser 'active' pero cancel_at_period_end será true
         await prisma.subscription.update({
           where: { userId: req.userId! },
           data: {
-            isActive: false,
-            stripeStatus: 'canceled',
+            // Mantener isActive en true - el usuario seguirá teniendo acceso
+            stripeStatus: canceledSubscription.status,
+            // Guardar el endDate del período actual
+            endDate: canceledSubscription.current_period_end 
+              ? new Date(canceledSubscription.current_period_end * 1000)
+              : subscription.endDate,
           },
         });
       } catch (stripeError: any) {
         console.error('Error al cancelar suscripción en Stripe:', stripeError);
-        // Si falla en Stripe, aún así actualizamos localmente
+        // Si falla en Stripe, aún así marcamos como cancelada pero mantenemos acceso
         await prisma.subscription.update({
           where: { userId: req.userId! },
           data: {
-            isActive: false,
+            stripeStatus: 'canceled',
+            // Mantener isActive hasta que expire el endDate
           },
         });
       }
     } else {
-      // Si no hay suscripción de Stripe, solo actualizar localmente
+      // Si no hay suscripción de Stripe, mantener acceso hasta el endDate
       await prisma.subscription.update({
         where: { userId: req.userId! },
         data: {
-          isActive: false,
+          stripeStatus: 'canceled',
+          // Mantener isActive: true hasta que expire endDate
         },
       });
     }

@@ -554,15 +554,23 @@ const handleSubscriptionCanceled = async (subscription: Stripe.Subscription) => 
     return;
   }
 
+  // Cuando Stripe envía customer.subscription.deleted, significa que el período terminó
+  // En este punto, desactivamos la suscripción
+  const currentPeriodEnd = (subscription as any).current_period_end;
+  const endDate = currentPeriodEnd 
+    ? new Date(currentPeriodEnd * 1000)
+    : new Date();
+
   await prisma.subscription.update({
     where: { userId },
     data: {
-      isActive: false,
+      isActive: false, // Ahora sí desactivamos porque el período terminó
       stripeStatus: 'canceled',
+      endDate,
     },
   });
 
-  console.log(`❌ Suscripción cancelada para usuario ${userId}`);
+  console.log(`❌ Suscripción cancelada y desactivada para usuario ${userId} (período terminado)`);
 };
 
 // Manejar pago de factura exitoso
