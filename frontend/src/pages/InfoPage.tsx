@@ -17,12 +17,10 @@ export default function InfoPage() {
   const handleShowTutorial = () => {
     // Eliminar la marca de que ya vio el tutorial
     localStorage.removeItem('hasSeenOnboarding')
+    // Establecer flag para mostrar el tutorial
+    sessionStorage.setItem('showTutorial', 'true')
     // Redirigir a la página principal para que se muestre el tutorial
     navigate('/app')
-    // Recargar la página para activar el tutorial
-    setTimeout(() => {
-      window.location.reload()
-    }, 100)
   }
 
   const tabs = [

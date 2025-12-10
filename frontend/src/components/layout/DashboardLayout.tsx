@@ -57,13 +57,15 @@ export default function DashboardLayout() {
     }, 100)
     
     // Verificar si es la primera vez del usuario (mostrar tutorial)
-    // SOLO mostrar si es REALMENTE la primera vez (justo después del registro)
+    // O si el usuario quiere ver el tutorial de nuevo
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding')
     const isJustRegistered = sessionStorage.getItem('justRegistered') === 'true'
+    const showTutorial = sessionStorage.getItem('showTutorial') === 'true'
     
-    if (!hasSeenOnboarding && isJustRegistered && user?.id) {
-      // Limpiar el flag de registro
+    if ((!hasSeenOnboarding && isJustRegistered && user?.id) || (showTutorial && user?.id)) {
+      // Limpiar los flags
       sessionStorage.removeItem('justRegistered')
+      sessionStorage.removeItem('showTutorial')
       // Esperar 1 segundo para que cargue todo antes de mostrar el tutorial
       setTimeout(() => {
         setShowOnboarding(true)
