@@ -158,7 +158,8 @@ function PaymentFormContent({
                 colorPrimary: '#FCD34D',
                 colorBackground: '#111827',
                 colorText: '#FFFFFF',
-                colorTextSecondary: '#FFFFFF',
+                colorTextSecondary: '#E5E7EB',
+                colorTextPlaceholder: '#9CA3AF',
                 colorDanger: '#EF4444',
                 colorIcon: '#FFFFFF',
                 fontFamily: 'system-ui, sans-serif',
@@ -167,7 +168,13 @@ function PaymentFormContent({
               },
               rules: {
                 '.Label': {
-                  color: '#FFFFFF',
+                  color: '#FFFFFF !important',
+                },
+                'label': {
+                  color: '#FFFFFF !important',
+                },
+                '.Field label': {
+                  color: '#FFFFFF !important',
                 },
                 '.Input': {
                   color: '#FFFFFF',
@@ -175,6 +182,15 @@ function PaymentFormContent({
                 },
                 '.Input::placeholder': {
                   color: '#9CA3AF',
+                },
+                '::placeholder': {
+                  color: '#9CA3AF',
+                },
+                '.Input--empty': {
+                  color: '#FFFFFF',
+                },
+                '.Input--focus': {
+                  color: '#FFFFFF',
                 },
               },
             },
