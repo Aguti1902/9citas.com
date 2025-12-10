@@ -20,7 +20,8 @@ export default function InfoPage() {
     // Establecer flag para mostrar el tutorial
     sessionStorage.setItem('showTutorial', 'true')
     // Redirigir a la página principal para que se muestre el tutorial
-    navigate('/app')
+    // Usar window.location para forzar una recarga completa y asegurar que el flag se lea
+    window.location.href = '/app'
   }
 
   const tabs = [
