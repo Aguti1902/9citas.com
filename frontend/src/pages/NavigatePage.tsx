@@ -11,6 +11,8 @@ import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Modal from '@/components/common/Modal'
 import Button from '@/components/common/Button'
 import RoamStatusContent from '@/components/common/RoamStatusContent'
+import StripeProvider from '@/components/payment/StripeProvider'
+import RoamPaymentForm from '@/components/payment/RoamPaymentForm'
 import { useNavigate } from 'react-router-dom'
 import { LayoutGrid, Layers, Zap, Share2 } from 'lucide-react'
 
@@ -24,6 +26,9 @@ export default function NavigatePage() {
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [showRoamModal, setShowRoamModal] = useState(false)
+  const [showRoamPaymentModal, setShowRoamPaymentModal] = useState(false)
+  const [roamDuration, setRoamDuration] = useState(60)
+  const [roamPrice, setRoamPrice] = useState(6.49)
   const [showRoamSuccessModal, setShowRoamSuccessModal] = useState(false)
   const [showRoamStatusModal, setShowRoamStatusModal] = useState(false)
   const [roamStatus, setRoamStatus] = useState<any>(null)
@@ -748,31 +753,37 @@ export default function NavigatePage() {
           <Button
             fullWidth
             variant="accent"
-            onClick={async () => {
-              try {
-                // Crear sesión de checkout de Stripe para RoAM
-                const response = await api.post('/payments/roam/checkout', { duration: 60 })
-                const { url } = response.data
-                
-                // Redirigir a Stripe Checkout
-                if (url) {
-                  window.location.href = url
-                } else {
-                  throw new Error('No se recibió URL de checkout')
-                }
-              } catch (error: any) {
-                if (error.response?.data?.requiresPremium) {
-                  setShowRoamModal(false)
-                  setShowPremiumModal(true)
-                } else {
-                  showToast(error.response?.data?.error || 'Error al iniciar el proceso de pago', 'error')
-                }
-              }
+            onClick={() => {
+              setRoamDuration(60)
+              setRoamPrice(6.49)
+              setShowRoamModal(false)
+              setShowRoamPaymentModal(true)
             }}
           >
             Activar Roam - 6,49€
           </Button>
         </div>
+      </Modal>
+
+      {/* Modal de pago embebido de RoAM */}
+      <Modal
+        isOpen={showRoamPaymentModal}
+        onClose={() => setShowRoamPaymentModal(false)}
+        title="Activar RoAM"
+        maxWidth="md"
+      >
+        <StripeProvider>
+          <RoamPaymentForm
+            duration={roamDuration}
+            price={roamPrice}
+            onSuccess={() => {
+              setShowRoamPaymentModal(false)
+              showToast('¡RoAM activado exitosamente!', 'success')
+              loadRoamStatus()
+            }}
+            onCancel={() => setShowRoamPaymentModal(false)}
+          />
+        </StripeProvider>
       </Modal>
 
       {/* Modal de éxito de Roam */}

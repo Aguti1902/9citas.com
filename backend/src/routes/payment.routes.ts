@@ -5,6 +5,10 @@ import {
   createRoamCheckout,
   stripeWebhook,
   createCustomerPortalSession,
+  getStripePublishableKey,
+  createRoamPaymentIntentController,
+  createSubscriptionSetupIntentController,
+  confirmSubscriptionController,
 } from '../controllers/payment.controller';
 
 const router = Router();
@@ -15,11 +19,24 @@ router.post('/webhook', stripeWebhook);
 // Rutas protegidas
 router.use(authenticateToken);
 
-// Crear checkout para suscripción
+// Obtener clave pública de Stripe (para inicializar Stripe.js)
+router.get('/publishable-key', getStripePublishableKey);
+
+// Crear checkout para suscripción (método antiguo - redirige a Stripe)
 router.post('/subscription/checkout', createSubscriptionCheckout);
 
-// Crear checkout para RoAM
+// Crear checkout para RoAM (método antiguo - redirige a Stripe)
 router.post('/roam/checkout', requireProfile, createRoamCheckout);
+
+// Nuevos endpoints para checkout embebido
+// Crear Setup Intent para suscripción (embebido)
+router.post('/subscription/setup-intent', createSubscriptionSetupIntentController);
+
+// Confirmar suscripción con método de pago guardado (embebido)
+router.post('/subscription/confirm', confirmSubscriptionController);
+
+// Crear Payment Intent para RoAM (embebido)
+router.post('/roam/payment-intent', requireProfile, createRoamPaymentIntentController);
 
 // Crear sesión del portal de cliente (gestionar suscripción)
 router.post('/customer-portal', createCustomerPortalSession);

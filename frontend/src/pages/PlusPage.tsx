@@ -4,11 +4,14 @@ import { useAuthStore } from '@/store/authStore'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import Logo from '@/components/common/Logo'
+import StripeProvider from '@/components/payment/StripeProvider'
+import SubscriptionPaymentForm from '@/components/payment/SubscriptionPaymentForm'
 
 export default function PlusPage() {
   const { user, refreshUserData } = useAuthStore()
   const [isActivating, setIsActivating] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)
   const isPremium = user?.subscription?.isActive || false
 
@@ -29,24 +32,17 @@ export default function PlusPage() {
     }
   }, [refreshUserData])
 
-  const handleActivate = async () => {
-    setIsActivating(true)
-    try {
-      // Crear sesión de checkout de Stripe
-      const response = await api.post('/payments/subscription/checkout')
-      const { url } = response.data
-      
-      // Redirigir a Stripe Checkout
-      if (url) {
-        window.location.href = url
-      } else {
-        throw new Error('No se recibió URL de checkout')
-      }
-    } catch (error: any) {
-      console.error('Error al crear sesión de checkout:', error)
-      alert(error.response?.data?.error || 'Error al iniciar el proceso de pago')
-      setIsActivating(false)
-    }
+  const handleActivate = () => {
+    setShowPaymentModal(true)
+  }
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false)
+    refreshUserData()
+  }
+
+  const handlePaymentCancel = () => {
+    setShowPaymentModal(false)
   }
 
   const handleCancel = async () => {
@@ -234,7 +230,6 @@ export default function PlusPage() {
           <Button
             fullWidth
             variant="accent"
-            isLoading={isActivating}
             onClick={handleActivate}
             className="text-xl py-4"
           >
@@ -316,6 +311,21 @@ export default function PlusPage() {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Modal de pago embebido */}
+      <Modal
+        isOpen={showPaymentModal}
+        onClose={handlePaymentCancel}
+        title="Suscribirse a 9Plus"
+        maxWidth="md"
+      >
+        <StripeProvider>
+          <SubscriptionPaymentForm
+            onSuccess={handlePaymentSuccess}
+            onCancel={handlePaymentCancel}
+          />
+        </StripeProvider>
       </Modal>
     </div>
   )

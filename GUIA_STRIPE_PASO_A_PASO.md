@@ -164,6 +164,7 @@ RoAM 4h:          price_________________
 
    **Events to send:** Selecciona estos eventos:
    - ✅ `checkout.session.completed`
+   - ✅ `payment_intent.succeeded` (para pagos embebidos)
    - ✅ `customer.subscription.created`
    - ✅ `customer.subscription.updated`
    - ✅ `customer.subscription.deleted`
@@ -202,32 +203,37 @@ RoAM 4h:          price_________________
 - **Value:** `sk_test_...` (tu Secret Key de TEST)
 - Click en **"Add"**
 
-#### Variable 2: STRIPE_WEBHOOK_SECRET
+#### Variable 2: STRIPE_PUBLISHABLE_KEY
+- **Name:** `STRIPE_PUBLISHABLE_KEY`
+- **Value:** `pk_test_...` (tu Publishable Key de TEST)
+- Click en **"Add"**
+
+#### Variable 3: STRIPE_WEBHOOK_SECRET
 - **Name:** `STRIPE_WEBHOOK_SECRET`
 - **Value:** `whsec_...` (tu Signing Secret del webhook)
 - Click en **"Add"**
 
-#### Variable 3: STRIPE_PRICE_ID_SUBSCRIPTION
+#### Variable 4: STRIPE_PRICE_ID_SUBSCRIPTION
 - **Name:** `STRIPE_PRICE_ID_SUBSCRIPTION`
 - **Value:** `price_...` (Price ID de la suscripción 9Plus)
 - Click en **"Add"**
 
-#### Variable 4: STRIPE_PRICE_ID_ROAM_1H
+#### Variable 5: STRIPE_PRICE_ID_ROAM_1H
 - **Name:** `STRIPE_PRICE_ID_ROAM_1H`
 - **Value:** `price_...` (Price ID de RoAM 1h)
 - Click en **"Add"**
 
-#### Variable 5: STRIPE_PRICE_ID_ROAM_2H
+#### Variable 6: STRIPE_PRICE_ID_ROAM_2H
 - **Name:** `STRIPE_PRICE_ID_ROAM_2H`
 - **Value:** `price_...` (Price ID de RoAM 2h)
 - Click en **"Add"**
 
-#### Variable 6: STRIPE_PRICE_ID_ROAM_4H
+#### Variable 7: STRIPE_PRICE_ID_ROAM_4H
 - **Name:** `STRIPE_PRICE_ID_ROAM_4H`
 - **Value:** `price_...` (Price ID de RoAM 4h)
 - Click en **"Add"**
 
-#### Variable 7: FRONTEND_URL (si no existe)
+#### Variable 8: FRONTEND_URL (si no existe)
 - **Name:** `FRONTEND_URL`
 - **Value:** `https://9citas.com,https://www.9citas.com`
 - Click en **"Add"**
@@ -238,6 +244,7 @@ Tu lista de variables debe verse así:
 
 ```
 ✅ STRIPE_SECRET_KEY=sk_test_...
+✅ STRIPE_PUBLISHABLE_KEY=pk_test_...
 ✅ STRIPE_WEBHOOK_SECRET=whsec_...
 ✅ STRIPE_PRICE_ID_SUBSCRIPTION=price_...
 ✅ STRIPE_PRICE_ID_ROAM_1H=price_...
@@ -327,6 +334,7 @@ Actualiza estas variables en Railway con los valores de producción:
 
 ```
 STRIPE_SECRET_KEY=sk_live_... (clave de producción)
+STRIPE_PUBLISHABLE_KEY=pk_live_... (clave pública de producción)
 STRIPE_WEBHOOK_SECRET=whsec_... (nuevo secret de producción)
 STRIPE_PRICE_ID_SUBSCRIPTION=price_... (nuevo price ID de producción)
 STRIPE_PRICE_ID_ROAM_1H=price_... (nuevo price ID de producción)

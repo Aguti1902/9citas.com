@@ -182,6 +182,133 @@ export const createRoamCheckoutSession = async (
   return session;
 };
 
+// Crear Payment Intent para RoAM (pago único embebido)
+export const createRoamPaymentIntent = async (
+  userId: string,
+  profileId: string,
+  email: string,
+  duration: number // minutos
+) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
+  const customer = await getOrCreateStripeCustomer(userId, email);
+
+  // Determinar precio según duración
+  let price: number;
+  
+  if (duration === 60) {
+    price = 6.49;
+  } else if (duration === 120) {
+    price = 11.99;
+  } else if (duration === 240) {
+    price = 19.99;
+  } else {
+    // Default: 1 hora
+    price = 6.49;
+  }
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: Math.round(price * 100), // Convertir a céntimos
+    currency: 'eur',
+    customer: customer.id,
+    metadata: {
+      userId,
+      profileId,
+      type: 'roam',
+      duration: duration.toString(),
+      price: price.toString(),
+    },
+  });
+
+  return paymentIntent;
+};
+
+// Crear Setup Intent y suscripción para 9Plus (suscripción embebida)
+export const createSubscriptionSetupIntent = async (
+  userId: string,
+  email: string
+) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
+  const customer = await getOrCreateStripeCustomer(userId, email);
+
+  // Crear Setup Intent para guardar método de pago
+  const setupIntent = await stripe.setupIntents.create({
+    customer: customer.id,
+    payment_method_types: ['card'],
+    metadata: {
+      userId,
+      type: 'subscription',
+    },
+  });
+
+  return setupIntent;
+};
+
+// Confirmar suscripción después de guardar método de pago
+export const confirmSubscriptionWithPaymentMethod = async (
+  userId: string,
+  paymentMethodId: string
+) => {
+  if (!stripe) {
+    throw new Error('Stripe no está configurado. Por favor, configura STRIPE_SECRET_KEY en las variables de entorno.');
+  }
+
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId },
+  });
+
+  if (!subscription?.stripeCustomerId) {
+    throw new Error('Cliente de Stripe no encontrado');
+  }
+
+  // Adjuntar el método de pago al cliente como método por defecto
+  await stripe.paymentMethods.attach(paymentMethodId, {
+    customer: subscription.stripeCustomerId,
+  });
+
+  // Establecer como método de pago por defecto
+  await stripe.customers.update(subscription.stripeCustomerId, {
+    invoice_settings: {
+      default_payment_method: paymentMethodId,
+    },
+  });
+
+  // Crear suscripción con el método de pago guardado
+  const stripeSubscription = await stripe.subscriptions.create({
+    customer: subscription.stripeCustomerId,
+    items: [
+      {
+        price: STRIPE_PRICES.SUBSCRIPTION_MONTHLY,
+      },
+    ],
+    default_payment_method: paymentMethodId,
+    expand: ['latest_invoice.payment_intent'],
+    metadata: {
+      userId,
+    },
+  });
+
+  // Si la primera factura requiere pago inmediato, confirmarlo
+  const invoice = stripeSubscription.latest_invoice as Stripe.Invoice;
+  if (invoice && invoice.payment_intent) {
+    const paymentIntent = typeof invoice.payment_intent === 'string'
+      ? await stripe.paymentIntents.retrieve(invoice.payment_intent)
+      : invoice.payment_intent;
+    
+    // Si el payment intent no está confirmado, confirmarlo
+    if (paymentIntent.status === 'requires_confirmation') {
+      await stripe.paymentIntents.confirm(paymentIntent.id);
+    }
+  }
+
+  return stripeSubscription;
+};
+
 // Manejar webhook de Stripe
 export const handleStripeWebhook = async (event: Stripe.Event) => {
   if (!stripe) {
@@ -192,6 +319,11 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutCompleted(session);
+      break;
+    }
+    case 'payment_intent.succeeded': {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await handlePaymentIntentSucceeded(paymentIntent);
       break;
     }
     case 'customer.subscription.created':
@@ -217,6 +349,79 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
     }
     default:
       console.log(`Unhandled event type: ${event.type}`);
+  }
+};
+
+// Manejar Payment Intent exitoso (pagos embebidos)
+const handlePaymentIntentSucceeded = async (paymentIntent: Stripe.PaymentIntent) => {
+  const metadata = paymentIntent.metadata;
+  if (!metadata) return;
+
+  const type = metadata.type;
+
+  if (type === 'roam') {
+    const userId = metadata.userId;
+    const profileId = metadata.profileId;
+    const duration = parseInt(metadata.duration || '60');
+    const price = parseFloat(metadata.price || '6.49');
+
+    // Activar RoAM
+    const startTime = new Date();
+    const endTime = new Date(startTime.getTime() + duration * 60 * 1000);
+
+    // Actualizar perfil
+    await prisma.profile.update({
+      where: { id: profileId },
+      data: {
+        isRoaming: true,
+        roamingUntil: endTime,
+      },
+    });
+
+    // Crear sesión de RoAM
+    const previousSession = await prisma.roamSession.findFirst({
+      where: {
+        profileId,
+        isActive: false,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const currentViews = previousSession
+      ? (previousSession.viewsBeforeRoam + (previousSession.viewsDuringRoam || 0))
+      : 0;
+
+    const currentLikes = await prisma.like.count({
+      where: { toProfileId: profileId },
+    });
+
+    await prisma.roamSession.create({
+      data: {
+        profileId,
+        startTime,
+        endTime,
+        viewsBeforeRoam: currentViews,
+        likesBeforeRoam: currentLikes,
+        isActive: true,
+      },
+    });
+
+    // Crear registro de compra
+    await prisma.roamPurchase.create({
+      data: {
+        profileId,
+        duration,
+        price,
+        startTime,
+        endTime,
+        stripeSessionId: paymentIntent.id,
+        stripePaymentIntentId: paymentIntent.id,
+      },
+    });
+
+    console.log(`✅ RoAM activado para perfil ${profileId} (${duration} minutos) via Payment Intent`);
   }
 };
 
