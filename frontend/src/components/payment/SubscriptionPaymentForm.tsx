@@ -94,6 +94,18 @@ export default function SubscriptionPaymentForm({
         <PaymentElement
           options={{
             layout: 'tabs',
+            appearance: {
+              theme: 'night',
+              variables: {
+                colorPrimary: '#FCD34D',
+                colorBackground: '#111827',
+                colorText: '#FFFFFF',
+                colorDanger: '#EF4444',
+                fontFamily: 'system-ui, sans-serif',
+                spacingUnit: '4px',
+                borderRadius: '8px',
+              },
+            },
           }}
         />
       </div>
