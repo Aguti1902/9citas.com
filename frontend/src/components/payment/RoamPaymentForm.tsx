@@ -153,7 +153,7 @@ function RoamPaymentFormContent({
                 borderRadius: '8px',
               },
             },
-          }}
+          } as any}
         />
       </div>
 

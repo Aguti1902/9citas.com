@@ -164,7 +164,7 @@ function PaymentFormContent({
                 borderRadius: '8px',
               },
             },
-          }}
+          } as any}
         />
       </div>
 
