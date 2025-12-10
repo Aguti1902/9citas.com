@@ -86,7 +86,7 @@ export default function PlusPage() {
     setIsCanceling(true)
     try {
       // Cancelar suscripción directamente
-      await api.post('/subscription/cancel')
+      await api.post('/subscriptions/cancel')
       
       // Recargar datos del usuario
       await refreshUserData()
