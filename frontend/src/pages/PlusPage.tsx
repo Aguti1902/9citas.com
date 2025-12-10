@@ -85,19 +85,18 @@ export default function PlusPage() {
   const handleCancel = async () => {
     setIsCanceling(true)
     try {
-      // Crear sesión del portal de cliente de Stripe
-      const response = await api.post('/payments/customer-portal')
-      const { url } = response.data
+      // Cancelar suscripción directamente
+      await api.post('/subscription/cancel')
       
-      // Redirigir al portal de Stripe donde puede cancelar
-      if (url) {
-        window.location.href = url
-      } else {
-        throw new Error('No se recibió URL del portal')
-      }
+      // Recargar datos del usuario
+      await refreshUserData()
+      
+      // Cerrar modal y mostrar mensaje de éxito
+      setShowCancelModal(false)
+      showToast('Suscripción cancelada exitosamente. Mantendrás acceso hasta el final del periodo de facturación.', 'success')
     } catch (error: any) {
-      console.error('Error al crear sesión del portal:', error)
-      alert(error.response?.data?.error || 'Error al acceder al portal de gestión')
+      console.error('Error al cancelar suscripción:', error)
+      showToast(error.response?.data?.error || 'Error al cancelar suscripción', 'error')
       setIsCanceling(false)
     }
   }

@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { stripe } from '../services/stripe.service';
 
 const prisma = new PrismaClient();
 
@@ -61,6 +62,10 @@ export const activateSubscription = async (req: AuthRequest, res: Response) => {
 // Cancelar suscripción
 export const cancelSubscription = async (req: AuthRequest, res: Response) => {
   try {
+    if (!stripe) {
+      return res.status(500).json({ error: 'Stripe no está configurado' });
+    }
+
     const subscription = await prisma.subscription.findUnique({
       where: { userId: req.userId! },
     });
@@ -69,17 +74,49 @@ export const cancelSubscription = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'No tienes una suscripción activa' });
     }
 
-    await prisma.subscription.update({
-      where: { userId: req.userId! },
-      data: {
-        isActive: false,
-      },
-    });
+    // Si hay una suscripción de Stripe activa, cancelarla
+    if (subscription.stripeSubscriptionId) {
+      try {
+        // Cancelar la suscripción en Stripe
+        // Al cancelar inmediatamente, el usuario pierde acceso al final del periodo actual
+        await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+        
+        // El webhook customer.subscription.deleted actualizará la BD automáticamente
+        // Pero también lo actualizamos aquí por si acaso
+        await prisma.subscription.update({
+          where: { userId: req.userId! },
+          data: {
+            isActive: false,
+            stripeStatus: 'canceled',
+          },
+        });
+      } catch (stripeError: any) {
+        console.error('Error al cancelar suscripción en Stripe:', stripeError);
+        // Si falla en Stripe, aún así actualizamos localmente
+        await prisma.subscription.update({
+          where: { userId: req.userId! },
+          data: {
+            isActive: false,
+          },
+        });
+      }
+    } else {
+      // Si no hay suscripción de Stripe, solo actualizar localmente
+      await prisma.subscription.update({
+        where: { userId: req.userId! },
+        data: {
+          isActive: false,
+        },
+      });
+    }
 
-    res.json({ message: 'Suscripción cancelada' });
-  } catch (error) {
+    res.json({ 
+      message: 'Suscripción cancelada exitosamente',
+      canceled: true,
+    });
+  } catch (error: any) {
     console.error('Error al cancelar suscripción:', error);
-    res.status(500).json({ error: 'Error al cancelar suscripción' });
+    res.status(500).json({ error: error.message || 'Error al cancelar suscripción' });
   }
 };
 
