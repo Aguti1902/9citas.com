@@ -713,7 +713,7 @@ export default function NavigatePage() {
       >
         <div className="space-y-4">
           <p className="text-gray-300">
-            <strong className="text-accent">Aumenta tu visibilidad 10x</strong> durante 1 hora y aparece en los primeros resultados para todos los usuarios.
+            <strong className="text-accent">Aumenta tu visibilidad 10x</strong> y aparece en los primeros resultados para todos los usuarios.
           </p>
           
           <div className="bg-gradient-to-r from-accent/10 to-yellow-500/10 border border-accent/30 rounded-lg p-4">
@@ -737,15 +737,73 @@ export default function NavigatePage() {
               </li>
             </ul>
           </div>
-          
-          <div className="bg-gray-800 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white font-semibold">Duración:</span>
-              <span className="text-accent font-bold">1 hora</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-white font-semibold">Precio:</span>
-              <span className="text-accent font-bold text-2xl">6,49€</span>
+
+          {/* Selector de duración */}
+          <div className="space-y-3">
+            <h4 className="text-white font-semibold">Selecciona la duración:</h4>
+            <div className="grid grid-cols-1 gap-3">
+              {/* 1 hora */}
+              <button
+                onClick={() => {
+                  setRoamDuration(60)
+                  setRoamPrice(6.49)
+                }}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  roamDuration === 60
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="text-white font-bold">1 hora</div>
+                    <div className="text-gray-400 text-sm">Boost de visibilidad</div>
+                  </div>
+                  <div className="text-accent font-bold text-xl">6,49€</div>
+                </div>
+              </button>
+
+              {/* 2 horas */}
+              <button
+                onClick={() => {
+                  setRoamDuration(120)
+                  setRoamPrice(11.99)
+                }}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  roamDuration === 120
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="text-white font-bold">2 horas</div>
+                    <div className="text-gray-400 text-sm">Más tiempo, mejor resultado</div>
+                  </div>
+                  <div className="text-accent font-bold text-xl">11,99€</div>
+                </div>
+              </button>
+
+              {/* 4 horas */}
+              <button
+                onClick={() => {
+                  setRoamDuration(240)
+                  setRoamPrice(19.99)
+                }}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  roamDuration === 240
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="text-white font-bold">4 horas</div>
+                    <div className="text-gray-400 text-sm">Máxima visibilidad</div>
+                  </div>
+                  <div className="text-accent font-bold text-xl">19,99€</div>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -753,13 +811,11 @@ export default function NavigatePage() {
             fullWidth
             variant="accent"
             onClick={() => {
-              setRoamDuration(60)
-              setRoamPrice(6.49)
               setShowRoamModal(false)
               setShowRoamPaymentModal(true)
             }}
           >
-            Activar Roam - 6,49€
+            Activar Roam - {roamPrice.toFixed(2)}€
           </Button>
         </div>
       </Modal>
@@ -768,16 +824,51 @@ export default function NavigatePage() {
       <Modal
         isOpen={showRoamPaymentModal}
         onClose={() => setShowRoamPaymentModal(false)}
-        title="Activar RoAM"
+        title={`Activar RoAM - ${roamDuration === 60 ? '1 hora' : roamDuration === 120 ? '2 horas' : '4 horas'}`}
         maxWidth="md"
       >
         <RoamPaymentForm
           duration={roamDuration}
           price={roamPrice}
-          onSuccess={() => {
+          onSuccess={async () => {
             setShowRoamPaymentModal(false)
-            showToast('¡RoAM activado exitosamente!', 'success')
-            loadRoamStatus()
+            
+            // Esperar un momento para que el webhook procese la activación
+            // Hacer polling para verificar que RoAM está activo
+            let attempts = 0
+            const maxAttempts = 10
+            const checkInterval = 1000 // 1 segundo
+
+            const checkRoamStatus = async (): Promise<boolean> => {
+              try {
+                await loadRoamStatus()
+                // Verificar si RoAM está activo revisando el estado del perfil
+                const updatedUser = useAuthStore.getState().user
+                return updatedUser?.profile?.isRoaming || false
+              } catch (error) {
+                console.error('Error al verificar estado de RoAM:', error)
+                return false
+              }
+            }
+
+            // Esperar inicial y luego hacer polling
+            await new Promise(resolve => setTimeout(resolve, 2000))
+
+            while (attempts < maxAttempts) {
+              const isActive = await checkRoamStatus()
+              
+              if (isActive) {
+                // RoAM activado exitosamente
+                showToast(`¡RoAM activado exitosamente durante ${roamDuration === 60 ? '1 hora' : roamDuration === 120 ? '2 horas' : '4 horas'}!`, 'success')
+                return
+              }
+
+              attempts++
+              await new Promise(resolve => setTimeout(resolve, checkInterval))
+            }
+
+            // Si después de todos los intentos no se activó, mostrar mensaje
+            showToast('Pago procesado. RoAM se activará en breve', 'info')
           }}
           onCancel={() => setShowRoamPaymentModal(false)}
         />
