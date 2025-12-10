@@ -355,9 +355,44 @@ export const confirmSubscriptionController = async (req: AuthRequest, res: Respo
       paymentMethodId
     );
 
+    // Si la suscripción está activa, activarla en la base de datos inmediatamente
+    if (subscription.status === 'active') {
+      const currentPeriodStart = (subscription as any).current_period_start;
+      const currentPeriodEnd = (subscription as any).current_period_end;
+      const startDate = currentPeriodStart 
+        ? new Date(currentPeriodStart * 1000)
+        : new Date();
+      const endDate = currentPeriodEnd
+        ? new Date(currentPeriodEnd * 1000)
+        : new Date();
+
+      await prisma.subscription.upsert({
+        where: { userId: req.userId },
+        update: {
+          isActive: true,
+          startDate,
+          endDate,
+          stripeSubscriptionId: subscription.id,
+          stripeStatus: subscription.status,
+          stripePriceId: subscription.items.data[0]?.price.id || null,
+        },
+        create: {
+          userId: req.userId,
+          plan: '9plus',
+          isActive: true,
+          startDate,
+          endDate,
+          stripeSubscriptionId: subscription.id,
+          stripeStatus: subscription.status,
+          stripePriceId: subscription.items.data[0]?.price.id || null,
+        },
+      });
+    }
+
     res.json({
       subscriptionId: subscription.id,
       status: subscription.status,
+      isActive: subscription.status === 'active',
     });
   } catch (error: any) {
     console.error('Error al confirmar suscripción:', error);

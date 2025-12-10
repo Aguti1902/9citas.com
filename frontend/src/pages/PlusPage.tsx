@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
+import { showToast } from '@/store/toastStore'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import Logo from '@/components/common/Logo'
@@ -10,6 +11,7 @@ export default function PlusPage() {
   const { user, refreshUserData } = useAuthStore()
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)
   const isPremium = user?.subscription?.isActive || false
 
@@ -34,9 +36,46 @@ export default function PlusPage() {
     setShowPaymentModal(true)
   }
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
     setShowPaymentModal(false)
-    refreshUserData()
+    
+    // Esperar un momento para que el webhook procese la suscripción
+    // Hacer polling para verificar que la suscripción está activa
+    let attempts = 0
+    const maxAttempts = 10
+    const checkInterval = 1000 // 1 segundo
+
+    const checkSubscription = async (): Promise<boolean> => {
+      try {
+        await refreshUserData()
+        const updatedUser = useAuthStore.getState().user
+        return updatedUser?.subscription?.isActive || false
+      } catch (error) {
+        console.error('Error al verificar suscripción:', error)
+        return false
+      }
+    }
+
+    // Esperar inicial y luego hacer polling
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    while (attempts < maxAttempts) {
+      const isActive = await checkSubscription()
+      
+      if (isActive) {
+        // Suscripción activada exitosamente
+        setShowSuccessModal(true)
+        showToast('¡Bienvenido a 9Plus! Tu suscripción está activa', 'success')
+        return
+      }
+
+      attempts++
+      await new Promise(resolve => setTimeout(resolve, checkInterval))
+    }
+
+    // Si después de todos los intentos no se activó, mostrar mensaje
+    showToast('Pago procesado. Tu suscripción se activará en breve', 'info')
+    setShowSuccessModal(true)
   }
 
   const handlePaymentCancel = () => {
@@ -322,6 +361,49 @@ export default function PlusPage() {
           onSuccess={handlePaymentSuccess}
           onCancel={handlePaymentCancel}
         />
+      </Modal>
+
+      {/* Modal de éxito */}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false)
+          refreshUserData()
+        }}
+        title=""
+        maxWidth="sm"
+      >
+        <div className="text-center py-6">
+          <div className="mb-4 inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-accent to-warning rounded-full">
+            <span className="text-4xl">⭐</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-3">
+            ¡Bienvenido a 9Plus!
+          </h3>
+          <p className="text-gray-300 mb-4">
+            Tu suscripción está <strong className="text-accent">activa</strong>. Ahora puedes disfrutar de todas las funciones premium.
+          </p>
+          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 rounded-lg p-4 mb-4">
+            <p className="text-white font-semibold mb-2">🚀 Funciones activas:</p>
+            <ul className="text-gray-300 text-sm space-y-1 text-left">
+              <li>✓ Perfiles ilimitados</li>
+              <li>✓ Ver distancia y ciudad exacta</li>
+              <li>✓ Ver todos los "Me gusta"</li>
+              <li>✓ Todos los filtros premium</li>
+              <li>✓ Función RoAM disponible</li>
+            </ul>
+          </div>
+          <Button
+            fullWidth
+            variant="accent"
+            onClick={() => {
+              setShowSuccessModal(false)
+              refreshUserData()
+            }}
+          >
+            ¡Empezar a usar 9Plus!
+          </Button>
+        </div>
       </Modal>
     </div>
   )
