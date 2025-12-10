@@ -287,25 +287,54 @@ export const confirmSubscriptionWithPaymentMethod = async (
       },
     ],
     default_payment_method: paymentMethodId,
+    payment_behavior: 'default_incomplete',
+    payment_settings: {
+      save_default_payment_method: 'on_subscription',
+    },
     expand: ['latest_invoice.payment_intent'],
     metadata: {
       userId,
     },
   });
 
-  // Si la primera factura requiere pago inmediato, confirmarlo
+  // Obtener y procesar la factura inicial
   const invoice = stripeSubscription.latest_invoice as Stripe.Invoice;
-  if (invoice && (invoice as any).payment_intent) {
-    const paymentIntentId = (invoice as any).payment_intent;
-    const paymentIntent = typeof paymentIntentId === 'string'
-      ? await stripe.paymentIntents.retrieve(paymentIntentId)
-      : paymentIntentId;
+  if (invoice && invoice.payment_intent) {
+    const paymentIntentId = typeof invoice.payment_intent === 'string'
+      ? invoice.payment_intent
+      : invoice.payment_intent.id;
     
-    // Si el payment intent no está confirmado, confirmarlo
-    if (paymentIntent && paymentIntent.status === 'requires_confirmation') {
-      await stripe.paymentIntents.confirm(paymentIntent.id);
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    
+    // Confirmar el payment intent con el método de pago
+    if (paymentIntent.status === 'requires_confirmation' || paymentIntent.status === 'requires_payment_method') {
+      await stripe.paymentIntents.confirm(paymentIntentId, {
+        payment_method: paymentMethodId,
+      });
     }
   }
+
+  // Actualizar la suscripción en la base de datos inmediatamente
+  const currentPeriodStart = stripeSubscription.current_period_start
+    ? new Date(stripeSubscription.current_period_start * 1000)
+    : new Date();
+  const currentPeriodEnd = stripeSubscription.current_period_end
+    ? new Date(stripeSubscription.current_period_end * 1000)
+    : new Date();
+
+  await prisma.subscription.update({
+    where: { userId },
+    data: {
+      isActive: stripeSubscription.status === 'active' || stripeSubscription.status === 'trialing',
+      startDate: currentPeriodStart,
+      endDate: currentPeriodEnd,
+      stripeSubscriptionId: stripeSubscription.id,
+      stripeStatus: stripeSubscription.status,
+      stripePriceId: stripeSubscription.items.data[0]?.price.id || null,
+    },
+  });
+
+  console.log(`✅ Suscripción creada y activada para usuario ${userId}`);
 
   return stripeSubscription;
 };

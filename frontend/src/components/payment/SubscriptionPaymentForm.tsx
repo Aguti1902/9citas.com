@@ -104,6 +104,8 @@ function PaymentFormContent({
     setError(null)
 
     try {
+      console.log('Iniciando confirmación de setup intent...')
+      
       // Confirmar el setup intent para guardar el método de pago
       const { error: confirmError, setupIntent } = await stripe.confirmSetup({
         elements,
@@ -111,10 +113,13 @@ function PaymentFormContent({
       })
 
       if (confirmError) {
+        console.error('Error al confirmar setup intent:', confirmError)
         setError(confirmError.message || 'Error al procesar el pago')
         setIsProcessing(false)
         return
       }
+
+      console.log('Setup intent confirmado:', setupIntent?.id)
 
       // Obtener el payment method ID
       const paymentMethodId = setupIntent?.payment_method
@@ -124,22 +129,34 @@ function PaymentFormContent({
         : null
 
       if (!paymentMethodId) {
+        console.error('No se pudo obtener el payment method ID')
         setError('No se pudo obtener el método de pago')
         setIsProcessing(false)
         return
       }
 
+      console.log('Payment method ID obtenido:', paymentMethodId)
+      console.log('Confirmando suscripción en backend...')
+
       // Confirmar la suscripción con el método de pago guardado
-      await api.post('/payments/subscription/confirm', {
+      const confirmResponse = await api.post('/payments/subscription/confirm', {
         paymentMethodId,
       })
 
+      console.log('Suscripción confirmada:', confirmResponse.data)
+
+      // Esperar un momento para que el webhook procese
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
       // Recargar datos del usuario
+      console.log('Recargando datos del usuario...')
       await refreshUserData()
 
+      console.log('Suscripción completada exitosamente')
       onSuccess()
     } catch (err: any) {
       console.error('Error al procesar suscripción:', err)
+      console.error('Detalles del error:', err.response?.data)
       setError(err.response?.data?.error || err.message || 'Error al procesar el pago')
     } finally {
       setIsProcessing(false)
