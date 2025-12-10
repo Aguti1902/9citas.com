@@ -158,10 +158,24 @@ function PaymentFormContent({
                 colorPrimary: '#FCD34D',
                 colorBackground: '#111827',
                 colorText: '#FFFFFF',
+                colorTextSecondary: '#FFFFFF',
                 colorDanger: '#EF4444',
+                colorIcon: '#FFFFFF',
                 fontFamily: 'system-ui, sans-serif',
                 spacingUnit: '4px',
                 borderRadius: '8px',
+              },
+              rules: {
+                '.Label': {
+                  color: '#FFFFFF',
+                },
+                '.Input': {
+                  color: '#FFFFFF',
+                  backgroundColor: '#1F2937',
+                },
+                '.Input::placeholder': {
+                  color: '#9CA3AF',
+                },
               },
             },
           } as any}
