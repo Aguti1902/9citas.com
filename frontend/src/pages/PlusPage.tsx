@@ -9,7 +9,6 @@ import SubscriptionPaymentForm from '@/components/payment/SubscriptionPaymentFor
 
 export default function PlusPage() {
   const { user, refreshUserData } = useAuthStore()
-  const [isActivating, setIsActivating] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)

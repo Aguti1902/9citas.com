@@ -295,13 +295,14 @@ export const confirmSubscriptionWithPaymentMethod = async (
 
   // Si la primera factura requiere pago inmediato, confirmarlo
   const invoice = stripeSubscription.latest_invoice as Stripe.Invoice;
-  if (invoice && invoice.payment_intent) {
-    const paymentIntent = typeof invoice.payment_intent === 'string'
-      ? await stripe.paymentIntents.retrieve(invoice.payment_intent)
-      : invoice.payment_intent;
+  if (invoice && (invoice as any).payment_intent) {
+    const paymentIntentId = (invoice as any).payment_intent;
+    const paymentIntent = typeof paymentIntentId === 'string'
+      ? await stripe.paymentIntents.retrieve(paymentIntentId)
+      : paymentIntentId;
     
     // Si el payment intent no está confirmado, confirmarlo
-    if (paymentIntent.status === 'requires_confirmation') {
+    if (paymentIntent && paymentIntent.status === 'requires_confirmation') {
       await stripe.paymentIntents.confirm(paymentIntent.id);
     }
   }
