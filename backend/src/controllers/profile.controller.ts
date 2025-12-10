@@ -270,18 +270,12 @@ export const searchProfiles = async (req: AuthRequest, res: Response) => {
       }
     }
     
-    // RECIENTES: Para TODOS (gratis y premium) - FORZAR Online o conectados hace menos de 2h
+    // RECIENTES: Solo perfiles conectados hace 2 horas o menos
     if (filter === 'recent') {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 horas atrás
-      // Usar AND con OR para asegurar que se aplica correctamente
-      where.AND = [
-        {
-          OR: [
-            { isOnline: true }, // Usuarios online ahora
-            { lastSeenAt: { gte: twoHoursAgo } }, // Conectados en las últimas 2 horas
-          ]
-        }
-      ];
+      where.lastSeenAt = {
+        gte: twoHoursAgo, // Solo conectados en las últimas 2 horas
+      };
     }
 
     // Buscar perfiles
