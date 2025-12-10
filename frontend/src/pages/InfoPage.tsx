@@ -1,6 +1,5 @@
 import Logo from '@/components/common/Logo'
 import Button from '@/components/common/Button'
-import { useNavigate } from 'react-router-dom'
 import { BookOpen, FileText, Shield, Cookie, Users } from 'lucide-react'
 import { useState } from 'react'
 import TermsAndConditions from '@/components/legal/TermsAndConditions'
@@ -11,7 +10,6 @@ import CommunityGuidelines from '@/components/legal/CommunityGuidelines'
 type LegalTab = 'info' | 'terms' | 'privacy' | 'cookies' | 'community'
 
 export default function InfoPage() {
-  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<LegalTab>('info')
 
   const handleShowTutorial = () => {
