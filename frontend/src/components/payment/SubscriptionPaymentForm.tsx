@@ -153,37 +153,37 @@ function PaymentFormContent({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-gray-900 rounded-lg p-4">
+      <div className="bg-white rounded-lg p-4">
         <PaymentElement
           options={{
             layout: 'tabs',
             appearance: {
-              theme: 'night',
+              theme: 'stripe',
               variables: {
                 colorPrimary: '#FCD34D',
-                colorBackground: '#111827',
-                colorText: '#FFFFFF',
-                colorTextSecondary: '#E5E7EB',
+                colorBackground: '#FFFFFF',
+                colorText: '#000000',
+                colorTextSecondary: '#4B5563',
                 colorTextPlaceholder: '#9CA3AF',
                 colorDanger: '#EF4444',
-                colorIcon: '#FFFFFF',
+                colorIcon: '#000000',
                 fontFamily: 'system-ui, sans-serif',
                 spacingUnit: '4px',
                 borderRadius: '8px',
               },
               rules: {
                 '.Label': {
-                  color: '#FFFFFF !important',
+                  color: '#1F2937 !important',
                 },
                 'label': {
-                  color: '#FFFFFF !important',
+                  color: '#1F2937 !important',
                 },
                 '.Field label': {
-                  color: '#FFFFFF !important',
+                  color: '#1F2937 !important',
                 },
                 '.Input': {
-                  color: '#FFFFFF',
-                  backgroundColor: '#1F2937',
+                  color: '#000000',
+                  backgroundColor: '#FFFFFF',
                 },
                 '.Input::placeholder': {
                   color: '#9CA3AF',
@@ -192,10 +192,10 @@ function PaymentFormContent({
                   color: '#9CA3AF',
                 },
                 '.Input--empty': {
-                  color: '#FFFFFF',
+                  color: '#000000',
                 },
                 '.Input--focus': {
-                  color: '#FFFFFF',
+                  color: '#000000',
                 },
               },
             },
