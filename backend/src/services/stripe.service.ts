@@ -299,18 +299,20 @@ export const confirmSubscriptionWithPaymentMethod = async (
 
   // Obtener y procesar la factura inicial
   const invoice = stripeSubscription.latest_invoice as Stripe.Invoice;
-  if (invoice && invoice.payment_intent) {
-    const paymentIntentId = typeof invoice.payment_intent === 'string'
-      ? invoice.payment_intent
-      : invoice.payment_intent.id;
+  if (invoice && (invoice as any).payment_intent) {
+    const paymentIntentId = typeof (invoice as any).payment_intent === 'string'
+      ? (invoice as any).payment_intent
+      : (invoice as any).payment_intent.id;
     
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    
-    // Confirmar el payment intent con el método de pago
-    if (paymentIntent.status === 'requires_confirmation' || paymentIntent.status === 'requires_payment_method') {
-      await stripe.paymentIntents.confirm(paymentIntentId, {
-        payment_method: paymentMethodId,
-      });
+    if (paymentIntentId) {
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      // Confirmar el payment intent con el método de pago
+      if (paymentIntent && (paymentIntent.status === 'requires_confirmation' || paymentIntent.status === 'requires_payment_method')) {
+        await stripe.paymentIntents.confirm(paymentIntentId, {
+          payment_method: paymentMethodId,
+        });
+      }
     }
   }
 
