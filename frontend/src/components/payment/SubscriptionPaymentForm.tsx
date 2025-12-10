@@ -1,8 +1,26 @@
 import { useState, useEffect } from 'react'
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { PaymentElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import { api } from '@/services/api'
 import Button from '@/components/common/Button'
 import { useAuthStore } from '@/store/authStore'
+
+// Cargar Stripe con la clave pública
+let stripePromise: Promise<any> | null = null
+
+const getStripe = async () => {
+  if (!stripePromise) {
+    try {
+      const response = await api.get('/payments/publishable-key')
+      const { publishableKey } = response.data
+      stripePromise = loadStripe(publishableKey)
+    } catch (error) {
+      console.error('Error al cargar clave pública de Stripe:', error)
+      throw error
+    }
+  }
+  return stripePromise
+}
 
 interface SubscriptionPaymentFormProps {
   onSuccess: () => void
@@ -13,17 +31,19 @@ export default function SubscriptionPaymentForm({
   onSuccess,
   onCancel,
 }: SubscriptionPaymentFormProps) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const { refreshUserData } = useAuthStore()
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [stripe, setStripe] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  // Crear Setup Intent al montar el componente
+  // Crear Setup Intent y cargar Stripe al montar el componente
   useEffect(() => {
-    const createSetupIntent = async () => {
+    const initialize = async () => {
       try {
+        // Cargar Stripe
+        const stripeInstance = await getStripe()
+        setStripe(stripeInstance)
+
+        // Crear Setup Intent
         const setupResponse = await api.post('/payments/subscription/setup-intent')
         setClientSecret(setupResponse.data.clientSecret)
       } catch (err: any) {
@@ -31,13 +51,52 @@ export default function SubscriptionPaymentForm({
       }
     }
 
-    createSetupIntent()
+    initialize()
   }, [])
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-red-500">{error}</div>
+      </div>
+    )
+  }
+
+  if (!clientSecret || !stripe) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-gray-400">Preparando pago...</div>
+      </div>
+    )
+  }
+
+  return (
+    <Elements stripe={stripe} options={{ clientSecret }}>
+      <PaymentFormContent
+        onSuccess={onSuccess}
+        onCancel={onCancel}
+      />
+    </Elements>
+  )
+}
+
+function PaymentFormContent({
+  onSuccess,
+  onCancel,
+}: {
+  onSuccess: () => void
+  onCancel: () => void
+}) {
+  const stripe = useStripe()
+  const elements = useElements()
+  const { refreshUserData } = useAuthStore()
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!stripe || !elements || !clientSecret) {
+    if (!stripe || !elements) {
       return
     }
 
@@ -48,7 +107,6 @@ export default function SubscriptionPaymentForm({
       // Confirmar el setup intent para guardar el método de pago
       const { error: confirmError, setupIntent } = await stripe.confirmSetup({
         elements,
-        clientSecret,
         redirect: 'if_required',
       })
 
@@ -82,7 +140,7 @@ export default function SubscriptionPaymentForm({
       onSuccess()
     } catch (err: any) {
       console.error('Error al procesar suscripción:', err)
-      setError(err.response?.data?.error || 'Error al procesar el pago')
+      setError(err.response?.data?.error || err.message || 'Error al procesar el pago')
     } finally {
       setIsProcessing(false)
     }

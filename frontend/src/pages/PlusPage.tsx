@@ -4,7 +4,6 @@ import { useAuthStore } from '@/store/authStore'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import Logo from '@/components/common/Logo'
-import StripeProvider from '@/components/payment/StripeProvider'
 import SubscriptionPaymentForm from '@/components/payment/SubscriptionPaymentForm'
 
 export default function PlusPage() {
@@ -319,12 +318,10 @@ export default function PlusPage() {
         title="Suscribirse a 9Plus"
         maxWidth="md"
       >
-        <StripeProvider>
-          <SubscriptionPaymentForm
-            onSuccess={handlePaymentSuccess}
-            onCancel={handlePaymentCancel}
-          />
-        </StripeProvider>
+        <SubscriptionPaymentForm
+          onSuccess={handlePaymentSuccess}
+          onCancel={handlePaymentCancel}
+        />
       </Modal>
     </div>
   )

@@ -5,6 +5,7 @@ import { api } from '@/services/api'
 
 interface StripeProviderProps {
   children: React.ReactNode
+  clientSecret?: string
 }
 
 // Cargar Stripe con la clave pública
@@ -24,7 +25,7 @@ const getStripe = async () => {
   return stripePromise
 }
 
-export default function StripeProvider({ children }: StripeProviderProps) {
+export default function StripeProvider({ children, clientSecret }: StripeProviderProps) {
   const [stripe, setStripe] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -55,6 +56,18 @@ export default function StripeProvider({ children }: StripeProviderProps) {
     )
   }
 
-  return <Elements stripe={stripe}>{children}</Elements>
+  if (!clientSecret) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-gray-400">Preparando pago...</div>
+      </div>
+    )
+  }
+
+  return (
+    <Elements stripe={stripe} options={{ clientSecret }}>
+      {children}
+    </Elements>
+  )
 }
 

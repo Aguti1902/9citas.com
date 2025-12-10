@@ -1,7 +1,25 @@
 import { useState, useEffect } from 'react'
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { PaymentElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import { api } from '@/services/api'
 import Button from '@/components/common/Button'
+
+// Cargar Stripe con la clave pública
+let stripePromise: Promise<any> | null = null
+
+const getStripe = async () => {
+  if (!stripePromise) {
+    try {
+      const response = await api.get('/payments/publishable-key')
+      const { publishableKey } = response.data
+      stripePromise = loadStripe(publishableKey)
+    } catch (error) {
+      console.error('Error al cargar clave pública de Stripe:', error)
+      throw error
+    }
+  }
+  return stripePromise
+}
 
 interface RoamPaymentFormProps {
   duration: number // minutos
@@ -16,16 +34,19 @@ export default function RoamPaymentForm({
   onSuccess,
   onCancel,
 }: RoamPaymentFormProps) {
-  const stripe = useStripe()
-  const elements = useElements()
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [stripe, setStripe] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Crear Payment Intent al montar el componente
+  // Crear Payment Intent y cargar Stripe al montar el componente
   useEffect(() => {
-    const createPaymentIntent = async () => {
+    const initialize = async () => {
       try {
+        // Cargar Stripe
+        const stripeInstance = await getStripe()
+        setStripe(stripeInstance)
+
+        // Crear Payment Intent
         const response = await api.post('/payments/roam/payment-intent', {
           duration,
         })
@@ -35,13 +56,54 @@ export default function RoamPaymentForm({
       }
     }
 
-    createPaymentIntent()
+    initialize()
   }, [duration])
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-red-500">{error}</div>
+      </div>
+    )
+  }
+
+  if (!clientSecret || !stripe) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-gray-400">Preparando pago...</div>
+      </div>
+    )
+  }
+
+  return (
+    <Elements stripe={stripe} options={{ clientSecret }}>
+      <RoamPaymentFormContent
+        price={price}
+        onSuccess={onSuccess}
+        onCancel={onCancel}
+      />
+    </Elements>
+  )
+}
+
+function RoamPaymentFormContent({
+  price,
+  onSuccess,
+  onCancel,
+}: {
+  price: number
+  onSuccess: () => void
+  onCancel: () => void
+}) {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!stripe || !elements || !clientSecret) {
+    if (!stripe || !elements) {
       return
     }
 
@@ -51,7 +113,6 @@ export default function RoamPaymentForm({
     try {
       const { error: confirmError } = await stripe.confirmPayment({
         elements,
-        clientSecret,
         redirect: 'if_required',
       })
 
@@ -72,14 +133,6 @@ export default function RoamPaymentForm({
       setError(err.response?.data?.error || 'Error al procesar el pago')
       setIsProcessing(false)
     }
-  }
-
-  if (!clientSecret) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <div className="text-gray-400">Preparando pago...</div>
-      </div>
-    )
   }
 
   return (
@@ -124,7 +177,7 @@ export default function RoamPaymentForm({
           type="submit"
           variant="accent"
           isLoading={isProcessing}
-          disabled={!stripe || isProcessing || !clientSecret}
+          disabled={!stripe || isProcessing}
           fullWidth
         >
           Pagar {price.toFixed(2)}€

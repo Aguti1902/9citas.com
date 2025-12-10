@@ -11,7 +11,6 @@ import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Modal from '@/components/common/Modal'
 import Button from '@/components/common/Button'
 import RoamStatusContent from '@/components/common/RoamStatusContent'
-import StripeProvider from '@/components/payment/StripeProvider'
 import RoamPaymentForm from '@/components/payment/RoamPaymentForm'
 import { useNavigate } from 'react-router-dom'
 import { LayoutGrid, Layers, Zap, Share2 } from 'lucide-react'
@@ -772,18 +771,16 @@ export default function NavigatePage() {
         title="Activar RoAM"
         maxWidth="md"
       >
-        <StripeProvider>
-          <RoamPaymentForm
-            duration={roamDuration}
-            price={roamPrice}
-            onSuccess={() => {
-              setShowRoamPaymentModal(false)
-              showToast('¡RoAM activado exitosamente!', 'success')
-              loadRoamStatus()
-            }}
-            onCancel={() => setShowRoamPaymentModal(false)}
-          />
-        </StripeProvider>
+        <RoamPaymentForm
+          duration={roamDuration}
+          price={roamPrice}
+          onSuccess={() => {
+            setShowRoamPaymentModal(false)
+            showToast('¡RoAM activado exitosamente!', 'success')
+            loadRoamStatus()
+          }}
+          onCancel={() => setShowRoamPaymentModal(false)}
+        />
       </Modal>
 
       {/* Modal de éxito de Roam */}
