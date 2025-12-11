@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Share2, X, Instagram, Youtube, Music } from 'lucide-react'
+import { Globe, X, Instagram, Youtube, Music } from 'lucide-react'
 
 const socialLinks = [
   {
@@ -62,7 +62,7 @@ export default function SocialMediaMenu() {
         className="text-gray-300 hover:text-white transition-colors relative"
         title="Redes sociales"
       >
-        <Share2 className="w-5 h-5 sm:w-6 sm:h-6" />
+        <Globe className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       {/* Menú desplegable */}
