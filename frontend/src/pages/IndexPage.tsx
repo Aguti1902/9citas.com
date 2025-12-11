@@ -39,7 +39,7 @@ export default function IndexPage() {
           <Button
             fullWidth
             variant="outline"
-            disabled
+            onClick={() => window.location.href = 'https://google.com'}
             className="text-lg py-4"
           >
             No tengo 18 años
