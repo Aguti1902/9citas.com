@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { useEffect } from 'react'
+import CookieBanner from './components/common/CookieBanner'
 
 // Páginas
 import IndexPage from './pages/IndexPage'
@@ -29,9 +30,11 @@ function App() {
   }, [initAuth])
 
   return (
-    <Routes>
-      {/* Rutas públicas */}
-      <Route path="/" element={isAuthenticated ? <Navigate to="/app" /> : <IndexPage />} />
+    <>
+      <CookieBanner />
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/" element={isAuthenticated ? <Navigate to="/app" /> : <IndexPage />} />
       <Route path="/login/:orientation" element={<LoginPage />} />
       <Route path="/register/:orientation" element={<RegisterPage />} />
       <Route path="/email-sent" element={<EmailSentPage />} />
@@ -80,7 +83,8 @@ function App() {
 
       {/* Redirección por defecto */}
       <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }
 
