@@ -128,6 +128,12 @@ export function useScreenshotProtection() {
 
     // Monitoreo continuo de cambios sospechosos
     let monitoringInterval: ReturnType<typeof setInterval> | null = null
+    let lastWindowState = {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      outerWidth: window.outerWidth,
+      outerHeight: window.outerHeight,
+    }
     
     const startMonitoring = () => {
       monitoringInterval = setInterval(() => {
@@ -135,7 +141,25 @@ export function useScreenshotProtection() {
         if (document.hidden) {
           triggerBlock()
         }
-      }, 100) // Verificar cada 100ms
+        
+        // Detectar cambios en el tamaño de la ventana (posible captura)
+        const currentState = {
+          innerWidth: window.innerWidth,
+          innerHeight: window.innerHeight,
+          outerWidth: window.outerWidth,
+          outerHeight: window.outerHeight,
+        }
+        
+        // Si hay cambios significativos y la ventana está oculta, podría ser una captura
+        if (document.hidden && (
+          Math.abs(currentState.innerWidth - lastWindowState.innerWidth) > 10 ||
+          Math.abs(currentState.innerHeight - lastWindowState.innerHeight) > 10
+        )) {
+          triggerBlock()
+        }
+        
+        lastWindowState = currentState
+      }, 50) // Verificar cada 50ms (más frecuente)
     }
 
     // Agregar event listeners con capture para interceptar antes
