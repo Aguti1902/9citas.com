@@ -123,60 +123,24 @@ export default function PlusPage() {
           <h3 className="text-2xl font-bold text-white mb-4">Plan Gratis</h3>
           <ul className="space-y-2.5 text-gray-300 text-sm">
             <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Ver solo los primeros 50 perfiles de tu ubicación</span>
+              <span className="text-green-500 mr-2 mt-0.5">✓</span>
+              <span>Ver hasta 50 perfiles en tu ubicación actual <span className="text-accent">(los primeros 50 usuarios)</span></span>
             </li>
             <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Chatear con cualquiera (sin restricciones de ciudad)</span>
+              <span className="text-green-500 mr-2 mt-0.5">✓</span>
+              <span>Chatear con cualquier usuario <span className="text-accent">(sin restricciones)</span></span>
             </li>
             <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin ver distancia exacta a usuarios</span>
+              <span className="text-green-500 mr-2 mt-0.5">✓</span>
+              <span>Ver los últimos 5 "Me gusta" recibidos</span>
             </li>
             <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin ver ciudad de los usuarios</span>
+              <span className="text-green-500 mr-2 mt-0.5">✓</span>
+              <span>Filtros básicos: <strong>TODOS</strong>, <strong>RECIENTES</strong>, <strong>NUEVOS</strong></span>
             </li>
             <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Ver solo los últimos 5 "Me gusta" recibidos</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin filtros por distancia</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin filtros por edad</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin filtro de usuarios online</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin filtro por género (hetero)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin filtro por tipo de relación</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin filtro por ROL (gay)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin confirmación de lectura de mensajes</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin función RoAM (boost de visibilidad)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 mt-0.5">✗</span>
-              <span>Sin cambiar ubicación manualmente</span>
+              <span className="text-green-500 mr-2 mt-0.5">✓</span>
+              <span>Solicitar y compartir fotos privadas</span>
             </li>
           </ul>
         </div>
@@ -187,67 +151,44 @@ export default function PlusPage() {
             PREMIUM
           </div>
           
-          <h3 className="text-2xl font-bold text-white mb-4">Plan 9Plus</h3>
+          <h3 className="text-2xl font-bold text-white mb-1">Plan 9Plus</h3>
+          <p className="text-accent font-bold text-lg mb-4">5 €/mes</p>
           <ul className="space-y-2.5 text-white text-sm">
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Perfiles ilimitados</strong> - Ver todos los perfiles sin límite</span>
+              <span>Perfiles ilimitados <span className="text-accent">(sin límite de 50)</span></span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Chat sin restricciones</strong> - Chatear con cualquiera desde cualquier ciudad</span>
+              <span>Filtros avanzados: distancia, edad, género, tipo de relación, ROL <span className="text-accent">(gay)</span></span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Distancia exacta</strong> - Ver la distancia en km a cada usuario</span>
+              <span>Ver distancia exacta en km a cada usuario</span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Ver ciudad</strong> - Ver la ciudad de todos los usuarios</span>
+              <span>Ver ciudad de todos los usuarios</span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Todos los "Me gusta"</strong> - Ver todos los likes que recibes, sin límite</span>
+              <span>Ver todos los "Me gusta" recibidos <span className="text-accent">(sin límite)</span></span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Filtro por distancia</strong> - Filtrar perfiles por rango de distancia</span>
+              <span>Confirmación de lectura de mensajes <span className="text-accent">(✓✓ leído)</span></span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Filtro por edad</strong> - Filtrar por rango de edad personalizado</span>
+              <span>Función RoAM: boost de visibilidad 10x <span className="text-accent">(6,49€/hora)</span></span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Filtro de usuarios online</strong> - Ver solo usuarios conectados ahora</span>
+              <span>Cambiar ubicación manualmente cuando quieras</span>
             </li>
             <li className="flex items-start">
               <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Filtro por género</strong> - Filtrar por género (solo hetero)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Filtro por tipo de relación</strong> - Amistad, Relación seria, Solo sexo</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Filtro por ROL</strong> - Activo, Pasivo, Versátil (solo gay)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Confirmación de lectura</strong> - Ver si tus mensajes fueron leídos (✓✓ leído)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Función RoAM</strong> - Boost de visibilidad 10x durante 1 hora (6,49€)</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Cambiar ubicación</strong> - Cambiar tu ciudad manualmente cuando quieras</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-accent mr-2 mt-0.5 font-bold">✓</span>
-              <span><strong>Prioridad en resultados</strong> - Apareces primero en las búsquedas</span>
+              <span>Prioridad en resultados de búsqueda</span>
             </li>
           </ul>
         </div>
