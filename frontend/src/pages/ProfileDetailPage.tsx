@@ -237,7 +237,10 @@ export default function ProfileDetailPage() {
       />
       
       {/* Contenido de la página - oculto cuando hay captura bloqueada */}
-      <div className={`max-w-4xl mx-auto pb-8 ${showScreenshotBlocked ? 'opacity-0 pointer-events-none' : ''}`}>
+      <div 
+        className={`max-w-4xl mx-auto pb-8 ${showScreenshotBlocked ? 'opacity-0 pointer-events-none fixed inset-0 -z-10' : ''}`}
+        style={showScreenshotBlocked ? { visibility: 'hidden' } : {}}
+      >
       {/* Carrusel de fotos - Solo fotos públicas */}
       <div className="relative aspect-[3/4] bg-gray-900">
         {photos.length > 0 && currentPhoto ? (
