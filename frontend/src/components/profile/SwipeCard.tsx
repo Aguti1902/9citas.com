@@ -2,7 +2,6 @@ import { useState, useRef } from 'react'
 import { Heart, X, MapPin, Briefcase, Ruler, Clock, Zap } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
 import { formatRelationshipGoal, formatGender, formatRole } from '@/utils/profileUtils'
-import ProtectedImage from '@/components/common/ProtectedImage'
 
 interface SwipeCardProps {
   profile: any
@@ -139,10 +138,11 @@ export default function SwipeCard({
             }}
           >
             {currentPhoto ? (
-              <ProtectedImage
+              <img
                 src={currentPhoto.url}
                 alt={profile.title}
-                className="w-full h-full"
+                className="w-full h-full object-cover"
+                draggable={false}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-800">

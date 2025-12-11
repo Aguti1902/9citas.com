@@ -9,7 +9,6 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Image, MapPin, Lock, Star } from 'lucide-react'
 import { getSocket } from '@/services/socket'
-import ProtectedImage from '@/components/common/ProtectedImage'
 
 export default function ChatPage() {
   const { profileId } = useParams()
@@ -343,10 +342,10 @@ export default function ChatPage() {
           <div className="relative">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800">
               {coverPhoto ? (
-                <ProtectedImage
+                <img
                   src={coverPhoto.url}
                   alt={profile.title}
-                  className="w-full h-full"
+                  className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600">
@@ -421,7 +420,7 @@ export default function ChatPage() {
                 >
                   {message.text && <p>{message.text}</p>}
                   {message.photo && (
-                    <ProtectedImage
+                    <img
                       src={message.photo.url}
                       alt="Foto"
                       className="rounded-lg mt-1 max-w-full cursor-pointer hover:opacity-90"

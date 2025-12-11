@@ -14,8 +14,6 @@ import { api } from '@/services/api'
 import { connectSocket, disconnectSocket, getSocket } from '@/services/socket'
 import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Lock, Bookmark } from 'lucide-react'
 import SocialMediaMenu from '../common/SocialMediaMenu'
-import { useScreenshotProtection } from '@/hooks/useScreenshotProtection'
-import ScreenshotBlockedModal from '../common/ScreenshotBlockedModal'
 
 export default function DashboardLayout() {
   const location = useLocation()
@@ -28,8 +26,6 @@ export default function DashboardLayout() {
   const [showRoamSummary, setShowRoamSummary] = useState(false)
   const [roamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const { showScreenshotBlocked, closeModal } = useScreenshotProtection()
-
   // Conectar Socket.IO cuando hay token
   useEffect(() => {
     if (accessToken) {
@@ -198,23 +194,7 @@ export default function DashboardLayout() {
   ]
 
   return (
-    <>
-      {/* Modal de captura bloqueada - Global */}
-      <ScreenshotBlockedModal
-        isOpen={showScreenshotBlocked}
-        onClose={closeModal}
-      />
-      
-      <div 
-        className={`dashboard-layout min-h-screen bg-dark ${showScreenshotBlocked ? 'opacity-0 pointer-events-none' : ''}`}
-        style={{ 
-          height: '100vh', 
-          overflow: 'hidden', 
-          position: 'fixed', 
-          width: '100%',
-          ...(showScreenshotBlocked ? { visibility: 'hidden', position: 'fixed', top: '-9999px', left: '-9999px' } : {})
-        }}
-      >
+    <div className="dashboard-layout min-h-screen bg-dark" style={{ height: '100vh', overflow: 'hidden', position: 'fixed', width: '100%' }}>
       {/* Header - FIJO ARRIBA - NO SE MUEVE */}
       <header 
         className="dashboard-header bg-gray-900" 

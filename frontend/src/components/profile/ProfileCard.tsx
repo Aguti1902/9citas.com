@@ -4,7 +4,6 @@ import { api } from '@/services/api'
 import { Heart, MapPin, Clock, Zap } from 'lucide-react'
 import { formatLastSeen } from '@/utils/timeUtils'
 import { formatRelationshipGoal, formatGender, formatRole } from '@/utils/profileUtils'
-import ProtectedImage from '@/components/common/ProtectedImage'
 
 interface ProfileCardProps {
   profile: any
@@ -70,10 +69,10 @@ export default function ProfileCard({ profile, onLikeToggle, isPremium = false }
       {/* Imagen */}
       <div className="relative aspect-[3/4] bg-gray-800 overflow-hidden">
         {coverPhoto ? (
-          <ProtectedImage
+          <img
             src={coverPhoto.url}
             alt={profile.title}
-            className="w-full h-full group-hover:scale-110 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-600">
