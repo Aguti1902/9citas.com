@@ -11,6 +11,8 @@ import ReportModal from '@/components/common/ReportModal'
 import { Lock, Eye, AlertTriangle } from 'lucide-react'
 import { formatRelationshipGoal, formatRole } from '@/utils/profileUtils'
 import ProtectedImage from '@/components/common/ProtectedImage'
+import ScreenshotBlockedModal from '@/components/common/ScreenshotBlockedModal'
+import { useScreenshotProtection } from '@/hooks/useScreenshotProtection'
 
 export default function ProfileDetailPage() {
   const { id } = useParams()
@@ -46,54 +48,13 @@ export default function ProfileDetailPage() {
   const [hasReported, setHasReported] = useState(false)
   const [isBlocked, setIsBlocked] = useState(false)
   const [showBlockModal, setShowBlockModal] = useState(false)
+  const { showScreenshotBlocked, closeModal } = useScreenshotProtection()
 
   useEffect(() => {
     loadProfile()
     checkPrivatePhotoAccess()
     loadReportData()
     checkBlockStatus()
-    
-    // Detectar intentos de captura de pantalla
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Print Screen, F12 (DevTools), Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S, Ctrl+P
-      if (
-        e.key === 'PrintScreen' ||
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-        (e.ctrlKey && e.key === 'u') ||
-        (e.ctrlKey && e.key === 's') || // Guardar página
-        (e.ctrlKey && e.key === 'p')    // Imprimir
-      ) {
-        e.preventDefault()
-        alert('⚠️ No se permiten capturas de pantalla en los perfiles de usuario para proteger la privacidad.')
-        return false
-      }
-    }
-    
-    // Detectar cambios de visibilidad (posible captura)
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Si la página se oculta, podría ser una captura
-        console.warn('Página oculta - posible intento de captura')
-      }
-    }
-    
-    // Detectar intentos de copiar
-    const handleCopy = (e: ClipboardEvent) => {
-      e.preventDefault()
-      alert('⚠️ No se permite copiar contenido de los perfiles.')
-      return false
-    }
-    
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    document.addEventListener('copy', handleCopy)
-    
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      document.removeEventListener('copy', handleCopy)
-    }
   }, [id])
 
   const loadProfile = async () => {
@@ -268,7 +229,15 @@ export default function ProfileDetailPage() {
   })
 
   return (
-    <div className="max-w-4xl mx-auto pb-8">
+    <>
+      {/* Modal de captura bloqueada */}
+      <ScreenshotBlockedModal
+        isOpen={showScreenshotBlocked}
+        onClose={closeModal}
+      />
+      
+      {/* Contenido de la página - oculto cuando hay captura bloqueada */}
+      <div className={`max-w-4xl mx-auto pb-8 ${showScreenshotBlocked ? 'opacity-0 pointer-events-none' : ''}`}>
       {/* Carrusel de fotos - Solo fotos públicas */}
       <div className="relative aspect-[3/4] bg-gray-900">
         {photos.length > 0 && currentPhoto ? (
@@ -862,7 +831,8 @@ export default function ProfileDetailPage() {
           </div>
         </div>
       </Modal>
-    </div>
+      </div>
+    </>
   )
 }
 
