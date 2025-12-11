@@ -114,7 +114,7 @@ export function useScreenshotProtection() {
     }
     
     // Detectar cuando se intenta hacer clic derecho
-    const handleContextMenu = (e: MouseEvent) => {
+    const handleContextMenu = () => {
       // Permitir clic derecho pero detectar si se intenta copiar después
       // Esto es solo para detectar, no bloqueamos el menú contextual
     }
@@ -127,7 +127,7 @@ export function useScreenshotProtection() {
     }
 
     // Monitoreo continuo de cambios sospechosos
-    let monitoringInterval: NodeJS.Timeout | null = null
+    let monitoringInterval: ReturnType<typeof setInterval> | null = null
     
     const startMonitoring = () => {
       monitoringInterval = setInterval(() => {
