@@ -37,7 +37,7 @@ export default function CookieBanner() {
   if (!showBanner) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-slide-up">
+    <div className="fixed bottom-0 left-0 right-0 z-[10000] p-4 animate-slide-up">
       <div className="max-w-4xl mx-auto bg-gray-900 border-2 border-primary/50 rounded-xl shadow-2xl p-6 relative">
         {/* Botón de cerrar */}
         <button
