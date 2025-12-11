@@ -10,7 +10,7 @@ export default function TermsAndConditions() {
       <section className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-4">1. Aceptación de los Términos</h2>
         <p className="text-gray-300 mb-4">
-          Al acceder y utilizar 9citas.com (en adelante, "el Servicio"), operado por Class Ads Entertainments LLC 
+          Al acceder y utilizar 9citas.com (en adelante, "el Servicio"), operado por SMM4U LLC Social Media Marketing Four You 
           (en adelante, "la Empresa", "nosotros" o "nuestro"), usted acepta estar legalmente vinculado por estos 
           Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar el Servicio.
         </p>
@@ -122,7 +122,7 @@ export default function TermsAndConditions() {
         <h2 className="text-2xl font-bold text-white mb-4">7. Propiedad Intelectual</h2>
         <p className="text-gray-300 mb-4">
           El Servicio, incluyendo su diseño, código fuente, logotipos, marcas comerciales y todo el contenido 
-          proporcionado por nosotros, es propiedad de Class Ads Entertainments LLC y está protegido por leyes 
+          proporcionado por nosotros, es propiedad de SMM4U LLC Social Media Marketing Four You y está protegido por leyes 
           de propiedad intelectual internacionales.
         </p>
         <p className="text-gray-300">
@@ -145,7 +145,7 @@ export default function TermsAndConditions() {
         </p>
         <h3 className="text-xl font-semibold text-white mb-3">8.3 Exclusión de Garantías</h3>
         <p className="text-gray-300">
-          EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, CLASS ADS ENTERTAINMENTS LLC RENUNCIA A TODAS LAS GARANTÍAS, 
+          EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, SMM4U LLC SOCIAL MEDIA MARKETING FOUR YOU RENUNCIA A TODAS LAS GARANTÍAS, 
           EXPRESAS O IMPLÍCITAS, INCLUYENDO GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR 
           Y NO INFRACCIÓN.
         </p>
@@ -154,7 +154,7 @@ export default function TermsAndConditions() {
       <section className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-4">9. Indemnización</h2>
         <p className="text-gray-300">
-          Usted acepta indemnizar, defender y mantener indemne a Class Ads Entertainments LLC, sus directores, 
+          Usted acepta indemnizar, defender y mantener indemne a SMM4U LLC Social Media Marketing Four You, sus directores, 
           empleados y agentes de cualquier reclamo, daño, pérdida, responsabilidad y gasto (incluyendo honorarios 
           de abogados) que surja de: (a) su uso del Servicio; (b) su violación de estos Términos; o (c) su 
           violación de cualquier derecho de terceros.
@@ -191,7 +191,7 @@ export default function TermsAndConditions() {
         <h2 className="text-2xl font-bold text-white mb-4">12. Ley Aplicable y Jurisdicción</h2>
         <p className="text-gray-300">
           Estos Términos se regirán e interpretarán de acuerdo con las leyes de Estados Unidos y del estado donde 
-          Class Ads Entertainments LLC tenga su sede principal, sin dar efecto a ningún principio de conflictos 
+          SMM4U LLC Social Media Marketing Four You tenga su sede principal, sin dar efecto a ningún principio de conflictos 
           de leyes.
         </p>
       </section>
@@ -200,7 +200,7 @@ export default function TermsAndConditions() {
         <h2 className="text-2xl font-bold text-white mb-4">13. Disposiciones Generales</h2>
         <h3 className="text-xl font-semibold text-white mb-3">13.1 Acuerdo Completo</h3>
         <p className="text-gray-300 mb-4">
-          Estos Términos constituyen el acuerdo completo entre usted y Class Ads Entertainments LLC con respecto 
+          Estos Términos constituyen el acuerdo completo entre usted y SMM4U LLC Social Media Marketing Four You con respecto 
           al uso del Servicio.
         </p>
         <h3 className="text-xl font-semibold text-white mb-3">13.2 Divisibilidad</h3>
@@ -221,7 +221,7 @@ export default function TermsAndConditions() {
           Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en:
         </p>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
-          <p><strong className="text-white">Empresa:</strong> Class Ads Entertainments LLC</p>
+          <p><strong className="text-white">Empresa:</strong> SMM4U LLC Social Media Marketing Four You</p>
           <p><strong className="text-white">Servicio:</strong> 9citas.com</p>
           <p><strong className="text-white">Email:</strong> legal@9citas.com</p>
           <p><strong className="text-white">Soporte:</strong> soporte@9citas.com</p>

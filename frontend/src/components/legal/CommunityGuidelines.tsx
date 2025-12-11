@@ -299,7 +299,7 @@ export default function CommunityGuidelines() {
           Si tienes preguntas sobre estas Normas de la Comunidad:
         </p>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
-          <p><strong className="text-white">Empresa:</strong> Class Ads Entertainments LLC</p>
+          <p><strong className="text-white">Empresa:</strong> SMM4U LLC Social Media Marketing Four You</p>
           <p><strong className="text-white">Servicio:</strong> 9citas.com</p>
           <p><strong className="text-white">Soporte:</strong> soporte@9citas.com</p>
           <p><strong className="text-white">Seguridad:</strong> safety@9citas.com</p>

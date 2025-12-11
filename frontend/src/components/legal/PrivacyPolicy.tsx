@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
       <section className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-4">1. Introducción</h2>
         <p className="text-gray-300 mb-4">
-          Class Ads Entertainments LLC ("nosotros", "nuestro" o "la Empresa") opera el servicio 9citas.com 
+          SMM4U LLC Social Media Marketing Four You ("nosotros", "nuestro" o "la Empresa") opera el servicio 9citas.com 
           (en adelante, "el Servicio"). Esta Política de Privacidad describe cómo recopilamos, usamos, 
           almacenamos y protegemos su información personal cuando utiliza nuestro Servicio.
         </p>
@@ -223,7 +223,7 @@ export default function PrivacyPolicy() {
           puede contactarnos en:
         </p>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
-          <p><strong className="text-white">Empresa:</strong> Class Ads Entertainments LLC</p>
+          <p><strong className="text-white">Empresa:</strong> SMM4U LLC Social Media Marketing Four You</p>
           <p><strong className="text-white">Servicio:</strong> 9citas.com</p>
           <p><strong className="text-white">Email de Privacidad:</strong> privacy@9citas.com</p>
           <p><strong className="text-white">Email General:</strong> soporte@9citas.com</p>

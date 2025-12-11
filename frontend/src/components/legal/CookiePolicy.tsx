@@ -20,7 +20,7 @@ export default function CookiePolicy() {
       <section className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-4">2. ¿Cómo Utilizamos las Cookies?</h2>
         <p className="text-gray-300 mb-4">
-          9citas.com, operado por Class Ads Entertainments LLC, utiliza cookies y tecnologías similares por varias razones:
+          9citas.com, operado por SMM4U LLC Social Media Marketing Four You, utiliza cookies y tecnologías similares por varias razones:
         </p>
         <ul className="list-disc list-inside text-gray-300 space-y-2">
           <li>Mantener su sesión activa mientras navega por el Servicio</li>
@@ -274,7 +274,7 @@ export default function CookiePolicy() {
           Si tiene preguntas sobre nuestra Política de Cookies, puede contactarnos en:
         </p>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
-          <p><strong className="text-white">Empresa:</strong> Class Ads Entertainments LLC</p>
+          <p><strong className="text-white">Empresa:</strong> SMM4U LLC Social Media Marketing Four You</p>
           <p><strong className="text-white">Servicio:</strong> 9citas.com</p>
           <p><strong className="text-white">Email:</strong> privacy@9citas.com</p>
           <p><strong className="text-white">Soporte:</strong> soporte@9citas.com</p>

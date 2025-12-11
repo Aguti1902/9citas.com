@@ -225,13 +225,13 @@ export default function InfoPage() {
           <h2 className="text-2xl font-bold text-white mb-4">Información de la empresa</h2>
           <div className="text-gray-300 space-y-2">
             <p>
-              <strong className="text-white">Empresa:</strong> Class Ads Entertainments LLC
+              <strong className="text-white">Empresa:</strong> SMM4U LLC Social Media Marketing Four You
             </p>
             <p>
               <strong className="text-white">Servicio:</strong> 9citas.com
             </p>
             <p className="text-sm text-gray-400 mt-4">
-              © {new Date().getFullYear()} Class Ads Entertainments LLC. Todos los derechos reservados.
+              © {new Date().getFullYear()} SMM4U LLC Social Media Marketing Four You. Todos los derechos reservados.
             </p>
           </div>
         </section>
