@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useNotificationStore } from '@/store/notificationStore'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Modal from '@/components/common/Modal'
+import Button from '@/components/common/Button'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Image, MapPin, Lock, Star } from 'lucide-react'
@@ -26,6 +27,7 @@ export default function ChatPage() {
   const [isSending, setIsSending] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showPhotoModal, setShowPhotoModal] = useState(false)
+  const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [myPhotos, setMyPhotos] = useState<any[]>([])
   const [isFavorite, setIsFavorite] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -271,9 +273,9 @@ export default function ChatPage() {
   const handleToggleFavorite = async () => {
     if (!profileId) return
     
-    // Si no es premium, redirigir a la página de 9Plus
+    // Si no es premium, mostrar modal de 9Plus
     if (!isPremium) {
-      navigate('/app/plus')
+      setShowPremiumModal(true)
       return
     }
     
@@ -287,7 +289,7 @@ export default function ChatPage() {
       }
     } catch (error: any) {
       if (error.response?.status === 403 && error.response?.data?.requiresPremium) {
-        navigate('/app/plus')
+        setShowPremiumModal(true)
       } else {
         alert(error.response?.data?.error || 'Error al actualizar favorito')
       }
@@ -612,6 +614,54 @@ export default function ChatPage() {
           >
             Eliminar
           </button>
+        </div>
+      </Modal>
+
+      {/* Modal Premium - Favoritos requiere 9Plus */}
+      <Modal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        title="Favoritos - Exclusivo 9Plus"
+        maxWidth="sm"
+      >
+        <div className="text-center py-4">
+          <div className="text-6xl mb-4">⭐</div>
+          <h3 className="text-xl font-bold text-white mb-3">
+            Los favoritos son exclusivos de 9Plus
+          </h3>
+          <p className="text-gray-400 mb-6">
+            Guarda tus perfiles favoritos con los que chateas para acceder a ellos rápidamente.
+          </p>
+          <div className="bg-gray-800 rounded-lg p-4 mb-6">
+            <p className="text-white font-semibold mb-2">Con 9Plus puedes:</p>
+            <ul className="text-left text-gray-300 text-sm space-y-2">
+              <li>⭐ Guardar perfiles favoritos</li>
+              <li>✅ Chatear con solo dar like</li>
+              <li>✅ Ver quién te ha dado like</li>
+              <li>✅ Filtrar por edad y online</li>
+              <li>✅ Chatear en cualquier ciudad</li>
+              <li>✅ Ver distancia exacta a usuarios</li>
+            </ul>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              fullWidth
+              variant="outline"
+              onClick={() => setShowPremiumModal(false)}
+            >
+              Volver
+            </Button>
+            <Button
+              fullWidth
+              variant="accent"
+              onClick={() => {
+                setShowPremiumModal(false)
+                navigate('/app/plus')
+              }}
+            >
+              Ver planes 9Plus
+            </Button>
+          </div>
         </div>
       </Modal>
       </div>
