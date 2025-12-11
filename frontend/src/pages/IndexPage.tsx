@@ -46,6 +46,16 @@ export default function IndexPage() {
           </Button>
         </div>
 
+        {/* Información sobre orientación */}
+        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-xl p-4 text-center">
+          <p className="text-white font-semibold text-base leading-relaxed">
+            Si te registras como <span className="text-primary">hetero</span>, encontrarás chicas y chicos buscando citas cerca de ti.
+          </p>
+          <p className="text-white font-semibold text-base leading-relaxed mt-2">
+            Si te registras como <span className="text-secondary">gay</span>, encontrarás chicos gays o trans buscando citas cerca de ti.
+          </p>
+        </div>
+
         {/* Aviso legal */}
         <div className="text-center text-sm text-gray-500 space-y-2 pt-4">
           <p>
