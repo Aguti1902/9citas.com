@@ -69,7 +69,7 @@ export default function LoginPage() {
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className={`${requiresVerification ? 'bg-yellow-500 bg-opacity-10 border-yellow-500' : 'bg-red-500 bg-opacity-10 border-red-500'} border text-${requiresVerification ? 'yellow' : 'red'}-500 px-4 py-3 rounded-lg`}>
+            <div className={`${requiresVerification ? 'bg-yellow-500 bg-opacity-10 border-yellow-500 text-yellow-500' : 'bg-red-500 bg-opacity-10 border-red-500 text-red-500'} border px-4 py-3 rounded-lg`}>
               <p className="mb-2">{error}</p>
               {requiresVerification && (
                 <button
