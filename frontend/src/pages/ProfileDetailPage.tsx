@@ -21,10 +21,12 @@ export default function ProfileDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLiked, setIsLiked] = useState(false)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const [currentPrivatePhotoIndex, setCurrentPrivatePhotoIndex] = useState(0)
   
   // Resetear índice cuando cambia el perfil o las fotos públicas
   useEffect(() => {
     setCurrentPhotoIndex(0)
+    setCurrentPrivatePhotoIndex(0)
   }, [id, profile?.photos])
   const [privatePhotoAccess, setPrivatePhotoAccess] = useState<any>(null)
   const [showPrivatePhotosModal, setShowPrivatePhotosModal] = useState(false)
@@ -50,6 +52,48 @@ export default function ProfileDetailPage() {
     checkPrivatePhotoAccess()
     loadReportData()
     checkBlockStatus()
+    
+    // Detectar intentos de captura de pantalla
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Print Screen, F12 (DevTools), Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S, Ctrl+P
+      if (
+        e.key === 'PrintScreen' ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+        (e.ctrlKey && e.key === 'u') ||
+        (e.ctrlKey && e.key === 's') || // Guardar página
+        (e.ctrlKey && e.key === 'p')    // Imprimir
+      ) {
+        e.preventDefault()
+        alert('⚠️ No se permiten capturas de pantalla en los perfiles de usuario para proteger la privacidad.')
+        return false
+      }
+    }
+    
+    // Detectar cambios de visibilidad (posible captura)
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Si la página se oculta, podría ser una captura
+        console.warn('Página oculta - posible intento de captura')
+      }
+    }
+    
+    // Detectar intentos de copiar
+    const handleCopy = (e: ClipboardEvent) => {
+      e.preventDefault()
+      alert('⚠️ No se permite copiar contenido de los perfiles.')
+      return false
+    }
+    
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    document.addEventListener('copy', handleCopy)
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      document.removeEventListener('copy', handleCopy)
+    }
   }, [id])
 
   const loadProfile = async () => {
@@ -458,8 +502,8 @@ export default function ProfileDetailPage() {
                       key={photo.id}
                       className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => {
-                        const photoIndex = allPhotos.findIndex((p: any) => p.id === photo.id)
-                        setCurrentPhotoIndex(photoIndex >= 0 ? photoIndex : 0)
+                        const photoIndex = privatePhotos.findIndex((p: any) => p.id === photo.id)
+                        setCurrentPrivatePhotoIndex(photoIndex >= 0 ? photoIndex : 0)
                         setShowPrivatePhotosModal(true)
                       }}
                     >
@@ -691,24 +735,24 @@ export default function ProfileDetailPage() {
       >
         <div className="relative aspect-[3/4] max-h-[70vh]">
           <ProtectedImage
-            src={photos[currentPhotoIndex]?.url}
+            src={privatePhotos[currentPrivatePhotoIndex]?.url}
             alt="Foto privada"
             className="w-full h-full"
           />
           
           {/* Navegación */}
-          {photos.length > 1 && (
+          {privatePhotos.length > 1 && (
             <div className="absolute inset-0 flex items-center justify-between px-4">
               <button
-                onClick={() => setCurrentPhotoIndex((prev) => Math.max(0, prev - 1))}
-                disabled={currentPhotoIndex === 0}
+                onClick={() => setCurrentPrivatePhotoIndex((prev) => Math.max(0, prev - 1))}
+                disabled={currentPrivatePhotoIndex === 0}
                 className="bg-black bg-opacity-50 text-white rounded-full p-3 disabled:opacity-30 hover:bg-opacity-70"
               >
                 ←
               </button>
               <button
-                onClick={() => setCurrentPhotoIndex((prev) => Math.min(photos.length - 1, prev + 1))}
-                disabled={currentPhotoIndex === photos.length - 1}
+                onClick={() => setCurrentPrivatePhotoIndex((prev) => Math.min(privatePhotos.length - 1, prev + 1))}
+                disabled={currentPrivatePhotoIndex === privatePhotos.length - 1}
                 className="bg-black bg-opacity-50 text-white rounded-full p-3 disabled:opacity-30 hover:bg-opacity-70"
               >
                 →
@@ -718,7 +762,7 @@ export default function ProfileDetailPage() {
           
           {/* Indicador */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm">
-            {currentPhotoIndex + 1} / {photos.length}
+            {currentPrivatePhotoIndex + 1} / {privatePhotos.length}
           </div>
         </div>
       </Modal>
