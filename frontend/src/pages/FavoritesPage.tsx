@@ -18,8 +18,10 @@ export default function FavoritesPage() {
   useEffect(() => {
     if (isPremium) {
       loadFavorites()
+    } else {
+      setIsLoading(false)
     }
-  }, [isPremium])
+  }, [isPremium, user?.subscription])
 
   const loadFavorites = async () => {
     setIsLoading(true)
