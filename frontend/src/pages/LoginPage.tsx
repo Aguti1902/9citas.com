@@ -15,20 +15,43 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [requiresVerification, setRequiresVerification] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isResending, setIsResending] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setRequiresVerification(false)
     setIsLoading(true)
 
     try {
       await login(email, password)
       navigate('/app')
     } catch (err: any) {
-      setError(err.message)
+      const errorMessage = err.message || 'Error al iniciar sesión'
+      setError(errorMessage)
+      
+      // Verificar si el error es por email no verificado
+      if (err.response?.data?.requiresEmailVerification) {
+        setRequiresVerification(true)
+      }
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    setIsResending(true)
+    try {
+      const { api } = await import('@/services/api')
+      await api.post('/auth/resend-verification', { email })
+      setError('Email de verificación reenviado. Por favor, revisa tu bandeja de entrada.')
+      setRequiresVerification(false)
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Error al reenviar el email de verificación')
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -46,8 +69,18 @@ export default function LoginPage() {
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg">
-              {error}
+            <div className={`${requiresVerification ? 'bg-yellow-500 bg-opacity-10 border-yellow-500' : 'bg-red-500 bg-opacity-10 border-red-500'} border text-${requiresVerification ? 'yellow' : 'red'}-500 px-4 py-3 rounded-lg`}>
+              <p className="mb-2">{error}</p>
+              {requiresVerification && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={isResending}
+                  className="text-yellow-400 hover:text-yellow-300 underline text-sm font-semibold"
+                >
+                  {isResending ? 'Reenviando...' : '¿No recibiste el email? Haz clic aquí para reenviarlo'}
+                </button>
+              )}
             </div>
           )}
 
