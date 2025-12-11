@@ -123,8 +123,7 @@ export default function ProtectedImage({ src, alt, className = '', onClick }: Pr
           msUserSelect: 'none',
           WebkitTouchCallout: 'none',
           pointerEvents: 'auto',
-          WebkitUserDrag: 'none',
-        }}
+        } as React.CSSProperties}
       />
       {/* Overlay invisible para protección adicional */}
       <div
