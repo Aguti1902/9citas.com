@@ -5,7 +5,7 @@ import ProfileCard from '@/components/profile/ProfileCard'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/common/Button'
-import { Star } from 'lucide-react'
+import { Bookmark, Star } from 'lucide-react'
 
 export default function FavoritesPage() {
   const navigate = useNavigate()
@@ -54,7 +54,7 @@ export default function FavoritesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-        <Star className="text-primary" size={32} />
+        <Bookmark className="text-primary" size={32} />
         Favoritos
       </h1>
       <p className="text-gray-400 mb-6">
@@ -65,7 +65,7 @@ export default function FavoritesPage() {
       {!isPremium && (
         <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 mb-6">
           <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2">
-            <Star className="text-white" size={24} />
+            <Bookmark className="text-white" size={24} />
             Esta función es exclusiva de 9Plus
           </h3>
           <p className="text-white mb-4">
@@ -86,7 +86,7 @@ export default function FavoritesPage() {
         <LoadingSpinner />
       ) : favorites.length === 0 ? (
         <div className="text-center py-12">
-          <Star className="text-gray-600 mx-auto mb-4" size={64} />
+          <Bookmark className="text-gray-600 mx-auto mb-4" size={64} />
           <p className="text-gray-400 text-lg mb-2">
             Aún no tienes favoritos
           </p>
@@ -108,7 +108,7 @@ export default function FavoritesPage() {
                 className="absolute top-2 right-2 bg-red-500/90 hover:bg-red-600 text-white rounded-full p-2 transition-colors z-10"
                 title="Quitar de favoritos"
               >
-                <Star className="fill-current" size={16} />
+                <Bookmark className="fill-current" size={16} />
               </button>
             </div>
           ))}

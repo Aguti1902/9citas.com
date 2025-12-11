@@ -367,19 +367,21 @@ export default function ChatPage() {
         </button>
 
         <div className="flex items-center gap-3">
-          {isPremium && (
-            <button
-              onClick={handleToggleFavorite}
-              className={`transition-colors ${
-                isFavorite 
-                  ? 'text-primary hover:text-primary/80' 
-                  : 'text-gray-400 hover:text-primary'
-              }`}
-              title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-            >
-              <Star className={isFavorite ? 'fill-current' : ''} size={20} />
-            </button>
-          )}
+          <button
+            onClick={isPremium ? handleToggleFavorite : () => navigate('/app/plus')}
+            className={`transition-colors ${
+              isPremium 
+                ? (isFavorite 
+                    ? 'text-primary hover:text-primary/80' 
+                    : 'text-gray-400 hover:text-primary')
+                : 'text-gray-500 hover:text-gray-400 opacity-50 cursor-not-allowed'
+            }`}
+            title={isPremium 
+              ? (isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos')
+              : 'Requiere 9Plus - Ver planes'}
+          >
+            <Star className={isFavorite && isPremium ? 'fill-current' : ''} size={20} />
+          </button>
           <button
             onClick={() => setShowDeleteModal(true)}
             className="text-gray-400 hover:text-red-500 transition-colors"
