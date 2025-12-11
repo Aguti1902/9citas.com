@@ -412,3 +412,24 @@ a {
   user-select: text !important;
 }
 
+/* Overlay de protección contra capturas - siempre presente pero invisible */
+.screenshot-protection-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: black !important;
+  z-index: 99998 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.1s ease !important;
+}
+
+.screenshot-protection-overlay.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
