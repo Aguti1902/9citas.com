@@ -13,6 +13,7 @@ import Modal from '../common/Modal'
 import { api } from '@/services/api'
 import { connectSocket, disconnectSocket, getSocket } from '@/services/socket'
 import { Search, MessageCircle, Heart, Star, Info, User, LogOut, Lock, Bookmark } from 'lucide-react'
+import SocialMediaMenu from '../common/SocialMediaMenu'
 
 export default function DashboardLayout() {
   const location = useLocation()
@@ -214,6 +215,9 @@ export default function DashboardLayout() {
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
+            {/* Redes sociales */}
+            <SocialMediaMenu />
+            
             {/* Notificaciones de fotos privadas */}
             <button
               onClick={() => navigate('/app/private-photo-requests')}
