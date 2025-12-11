@@ -10,7 +10,7 @@ export default function ScreenshotBlockedModal({ isOpen, onClose }: ScreenshotBl
 
   return (
     <div 
-      className="fixed inset-0 z-[99999] bg-black flex items-center justify-center"
+      className="screenshot-blocked-modal fixed inset-0 z-[99999] bg-black flex items-center justify-center"
       style={{
         position: 'fixed',
         top: 0,
@@ -18,6 +18,7 @@ export default function ScreenshotBlockedModal({ isOpen, onClose }: ScreenshotBl
         right: 0,
         bottom: 0,
         zIndex: 99999,
+        visibility: 'visible !important' as any,
       }}
     >
       <div className="text-center px-6 max-w-sm w-full">
