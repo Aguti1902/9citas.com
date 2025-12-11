@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, requireProfile } from '../middleware/auth.middleware';
+import { authenticateToken, requireProfile, require9Plus } from '../middleware/auth.middleware';
 import * as favoriteController from '../controllers/favorite.controller';
 
 const router = Router();
@@ -7,14 +7,14 @@ const router = Router();
 router.use(authenticateToken);
 router.use(requireProfile);
 
-// Agregar a favoritos
-router.post('/:profileId', favoriteController.addFavorite);
+// Agregar a favoritos (solo 9Plus)
+router.post('/:profileId', require9Plus, favoriteController.addFavorite);
 
-// Quitar de favoritos
-router.delete('/:profileId', favoriteController.removeFavorite);
+// Quitar de favoritos (solo 9Plus)
+router.delete('/:profileId', require9Plus, favoriteController.removeFavorite);
 
-// Obtener favoritos
-router.get('/', favoriteController.getFavorites);
+// Obtener favoritos (solo 9Plus)
+router.get('/', require9Plus, favoriteController.getFavorites);
 
 export default router;
 

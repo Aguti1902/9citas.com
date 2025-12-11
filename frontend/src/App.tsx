@@ -13,6 +13,7 @@ import DashboardLayout from './components/layout/DashboardLayout'
 import NavigatePage from './pages/NavigatePage'
 import ProfileDetailPage from './pages/ProfileDetailPage'
 import LikesPage from './pages/LikesPage'
+import FavoritesPage from './pages/FavoritesPage'
 import InboxPage from './pages/InboxPage'
 import ChatPage from './pages/ChatPage'
 import PlusPage from './pages/PlusPage'
@@ -70,6 +71,7 @@ function App() {
         <Route index element={<NavigatePage />} />
         <Route path="profile/:id" element={<ProfileDetailPage />} />
         <Route path="likes" element={<LikesPage />} />
+        <Route path="favorites" element={<FavoritesPage />} />
         <Route path="inbox" element={<InboxPage />} />
         <Route path="chat/:profileId" element={<ChatPage />} />
         <Route path="plus" element={<PlusPage />} />

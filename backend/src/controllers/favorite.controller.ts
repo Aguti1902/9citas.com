@@ -56,10 +56,11 @@ export const removeFavorite = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Obtener favoritos
+// Obtener favoritos - solo perfiles con conversación activa (mensajes)
 export const getFavorites = async (req: AuthRequest, res: Response) => {
   try {
-    const favorites = await prisma.favorite.findMany({
+    // Obtener todos los favoritos del usuario
+    const allFavorites = await prisma.favorite.findMany({
       where: { ownerProfileId: req.profileId! },
       include: {
         targetProfile: {
@@ -73,6 +74,36 @@ export const getFavorites = async (req: AuthRequest, res: Response) => {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Filtrar solo los que tienen mensajes (conversación activa)
+    const favoritesWithMessages = await Promise.all(
+      allFavorites.map(async (favorite) => {
+        // Verificar si hay mensajes entre el usuario y este perfil
+        const messageCount = await prisma.message.count({
+          where: {
+            OR: [
+              {
+                fromProfileId: req.profileId!,
+                toProfileId: favorite.targetProfileId,
+              },
+              {
+                fromProfileId: favorite.targetProfileId,
+                toProfileId: req.profileId!,
+              },
+            ],
+          },
+        });
+
+        // Solo incluir si hay al menos 1 mensaje (conversación activa)
+        if (messageCount > 0) {
+          return favorite;
+        }
+        return null;
+      })
+    );
+
+    // Filtrar los nulls
+    const favorites = favoritesWithMessages.filter((f) => f !== null);
 
     res.json({ favorites });
   } catch (error) {

@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner'
 import Modal from '@/components/common/Modal'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Image, MapPin, Lock } from 'lucide-react'
+import { Image, MapPin, Lock, Star } from 'lucide-react'
 import { getSocket } from '@/services/socket'
 
 export default function ChatPage() {
@@ -26,6 +26,7 @@ export default function ChatPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showPhotoModal, setShowPhotoModal] = useState(false)
   const [myPhotos, setMyPhotos] = useState<any[]>([])
+  const [isFavorite, setIsFavorite] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -34,7 +35,10 @@ export default function ChatPage() {
     loadProfile()
     loadMessages()
     loadMyPhotos()
-  }, [profileId])
+    if (isPremium && profileId) {
+      checkFavorite()
+    }
+  }, [profileId, isPremium])
 
   // Polling cada segundo para recibir mensajes nuevos (respaldo de Socket.IO)
   useEffect(() => {
@@ -240,6 +244,43 @@ export default function ChatPage() {
     )
   }
 
+  const checkFavorite = async () => {
+    if (!isPremium || !profileId) return
+    try {
+      const response = await api.get('/favorites')
+      const favorites = response.data.favorites || []
+      const isFav = favorites.some((fav: any) => fav.targetProfileId === profileId)
+      setIsFavorite(isFav)
+    } catch (error) {
+      // Si no es premium, no mostrar error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const err = error as any
+        if (err.response?.status !== 403) {
+          console.error('Error al verificar favorito:', error)
+        }
+      }
+    }
+  }
+
+  const handleToggleFavorite = async () => {
+    if (!isPremium || !profileId) return
+    try {
+      if (isFavorite) {
+        await api.delete(`/favorites/${profileId}`)
+        setIsFavorite(false)
+      } else {
+        await api.post(`/favorites/${profileId}`)
+        setIsFavorite(true)
+      }
+    } catch (error: any) {
+      if (error.response?.status === 403 && error.response?.data?.requiresPremium) {
+        alert('Esta función requiere suscripción 9Plus')
+      } else {
+        alert(error.response?.data?.error || 'Error al actualizar favorito')
+      }
+    }
+  }
+
   const handleDeleteConversation = async () => {
     try {
       await api.delete(`/messages/${profileId}`)
@@ -324,13 +365,28 @@ export default function ChatPage() {
           </div>
         </button>
 
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="text-gray-400 hover:text-red-500 transition-colors"
-          title="Eliminar conversación"
-        >
-          🗑️
-        </button>
+        <div className="flex items-center gap-3">
+          {isPremium && (
+            <button
+              onClick={handleToggleFavorite}
+              className={`transition-colors ${
+                isFavorite 
+                  ? 'text-primary hover:text-primary/80' 
+                  : 'text-gray-400 hover:text-primary'
+              }`}
+              title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            >
+              <Star className={isFavorite ? 'fill-current' : ''} size={20} />
+            </button>
+          )}
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="text-gray-400 hover:text-red-500 transition-colors"
+            title="Eliminar conversación"
+          >
+            🗑️
+          </button>
+        </div>
       </div>
 
       {/* Mensajes - Con padding para header global + header del chat + input */}

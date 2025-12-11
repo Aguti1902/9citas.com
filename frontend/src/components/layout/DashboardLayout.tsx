@@ -182,10 +182,13 @@ export default function DashboardLayout() {
     navigate('/')
   }
 
+  const isPremium = user?.subscription?.isActive || false
+  
   const navItems = [
     { path: '/app', label: 'Navegar', Icon: Search },
     { path: '/app/inbox', label: 'Buzón', Icon: MessageCircle },
     { path: '/app/likes', label: 'Me gusta', Icon: Heart },
+    ...(isPremium ? [{ path: '/app/favorites', label: 'Favoritos', Icon: Star }] : []),
     { path: '/app/plus', label: '9Plus', Icon: Star },
     { path: '/app/info', label: 'Info', Icon: Info },
   ]
