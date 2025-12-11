@@ -10,6 +10,7 @@ import MatchModal from '@/components/common/MatchModal'
 import ReportModal from '@/components/common/ReportModal'
 import { Lock, Eye, AlertTriangle } from 'lucide-react'
 import { formatRelationshipGoal, formatRole } from '@/utils/profileUtils'
+import ProtectedImage from '@/components/common/ProtectedImage'
 
 export default function ProfileDetailPage() {
   const { id } = useParams()
@@ -45,6 +46,7 @@ export default function ProfileDetailPage() {
   const [hasReported, setHasReported] = useState(false)
   const [isBlocked, setIsBlocked] = useState(false)
   const [showBlockModal, setShowBlockModal] = useState(false)
+
   useEffect(() => {
     loadProfile()
     checkPrivatePhotoAccess()
@@ -229,10 +231,10 @@ export default function ProfileDetailPage() {
       <div className="relative aspect-[3/4] bg-gray-900">
         {photos.length > 0 && currentPhoto ? (
           <>
-            <img
+            <ProtectedImage
               src={currentPhoto.url}
               alt={profile.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full"
             />
 
             {/* Navegación de fotos - Flechas mejoradas */}
@@ -463,10 +465,10 @@ export default function ProfileDetailPage() {
                         setShowPrivatePhotosModal(true)
                       }}
                     >
-                      <img
+                      <ProtectedImage
                         src={photo.url}
                         alt={`Privada ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
                       />
                     </div>
                   ))}
@@ -501,10 +503,10 @@ export default function ProfileDetailPage() {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {privatePhotos.map((photo: any, index: number) => (
                       <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
-                        <img
+                        <ProtectedImage
                           src={photo.url}
                           alt={`Privada ${index + 1}`}
-                          className="w-full h-full object-cover filter blur-md"
+                          className="w-full h-full filter blur-md"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
                           <Lock className="w-8 h-8 text-white" />
@@ -525,10 +527,10 @@ export default function ProfileDetailPage() {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {privatePhotos.map((photo: any, index: number) => (
                       <div key={photo.id} className="aspect-square rounded-lg overflow-hidden relative">
-                        <img
+                        <ProtectedImage
                           src={photo.url}
                           alt={`Privada ${index + 1}`}
-                          className="w-full h-full object-cover filter blur-md"
+                          className="w-full h-full filter blur-md"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
                           <Lock className="w-8 h-8 text-white" />
@@ -690,10 +692,10 @@ export default function ProfileDetailPage() {
         maxWidth="lg"
       >
         <div className="relative aspect-[3/4] max-h-[70vh]">
-          <img
+          <ProtectedImage
             src={privatePhotos[currentPrivatePhotoIndex]?.url}
             alt="Foto privada"
-            className="w-full h-full object-contain"
+            className="w-full h-full"
           />
           
           {/* Navegación */}
@@ -818,8 +820,7 @@ export default function ProfileDetailPage() {
           </div>
         </div>
       </Modal>
-      </div>
-    </>
+    </div>
   )
 }
 

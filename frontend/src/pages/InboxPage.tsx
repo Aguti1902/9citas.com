@@ -4,6 +4,7 @@ import { api } from '@/services/api'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
+import ProtectedImage from '@/components/common/ProtectedImage'
 
 export default function InboxPage() {
   const navigate = useNavigate()
@@ -63,10 +64,10 @@ export default function InboxPage() {
                 <div className="relative flex-shrink-0">
                   <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-800">
                     {coverPhoto ? (
-                      <img
+                      <ProtectedImage
                         src={coverPhoto.url}
                         alt={conv.profile.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-600">

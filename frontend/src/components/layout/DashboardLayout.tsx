@@ -26,6 +26,7 @@ export default function DashboardLayout() {
   const [showRoamSummary, setShowRoamSummary] = useState(false)
   const [roamSummary] = useState({ viewsExtra: 0, likesExtra: 0, duration: 0 })
   const [showOnboarding, setShowOnboarding] = useState(false)
+
   // Conectar Socket.IO cuando hay token
   useEffect(() => {
     if (accessToken) {
@@ -188,7 +189,7 @@ export default function DashboardLayout() {
     { path: '/app', label: 'Navegar', Icon: Search },
     { path: '/app/inbox', label: 'Buzón', Icon: MessageCircle },
     { path: '/app/likes', label: 'Me gusta', Icon: Heart },
-    { path: '/app/favorites', label: 'Favoritos', Icon: Bookmark },
+    ...(isPremium ? [{ path: '/app/favorites', label: 'Favoritos', Icon: Bookmark }] : []),
     { path: '/app/plus', label: '9Plus', Icon: Star },
     { path: '/app/info', label: 'Info', Icon: Info },
   ]

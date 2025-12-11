@@ -371,4 +371,44 @@ div[class*="bg-gray-900"][class*="fixed top-14"] {
   animation: slideUp 0.5s ease-out;
 }
 
+/* ====================================================
+   PROTECCIÓN CONTRA CAPTURAS DE PANTALLA
+   ==================================================== */
+
+/* Prevenir selección y arrastre de imágenes de perfiles */
+img[src*="cloudinary"],
+img[src*="res.cloudinary"],
+img[alt*="Foto"],
+img[alt*="Privada"],
+img[alt*="perfil"],
+img[alt*="profile"] {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: auto !important;
+}
+
+/* Prevenir menú contextual globalmente (se puede hacer clic derecho pero no funciona) */
+body {
+  -webkit-touch-callout: none;
+}
+
+/* Permitir selección de texto en inputs, textareas y contenido editable */
+input,
+textarea,
+[contenteditable="true"],
+button,
+a {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
 

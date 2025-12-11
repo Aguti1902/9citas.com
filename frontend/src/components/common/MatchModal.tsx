@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Heart } from 'lucide-react'
+import ProtectedImage from './ProtectedImage'
 
 interface MatchModalProps {
   isOpen: boolean
@@ -66,10 +67,10 @@ export default function MatchModal({ isOpen, onClose, matchedProfile }: MatchMod
         <div className="relative mb-6">
           <div className="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-primary shadow-2xl">
             {coverPhoto ? (
-              <img
+              <ProtectedImage
                 src={coverPhoto.url}
                 alt={matchedProfile.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-800 text-6xl">

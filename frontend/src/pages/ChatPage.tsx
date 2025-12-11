@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Image, MapPin, Lock, Star } from 'lucide-react'
 import { getSocket } from '@/services/socket'
+import ProtectedImage from '@/components/common/ProtectedImage'
 
 export default function ChatPage() {
   const { profileId } = useParams()
@@ -35,7 +36,7 @@ export default function ChatPage() {
     loadProfile()
     loadMessages()
     loadMyPhotos()
-    if (isPremium && profileId) {
+    if (profileId) {
       checkFavorite()
     }
   }, [profileId, isPremium])
@@ -245,7 +246,12 @@ export default function ChatPage() {
   }
 
   const checkFavorite = async () => {
-    if (!isPremium || !profileId) return
+    if (!profileId) return
+    // Verificar favorito solo si es premium
+    if (!isPremium) {
+      setIsFavorite(false)
+      return
+    }
     try {
       const response = await api.get('/favorites')
       const favorites = response.data.favorites || []
@@ -263,7 +269,14 @@ export default function ChatPage() {
   }
 
   const handleToggleFavorite = async () => {
-    if (!isPremium || !profileId) return
+    if (!profileId) return
+    
+    // Si no es premium, redirigir a la página de 9Plus
+    if (!isPremium) {
+      navigate('/app/plus')
+      return
+    }
+    
     try {
       if (isFavorite) {
         await api.delete(`/favorites/${profileId}`)
@@ -274,7 +287,7 @@ export default function ChatPage() {
       }
     } catch (error: any) {
       if (error.response?.status === 403 && error.response?.data?.requiresPremium) {
-        alert('Esta función requiere suscripción 9Plus')
+        navigate('/app/plus')
       } else {
         alert(error.response?.data?.error || 'Error al actualizar favorito')
       }
@@ -342,10 +355,10 @@ export default function ChatPage() {
           <div className="relative">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800">
               {coverPhoto ? (
-                <img
+                <ProtectedImage
                   src={coverPhoto.url}
                   alt={profile.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600">
@@ -367,17 +380,21 @@ export default function ChatPage() {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={isPremium ? handleToggleFavorite : () => navigate('/app/plus')}
+            onClick={handleToggleFavorite}
             className={`transition-colors ${
-              isPremium 
-                ? (isFavorite 
-                    ? 'text-primary hover:text-primary/80' 
-                    : 'text-gray-400 hover:text-primary')
-                : 'text-gray-500 hover:text-gray-400 opacity-50 cursor-not-allowed'
+              isPremium
+                ? isFavorite 
+                  ? 'text-primary hover:text-primary/80' 
+                  : 'text-gray-400 hover:text-primary'
+                : 'text-gray-500 hover:text-gray-400 opacity-50'
             }`}
-            title={isPremium 
-              ? (isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos')
-              : 'Requiere 9Plus - Ver planes'}
+            title={
+              isPremium
+                ? isFavorite 
+                  ? 'Quitar de favoritos' 
+                  : 'Agregar a favoritos'
+                : 'Requiere 9Plus - Haz clic para ver planes'
+            }
           >
             <Star className={isFavorite && isPremium ? 'fill-current' : ''} size={20} />
           </button>
@@ -420,7 +437,7 @@ export default function ChatPage() {
                 >
                   {message.text && <p>{message.text}</p>}
                   {message.photo && (
-                    <img
+                    <ProtectedImage
                       src={message.photo.url}
                       alt="Foto"
                       className="rounded-lg mt-1 max-w-full cursor-pointer hover:opacity-90"
