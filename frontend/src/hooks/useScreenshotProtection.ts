@@ -6,15 +6,34 @@ export function useScreenshotProtection() {
   const lastFocusChange = useRef<number>(Date.now())
 
   useEffect(() => {
+    // Crear overlay de protección si no existe
+    let protectionOverlay: HTMLDivElement | null = null
+    const createOverlay = () => {
+      if (!protectionOverlay) {
+        protectionOverlay = document.createElement('div')
+        protectionOverlay.className = 'screenshot-protection-overlay'
+        protectionOverlay.id = 'screenshot-protection-overlay'
+        document.body.appendChild(protectionOverlay)
+      }
+      return protectionOverlay
+    }
+
     // Función para activar el bloqueo
     const triggerBlock = () => {
       setShowScreenshotBlocked(true)
       document.body.style.overflow = 'hidden'
-      // Ocultar todo el contenido
-      const allElements = document.querySelectorAll('*')
+      
+      // Activar overlay de protección
+      const overlay = createOverlay()
+      overlay.classList.add('active')
+      
+      // Ocultar todo el contenido de forma más agresiva
+      const allElements = document.querySelectorAll('body > *')
       allElements.forEach((el) => {
-        if (el instanceof HTMLElement && !el.classList.contains('screenshot-blocked-modal')) {
-          el.style.visibility = 'hidden'
+        if (el instanceof HTMLElement && 
+            !el.classList.contains('screenshot-blocked-modal') &&
+            el.id !== 'screenshot-protection-overlay') {
+          el.style.display = 'none'
         }
       })
     }
@@ -145,11 +164,20 @@ export function useScreenshotProtection() {
         clearInterval(monitoringInterval)
       }
       document.body.style.overflow = ''
+      
+      // Eliminar overlay si existe
+      const overlay = document.getElementById('screenshot-protection-overlay')
+      if (overlay) {
+        overlay.remove()
+      }
+      
       // Restaurar visibilidad de elementos
-      const allElements = document.querySelectorAll('*')
+      const allElements = document.querySelectorAll('body > *')
       allElements.forEach((el) => {
-        if (el instanceof HTMLElement) {
-          el.style.visibility = ''
+        if (el instanceof HTMLElement && 
+            !el.classList.contains('screenshot-blocked-modal') &&
+            el.id !== 'screenshot-protection-overlay') {
+          el.style.display = ''
         }
       })
     }
@@ -158,11 +186,20 @@ export function useScreenshotProtection() {
   const closeModal = () => {
     setShowScreenshotBlocked(false)
     document.body.style.overflow = ''
+    
+    // Desactivar overlay
+    const overlay = document.getElementById('screenshot-protection-overlay')
+    if (overlay) {
+      overlay.classList.remove('active')
+    }
+    
     // Restaurar visibilidad de elementos
-    const allElements = document.querySelectorAll('*')
+    const allElements = document.querySelectorAll('body > *')
     allElements.forEach((el) => {
-      if (el instanceof HTMLElement) {
-        el.style.visibility = ''
+      if (el instanceof HTMLElement && 
+          !el.classList.contains('screenshot-blocked-modal') &&
+          el.id !== 'screenshot-protection-overlay') {
+        el.style.display = ''
       }
     })
   }
