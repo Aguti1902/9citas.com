@@ -461,27 +461,33 @@ export default function ChatPage() {
                     </div>
                   )}
                   
-                  {/* Hora y confirmación de lectura */}
+                  {/* Hora */}
                   <div className="flex items-center gap-2 text-xs opacity-70 mt-1">
                     <span>{time}</span>
-                    {isOwn && (
-                      isPremium ? (
-                        // Usuario 9Plus: Mostrar estado de lectura
-                        <span className="flex items-center gap-1">
-                          {message.isRead ? (
-                            <span className="text-blue-400 font-semibold">✓✓ leído</span>
-                          ) : (
-                            <span className="text-gray-400">✓ enviado</span>
-                          )}
-                        </span>
-                      ) : (
-                        // Usuario FREE: Mensaje de upgrade
-                        <span className="text-yellow-400 text-[10px] cursor-pointer" onClick={() => navigate('/app/plus')} title="Contrata 9Plus">
-                          🔒 9Plus
-                        </span>
-                      )
+                    {isOwn && !isPremium && (
+                      // Usuario FREE: Mensaje de upgrade
+                      <span className="text-yellow-400 text-[10px] cursor-pointer" onClick={() => navigate('/app/plus')} title="Contrata 9Plus">
+                        🔒 9Plus
+                      </span>
                     )}
                   </div>
+                  
+                  {/* Confirmación de lectura - Debajo del mensaje */}
+                  {isOwn && isPremium && (
+                    <div className="mt-1 text-xs">
+                      {message.isRead ? (
+                        <span className="text-white font-semibold flex items-center gap-1">
+                          <span className="text-green-400">✓✓</span>
+                          <span>leído</span>
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 flex items-center gap-1">
+                          <span>✓</span>
+                          <span>enviado</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )
