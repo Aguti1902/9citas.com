@@ -137,6 +137,15 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 
+    // Verificar que el email esté confirmado
+    if (!user.emailVerified) {
+      return res.status(403).json({ 
+        error: 'Por favor, verifica tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.',
+        requiresEmailVerification: true,
+        email: user.email,
+      });
+    }
+
     // Actualizar estado online si tiene perfil
     if (user.profile) {
       await prisma.profile.update({
