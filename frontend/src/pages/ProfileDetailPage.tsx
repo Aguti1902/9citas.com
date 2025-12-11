@@ -38,6 +38,7 @@ export default function ProfileDetailPage() {
     money_request: 0,
     fake_photos: 0,
     underage: 0,
+    hate_speech: 0,
   })
   const [hasReported, setHasReported] = useState(false)
   const [isBlocked, setIsBlocked] = useState(false)
@@ -635,6 +636,10 @@ export default function ProfileDetailPage() {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-300">- Es menor de edad:</span>
                     <span className="font-bold text-white">{reportCountsByReason.underage} {reportCountsByReason.underage === 1 ? 'vez' : 'veces'}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">- Mensajes ofensivos o discriminatorios:</span>
+                    <span className="font-bold text-white">{reportCountsByReason.hate_speech} {reportCountsByReason.hate_speech === 1 ? 'vez' : 'veces'}</span>
                   </div>
                 </div>
               </div>

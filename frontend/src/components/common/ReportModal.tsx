@@ -15,6 +15,7 @@ const REPORT_REASONS = [
   { value: 'money_request', label: '💸 Pide dinero a cambio de sexo', description: 'Solicita dinero o pagos por encuentros' },
   { value: 'fake_photos', label: '🖼️ Fotos falsas', description: 'Las fotos no corresponden a la persona real' },
   { value: 'underage', label: '🔞 Es menor de edad', description: 'La persona parece ser menor de 18 años' },
+  { value: 'hate_speech', label: '🚫 Mensajes ofensivos o discriminatorios', description: 'El usuario envía mensajes con insultos, xenofobia, racismo o cualquier tipo de discriminación' },
 ];
 
 export default function ReportModal({ profileId, profileTitle, onClose, onReportSent }: ReportModalProps) {

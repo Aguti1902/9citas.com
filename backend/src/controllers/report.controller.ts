@@ -32,7 +32,7 @@ export const createReport = async (req: AuthRequest, res: Response) => {
     }
 
     // Validar que el motivo sea válido
-    const validReasons = ['scam', 'inappropriate_photos', 'money_request', 'fake_photos', 'underage'];
+    const validReasons = ['scam', 'inappropriate_photos', 'money_request', 'fake_photos', 'underage', 'hate_speech'];
     if (!validReasons.includes(reason)) {
       return res.status(400).json({ error: 'Motivo de denuncia inválido' });
     }
@@ -126,6 +126,7 @@ export const getReportCount = async (req: AuthRequest, res: Response) => {
       money_request: 0,
       fake_photos: 0,
       underage: 0,
+      hate_speech: 0,
     };
 
     reports.forEach((report) => {
@@ -208,6 +209,7 @@ async function sendReportEmail(reportedProfileId: string, totalReports: number) 
       money_request: 'Pide dinero a cambio de sexo',
       fake_photos: 'Fotos falsas',
       underage: 'Es menor de edad',
+      hate_speech: 'Mensajes ofensivos o discriminatorios',
     };
 
     const reasonsList = Object.entries(reportsByReason)
