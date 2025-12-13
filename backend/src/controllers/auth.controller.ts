@@ -80,8 +80,12 @@ export const register = async (req: Request, res: Response) => {
           },
         });
 
-        // Reenviar email
-        await sendVerificationEmail(existingUser.email, verificationToken);
+        // Reenviar email de forma asíncrona (no bloqueante)
+        sendVerificationEmail(existingUser.email, verificationToken).catch((error) => {
+          console.error('❌ Error al reenviar email de verificación (no bloqueante):', error);
+        });
+
+        console.log(`✅ Email de verificación reenviado a: ${existingUser.email}`);
 
         return res.status(200).json({
           message: 'Este email ya está registrado pero no verificado. Te hemos reenviado el email de confirmación.',
@@ -121,13 +125,18 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    // Enviar email de verificación
-    await sendVerificationEmail(user.email, verificationToken);
+    // Enviar email de verificación de forma asíncrona (no bloqueante)
+    // Esto evita que el registro se quede esperando si el envío de email tarda mucho
+    sendVerificationEmail(user.email, verificationToken).catch((error) => {
+      console.error('❌ Error al enviar email de verificación (no bloqueante):', error);
+    });
 
     // Guardar orientación en una variable temporal (se usará al crear el perfil)
     // En una app real, esto se guardaría en una sesión o cache
     
     // NO generar tokens aún - el usuario debe verificar su email primero
+    
+    console.log(`✅ Usuario registrado: ${user.email} (esperando verificación de email)`);
     
     res.status(201).json({
       message: 'Usuario registrado. Por favor verifica tu email para continuar.',
@@ -343,8 +352,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
       where: { id: verificationToken.id },
     });
 
-    // Enviar email de bienvenida
-    await sendWelcomeEmail(verificationToken.user.email, verificationToken.user.email.split('@')[0]);
+    // Enviar email de bienvenida de forma asíncrona (no bloqueante)
+    sendWelcomeEmail(verificationToken.user.email, verificationToken.user.email.split('@')[0]).catch((error) => {
+      console.error('❌ Error al enviar email de bienvenida (no bloqueante):', error);
+    });
 
     // Generar tokens de sesión
     const accessToken = generateAccessToken(verificationToken.userId);
@@ -461,8 +472,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
       },
     });
 
-    // Enviar email con link de reset
-    await sendPasswordResetEmail(user.email, resetToken);
+    // Enviar email con link de reset de forma asíncrona (no bloqueante)
+    sendPasswordResetEmail(user.email, resetToken).catch((error) => {
+      console.error('❌ Error al enviar email de recuperación (no bloqueante):', error);
+    });
+
+    console.log(`✅ Token de recuperación de contraseña generado para: ${user.email}`);
 
     res.json({ 
       message: 'Si el email existe en nuestro sistema, recibirás un email con instrucciones para restablecer tu contraseña.' 
