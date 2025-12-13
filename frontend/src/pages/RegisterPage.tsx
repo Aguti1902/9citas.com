@@ -64,7 +64,7 @@ export default function RegisterPage() {
         navigate('/email-sent', {
           state: {
             email: result.email,
-            orientation: result.orientation,
+            orientation: result.orientation || orientation,
           },
         })
       } else {
@@ -72,7 +72,14 @@ export default function RegisterPage() {
         navigate('/create-profile')
       }
     } catch (err: any) {
-      setError(err.message)
+      console.error('Error en registro:', err)
+      setError(err.message || 'Error al registrar usuario')
+      
+      // Resetear captcha si hay error
+      if (hasRealRecaptchaKey && recaptchaRef.current) {
+        recaptchaRef.current.reset()
+        setCaptchaToken(null)
+      }
     } finally {
       setIsLoading(false)
     }

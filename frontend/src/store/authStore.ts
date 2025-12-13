@@ -21,7 +21,7 @@ interface AuthState {
   setToken: (accessToken: string, refreshToken: string) => void
   setTokens: (accessToken: string, refreshToken: string) => void
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, orientation: string, captchaToken?: string) => Promise<{ requiresVerification: boolean, email: string, orientation: string }>
+  register: (email: string, password: string, orientation: string, captchaToken?: string) => Promise<{ requiresVerification: boolean, email: string, orientation: string, isResend?: boolean }>
   logout: () => Promise<void>
   initAuth: () => Promise<void>
   refreshUserData: () => Promise<void>
@@ -75,7 +75,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return {
           requiresVerification: true,
           email: response.data.email,
-          orientation: response.data.orientation,
+          orientation: response.data.orientation || orientation,
+          isResend: response.data.isResend || false,
         }
       }
 
@@ -87,10 +88,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { 
         requiresVerification: false,
         email: response.data.email,
-        orientation: savedOrientation 
+        orientation: savedOrientation,
+        isResend: false,
       }
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Error al registrarse')
+      // Distinguir entre errores de red y errores del servidor
+      if (error.response) {
+        // El servidor respondió con un código de error
+        throw new Error(error.response.data?.error || 'Error al registrarse')
+      } else if (error.request) {
+        // La petición fue enviada pero no hubo respuesta
+        throw new Error('No se pudo conectar con el servidor. Verifica tu conexión a internet.')
+      } else {
+        // Algo más salió mal
+        throw new Error('Error al procesar el registro. Por favor, inténtalo de nuevo.')
+      }
     }
   },
 
