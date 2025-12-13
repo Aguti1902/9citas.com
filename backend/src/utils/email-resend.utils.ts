@@ -82,10 +82,21 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
     `,
   });
 
+  console.log('🔍 Respuesta completa de Resend:', JSON.stringify(result, null, 2));
+
+  if (result.error) {
+    console.error('❌ ========================================');
+    console.error('❌ ERROR DE RESEND');
+    console.error('❌ ========================================');
+    console.error('Error:', result.error);
+    console.error('❌ ========================================\n');
+    throw new Error(`Resend error: ${JSON.stringify(result.error)}`);
+  }
+
   console.log(`✅ ========================================`);
   console.log(`✅ EMAIL DE VERIFICACIÓN ENVIADO EXITOSAMENTE`);
   console.log(`✅ Destinatario: ${email}`);
-  console.log(`✅ Message ID: ${result.data?.id}`);
+  console.log(`✅ Message ID: ${result.data?.id || 'N/A'}`);
   console.log(`✅ ========================================\n`);
 };
 
