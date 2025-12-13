@@ -10,6 +10,50 @@ import * as path from 'path';
 // Cargar variables de entorno
 dotenv.config();
 
+// ========================================
+// VALIDAR CONFIGURACIÓN CRÍTICA AL INICIO
+// ========================================
+console.log('\n🔍 ========================================');
+console.log('🔍 VALIDANDO CONFIGURACIÓN DEL SERVIDOR');
+console.log('🔍 ========================================');
+
+// Validar variables de entorno críticas
+const requiredEnvVars = {
+  'DATABASE_URL': process.env.DATABASE_URL,
+  'JWT_SECRET': process.env.JWT_SECRET,
+  'SMTP_HOST': process.env.SMTP_HOST,
+  'SMTP_PORT': process.env.SMTP_PORT,
+  'SMTP_USER': process.env.SMTP_USER,
+  'SMTP_PASS': process.env.SMTP_PASS,
+};
+
+let hasErrors = false;
+
+for (const [key, value] of Object.entries(requiredEnvVars)) {
+  if (!value) {
+    console.error(`❌ ${key} NO está configurado`);
+    hasErrors = true;
+  } else {
+    // Ocultar valores sensibles en logs
+    const displayValue = ['JWT_SECRET', 'SMTP_PASS', 'DATABASE_URL'].includes(key) 
+      ? '***' 
+      : value;
+    console.log(`✅ ${key}: ${displayValue}`);
+  }
+}
+
+if (hasErrors) {
+  console.error('\n❌ ========================================');
+  console.error('❌ FALTAN VARIABLES DE ENTORNO CRÍTICAS');
+  console.error('❌ Los emails NO se enviarán hasta que se configuren');
+  console.error('❌ ========================================\n');
+} else {
+  console.log('\n✅ ========================================');
+  console.log('✅ TODAS LAS VARIABLES CRÍTICAS CONFIGURADAS');
+  console.log('✅ ========================================\n');
+}
+
+
 // Importar rutas
 import authRoutes from './routes/auth.routes';
 import profileRoutes from './routes/profile.routes';

@@ -82,7 +82,13 @@ export const register = async (req: Request, res: Response) => {
 
         // Reenviar email de forma asíncrona (no bloqueante)
         sendVerificationEmail(existingUser.email, verificationToken).catch((error) => {
-          console.error('❌ Error al reenviar email de verificación (no bloqueante):', error);
+          console.error('\n❌ ========================================');
+          console.error('❌ ERROR CRÍTICO AL REENVIAR EMAIL');
+          console.error('❌ ========================================');
+          console.error('Email:', existingUser.email);
+          console.error('Error:', error.message);
+          console.error('Stack:', error.stack);
+          console.error('❌ ========================================\n');
         });
 
         console.log(`✅ Email de verificación reenviado a: ${existingUser.email}`);
@@ -128,7 +134,14 @@ export const register = async (req: Request, res: Response) => {
     // Enviar email de verificación de forma asíncrona (no bloqueante)
     // Esto evita que el registro se quede esperando si el envío de email tarda mucho
     sendVerificationEmail(user.email, verificationToken).catch((error) => {
-      console.error('❌ Error al enviar email de verificación (no bloqueante):', error);
+      console.error('\n❌ ========================================');
+      console.error('❌ ERROR CRÍTICO AL ENVIAR EMAIL DE VERIFICACIÓN');
+      console.error('❌ ========================================');
+      console.error('Email:', user.email);
+      console.error('Token:', verificationToken);
+      console.error('Error:', error.message);
+      console.error('Stack:', error.stack);
+      console.error('❌ ========================================\n');
     });
 
     // Guardar orientación en una variable temporal (se usará al crear el perfil)
@@ -354,7 +367,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     // Enviar email de bienvenida de forma asíncrona (no bloqueante)
     sendWelcomeEmail(verificationToken.user.email, verificationToken.user.email.split('@')[0]).catch((error) => {
-      console.error('❌ Error al enviar email de bienvenida (no bloqueante):', error);
+      console.error('\n❌ ERROR AL ENVIAR EMAIL DE BIENVENIDA:', error.message);
     });
 
     // Generar tokens de sesión
@@ -474,7 +487,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     // Enviar email con link de reset de forma asíncrona (no bloqueante)
     sendPasswordResetEmail(user.email, resetToken).catch((error) => {
-      console.error('❌ Error al enviar email de recuperación (no bloqueante):', error);
+      console.error('\n❌ ERROR AL ENVIAR EMAIL DE RECUPERACIÓN:', error.message);
     });
 
     console.log(`✅ Token de recuperación de contraseña generado para: ${user.email}`);

@@ -10,8 +10,18 @@ export const generateVerificationToken = (): string => {
 const getTransporter = () => {
   // Verificar que las credenciales SMTP estén configuradas
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    throw new Error('SMTP_USER y SMTP_PASS deben estar configurados en las variables de entorno');
+    const errorMsg = '❌ ERROR CRÍTICO: SMTP_USER y SMTP_PASS no están configurados. Los emails NO se enviarán.';
+    console.error(errorMsg);
+    console.error('Variables de entorno requeridas:');
+    console.error('- SMTP_HOST (ejemplo: smtp.gmail.com)');
+    console.error('- SMTP_PORT (ejemplo: 587)');
+    console.error('- SMTP_USER (tu email)');
+    console.error('- SMTP_PASS (contraseña de aplicación)');
+    throw new Error(errorMsg);
   }
+
+  console.log(`📧 Configurando SMTP con: ${process.env.SMTP_HOST || 'smtp.gmail.com'}:${process.env.SMTP_PORT || '587'}`);
+  console.log(`📧 Usuario SMTP: ${process.env.SMTP_USER}`);
 
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -26,13 +36,20 @@ const getTransporter = () => {
 
 // Enviar email de verificación
 export const sendVerificationEmail = async (email: string, token: string): Promise<void> => {
+  console.log(`\n📧 ========================================`);
+  console.log(`📧 ENVIANDO EMAIL DE VERIFICACIÓN`);
+  console.log(`📧 Destinatario: ${email}`);
+  console.log(`📧 ========================================`);
+
   // Obtener URL del frontend desde variables de entorno
   const frontendUrl = process.env.FRONTEND_URL || process.env.VERIFICATION_URL || 'https://9citas.com';
   const verificationUrl = `${frontendUrl}/verify-email/${token}`;
 
+  console.log(`📧 URL de verificación: ${verificationUrl}`);
+
   const transporter = getTransporter();
 
-  await transporter.sendMail({
+  const result = await transporter.sendMail({
     from: `"9citas" <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'Verifica tu cuenta en 9citas',
@@ -88,14 +105,20 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
     `,
   });
 
-  console.log(`✅ Email de verificación enviado a: ${email}`);
+  console.log(`✅ ========================================`);
+  console.log(`✅ EMAIL DE VERIFICACIÓN ENVIADO EXITOSAMENTE`);
+  console.log(`✅ Destinatario: ${email}`);
+  console.log(`✅ Message ID: ${result.messageId}`);
+  console.log(`✅ ========================================\n`);
 };
 
 // Enviar email de bienvenida
 export const sendWelcomeEmail = async (email: string, name: string): Promise<void> => {
+  console.log(`\n🎉 Enviando email de bienvenida a: ${email}`);
+  
   const transporter = getTransporter();
 
-  await transporter.sendMail({
+  const result = await transporter.sendMail({
     from: `"9citas" <${process.env.SMTP_USER}>`,
     to: email,
     subject: '¡Bienvenido a 9citas!',
@@ -151,17 +174,19 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<voi
     `,
   });
 
-  console.log(`✅ Email de bienvenida enviado a: ${email}`);
+  console.log(`✅ Email de bienvenida enviado exitosamente a: ${email} (ID: ${result.messageId})\n`);
 };
 
 // Enviar email de recuperación de contraseña
 export const sendPasswordResetEmail = async (email: string, token: string): Promise<void> => {
+  console.log(`\n🔑 Enviando email de recuperación de contraseña a: ${email}`);
+
   const frontendUrl = process.env.FRONTEND_URL || 'https://9citas.com';
   const resetUrl = `${frontendUrl}/reset-password/${token}`;
 
   const transporter = getTransporter();
 
-  await transporter.sendMail({
+  const result = await transporter.sendMail({
     from: `"9citas" <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'Recupera tu contraseña de 9citas',
@@ -222,6 +247,6 @@ export const sendPasswordResetEmail = async (email: string, token: string): Prom
     `,
   });
 
-  console.log(`✅ Email de recuperación de contraseña enviado a: ${email}`);
+  console.log(`✅ Email de recuperación enviado exitosamente a: ${email} (ID: ${result.messageId})\n`);
 };
 
