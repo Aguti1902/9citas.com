@@ -105,7 +105,6 @@ export default function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="tu@email.com"
-            icon={<Mail className="w-5 h-5" />}
           />
 
           <Button
