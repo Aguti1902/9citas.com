@@ -80,8 +80,11 @@ export const register = async (req: Request, res: Response) => {
           },
         });
 
-        // Reenviar email de forma asíncrona (no bloqueante)
-        sendVerificationEmail(existingUser.email, verificationToken).catch((error) => {
+        // Reenviar email de forma SÍNCRONA para capturar errores
+        try {
+          await sendVerificationEmail(existingUser.email, verificationToken);
+          console.log(`✅ Email de verificación reenviado a: ${existingUser.email}`);
+        } catch (error: any) {
           console.error('\n❌ ========================================');
           console.error('❌ ERROR CRÍTICO AL REENVIAR EMAIL');
           console.error('❌ ========================================');
@@ -89,9 +92,8 @@ export const register = async (req: Request, res: Response) => {
           console.error('Error:', error.message);
           console.error('Stack:', error.stack);
           console.error('❌ ========================================\n');
-        });
-
-        console.log(`✅ Email de verificación reenviado a: ${existingUser.email}`);
+          // No bloquear el flujo si falla el email
+        }
 
         return res.status(200).json({
           message: 'Este email ya está registrado pero no verificado. Te hemos reenviado el email de confirmación.',
@@ -131,9 +133,11 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    // Enviar email de verificación de forma asíncrona (no bloqueante)
-    // Esto evita que el registro se quede esperando si el envío de email tarda mucho
-    sendVerificationEmail(user.email, verificationToken).catch((error) => {
+    // Enviar email de verificación de forma SÍNCRONA para capturar errores
+    try {
+      await sendVerificationEmail(user.email, verificationToken);
+      console.log(`✅ Email de verificación enviado exitosamente a: ${user.email}`);
+    } catch (error: any) {
       console.error('\n❌ ========================================');
       console.error('❌ ERROR CRÍTICO AL ENVIAR EMAIL DE VERIFICACIÓN');
       console.error('❌ ========================================');
@@ -142,7 +146,8 @@ export const register = async (req: Request, res: Response) => {
       console.error('Error:', error.message);
       console.error('Stack:', error.stack);
       console.error('❌ ========================================\n');
-    });
+      // No bloquear el registro si falla el email
+    }
 
     // Guardar orientación en una variable temporal (se usará al crear el perfil)
     // En una app real, esto se guardaría en una sesión o cache
@@ -365,10 +370,13 @@ export const verifyEmail = async (req: Request, res: Response) => {
       where: { id: verificationToken.id },
     });
 
-    // Enviar email de bienvenida de forma asíncrona (no bloqueante)
-    sendWelcomeEmail(verificationToken.user.email, verificationToken.user.email.split('@')[0]).catch((error) => {
+    // Enviar email de bienvenida de forma SÍNCRONA
+    try {
+      await sendWelcomeEmail(verificationToken.user.email, verificationToken.user.email.split('@')[0]);
+    } catch (error: any) {
       console.error('\n❌ ERROR AL ENVIAR EMAIL DE BIENVENIDA:', error.message);
-    });
+      // No bloquear si falla
+    }
 
     // Generar tokens de sesión
     const accessToken = generateAccessToken(verificationToken.userId);
@@ -485,12 +493,14 @@ export const forgotPassword = async (req: Request, res: Response) => {
       },
     });
 
-    // Enviar email con link de reset de forma asíncrona (no bloqueante)
-    sendPasswordResetEmail(user.email, resetToken).catch((error) => {
+    // Enviar email con link de reset de forma SÍNCRONA
+    try {
+      await sendPasswordResetEmail(user.email, resetToken);
+      console.log(`✅ Token de recuperación de contraseña generado y enviado a: ${user.email}`);
+    } catch (error: any) {
       console.error('\n❌ ERROR AL ENVIAR EMAIL DE RECUPERACIÓN:', error.message);
-    });
-
-    console.log(`✅ Token de recuperación de contraseña generado para: ${user.email}`);
+      // No bloquear si falla
+    }
 
     res.json({ 
       message: 'Si el email existe en nuestro sistema, recibirás un email con instrucciones para restablecer tu contraseña.' 

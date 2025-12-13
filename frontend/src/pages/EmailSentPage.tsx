@@ -105,13 +105,6 @@ export default function EmailSentPage() {
             Volver al inicio
           </button>
         </div>
-
-        {/* Nota de desarrollo */}
-        <div className="bg-warning bg-opacity-10 border border-warning text-warning rounded-lg p-4 text-sm">
-          <p className="font-semibold mb-2">ℹ️ MODO DESARROLLO</p>
-          <p>El enlace de verificación se muestra en la consola del backend.</p>
-          <p className="mt-2">Revisa la terminal donde corre el servidor.</p>
-        </div>
       </div>
     </div>
   )
