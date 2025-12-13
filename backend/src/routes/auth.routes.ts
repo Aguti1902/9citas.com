@@ -42,6 +42,12 @@ router.get('/verify-email/:token', authController.verifyEmail);
 // Reenviar email de verificación
 router.post('/resend-verification', authController.resendVerificationEmail);
 
+// Solicitar recuperación de contraseña
+router.post('/forgot-password', authController.forgotPassword);
+
+// Restablecer contraseña
+router.post('/reset-password', authController.resetPassword);
+
 // Obtener usuario actual
 router.get('/me', authenticateToken, authController.getCurrentUser);
 

@@ -208,3 +208,103 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<voi
   }
 };
 
+// Enviar email de recuperación de contraseña
+export const sendPasswordResetEmail = async (email: string, token: string): Promise<void> => {
+  const frontendUrl = process.env.FRONTEND_URL || 'https://9citas.com';
+  const resetUrl = `${frontendUrl}/reset-password/${token}`;
+
+  const transporter = getTransporter();
+
+  // Si no hay transporter (modo desarrollo), usar console.log
+  if (!transporter) {
+    console.log('\n============================================');
+    console.log('🔑 EMAIL DE RECUPERACIÓN DE CONTRASEÑA (MODO DESARROLLO)');
+    console.log('============================================');
+    console.log(`Para: ${email}`);
+    console.log(`Asunto: Recupera tu contraseña de 9citas`);
+    console.log(`\nHola!`);
+    console.log(`\nRecibimos una solicitud para restablecer tu contraseña en 9citas.`);
+    console.log(`\nPara crear una nueva contraseña, haz click en el siguiente enlace:`);
+    console.log(`\n${resetUrl}`);
+    console.log(`\nEste enlace expira en 1 hora.`);
+    console.log(`\nSi no solicitaste este cambio, ignora este email y tu contraseña permanecerá sin cambios.`);
+    console.log('============================================\n');
+    return;
+  }
+
+  // Modo producción: enviar email real
+  try {
+    await transporter.sendMail({
+      from: `"9citas" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Recupera tu contraseña de 9citas',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #fc4d5c 0%, #ff6b7a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .button { display: inline-block; background: #fc4d5c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+            .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🔑 Recuperación de contraseña</h1>
+            </div>
+            <div class="content">
+              <p>Hola,</p>
+              <p>Recibimos una solicitud para restablecer tu contraseña en <strong>9citas</strong>.</p>
+              <p>Para crear una nueva contraseña, haz click en el siguiente botón:</p>
+              <div style="text-align: center;">
+                <a href="${resetUrl}" class="button">Restablecer mi contraseña</a>
+              </div>
+              <p>O copia y pega este enlace en tu navegador:</p>
+              <p style="word-break: break-all; color: #666;">${resetUrl}</p>
+              <div class="warning">
+                <p><strong>⏰ Este enlace expira en 1 hora.</strong></p>
+              </div>
+              <p>Si no solicitaste este cambio, puedes ignorar este email de forma segura. Tu contraseña permanecerá sin cambios.</p>
+            </div>
+            <div class="footer">
+              <p>© 2024 9citas.com - Conoce chicas y chicos cerca de ti</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+        Recuperación de contraseña - 9citas
+
+        Hola,
+
+        Recibimos una solicitud para restablecer tu contraseña en 9citas.
+
+        Para crear una nueva contraseña, haz click en el siguiente enlace:
+        ${resetUrl}
+
+        Este enlace expira en 1 hora.
+
+        Si no solicitaste este cambio, ignora este email y tu contraseña permanecerá sin cambios.
+      `,
+    });
+
+    console.log(`✅ Email de recuperación de contraseña enviado a: ${email}`);
+  } catch (error) {
+    console.error('❌ Error al enviar email de recuperación:', error);
+    // En caso de error, mostrar en consola para debugging
+    console.log('\n============================================');
+    console.log('🔑 EMAIL DE RECUPERACIÓN (FALLBACK)');
+    console.log('============================================');
+    console.log(`Para: ${email}`);
+    console.log(`URL: ${resetUrl}`);
+    console.log('============================================\n');
+  }
+};
+

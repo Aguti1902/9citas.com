@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.utils';
-import { generateVerificationToken, sendVerificationEmail, sendWelcomeEmail } from '../utils/email.utils';
+import { generateVerificationToken, sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email.utils';
 import { AuthRequest } from '../middleware/auth.middleware';
 
 const prisma = new PrismaClient();
@@ -60,6 +60,39 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (existingUser) {
+      // Si el usuario existe pero NO ha verificado su email, reenviar el email de verificación
+      if (!existingUser.emailVerified) {
+        // Eliminar tokens antiguos
+        await prisma.emailVerificationToken.deleteMany({
+          where: { userId: existingUser.id },
+        });
+
+        // Crear nuevo token
+        const verificationToken = generateVerificationToken();
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        await prisma.emailVerificationToken.create({
+          data: {
+            userId: existingUser.id,
+            token: verificationToken,
+            expiresAt,
+          },
+        });
+
+        // Reenviar email
+        await sendVerificationEmail(existingUser.email, verificationToken);
+
+        return res.status(200).json({
+          message: 'Este email ya está registrado pero no verificado. Te hemos reenviado el email de confirmación.',
+          email: existingUser.email,
+          orientation,
+          requiresVerification: true,
+          isResend: true,
+        });
+      }
+
+      // Si ya está verificado, mostrar error
       return res.status(400).json({ error: 'Este email ya está registrado' });
     }
 
@@ -387,6 +420,114 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error al reenviar email:', error);
     res.status(500).json({ error: 'Error al reenviar email' });
+  }
+};
+
+// Solicitar recuperación de contraseña
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email requerido' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    // Por seguridad, siempre devolver el mismo mensaje aunque el usuario no exista
+    if (!user) {
+      return res.json({ 
+        message: 'Si el email existe en nuestro sistema, recibirás un email con instrucciones para restablecer tu contraseña.' 
+      });
+    }
+
+    // Eliminar tokens de reset anteriores
+    await prisma.passwordResetToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    // Generar nuevo token
+    const resetToken = generateVerificationToken(); // Reutilizamos la función
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1); // Expira en 1 hora
+
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        token: resetToken,
+        expiresAt,
+      },
+    });
+
+    // Enviar email con link de reset
+    await sendPasswordResetEmail(user.email, resetToken);
+
+    res.json({ 
+      message: 'Si el email existe en nuestro sistema, recibirás un email con instrucciones para restablecer tu contraseña.' 
+    });
+  } catch (error) {
+    console.error('Error en forgot password:', error);
+    res.status(500).json({ error: 'Error al procesar solicitud' });
+  }
+};
+
+// Restablecer contraseña
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token y nueva contraseña requeridos' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    // Buscar el token
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (!resetToken) {
+      return res.status(400).json({ error: 'Token inválido o expirado' });
+    }
+
+    // Verificar si ya fue usado
+    if (resetToken.used) {
+      return res.status(400).json({ error: 'Este token ya fue utilizado' });
+    }
+
+    // Verificar si ha expirado
+    if (new Date() > resetToken.expiresAt) {
+      await prisma.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      });
+      return res.status(400).json({ error: 'Token expirado. Por favor solicita uno nuevo.' });
+    }
+
+    // Hash de la nueva contraseña
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    // Actualizar contraseña
+    await prisma.user.update({
+      where: { id: resetToken.userId },
+      data: { passwordHash },
+    });
+
+    // Marcar token como usado
+    await prisma.passwordResetToken.update({
+      where: { id: resetToken.id },
+      data: { used: true },
+    });
+
+    res.json({ message: 'Contraseña restablecida exitosamente. Ya puedes iniciar sesión.' });
+  } catch (error) {
+    console.error('Error al restablecer contraseña:', error);
+    res.status(500).json({ error: 'Error al restablecer contraseña' });
   }
 };
 

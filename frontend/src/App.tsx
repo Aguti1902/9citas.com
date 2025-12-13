@@ -22,6 +22,8 @@ import AdminPage from './pages/AdminPage'
 import PrivatePhotoRequestsPage from './pages/PrivatePhotoRequestsPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import EmailSentPage from './pages/EmailSentPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 function App() {
   const { isAuthenticated, hasProfile, initAuth } = useAuthStore()
@@ -36,10 +38,12 @@ function App() {
       <Routes>
         {/* Rutas públicas */}
         <Route path="/" element={isAuthenticated ? <Navigate to="/app" /> : <IndexPage />} />
-      <Route path="/login/:orientation" element={<LoginPage />} />
-      <Route path="/register/:orientation" element={<RegisterPage />} />
-      <Route path="/email-sent" element={<EmailSentPage />} />
-      <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+        <Route path="/login/:orientation" element={<LoginPage />} />
+        <Route path="/register/:orientation" element={<RegisterPage />} />
+        <Route path="/email-sent" element={<EmailSentPage />} />
+        <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       {/* Ruta de crear perfil */}
       <Route

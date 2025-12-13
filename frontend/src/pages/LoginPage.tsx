@@ -133,6 +133,16 @@ export default function LoginPage() {
           </Button>
         </form>
 
+        {/* Olvidé mi contraseña */}
+        <div className="text-center">
+          <Link
+            to="/forgot-password"
+            className="text-gray-400 hover:text-primary transition-colors text-sm"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+
         {/* Registro */}
         <div className="text-center text-gray-400">
           <p>
