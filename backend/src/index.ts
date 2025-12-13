@@ -21,10 +21,7 @@ console.log('🔍 ========================================');
 const requiredEnvVars = {
   'DATABASE_URL': process.env.DATABASE_URL,
   'JWT_SECRET': process.env.JWT_SECRET,
-  'SMTP_HOST': process.env.SMTP_HOST,
-  'SMTP_PORT': process.env.SMTP_PORT,
-  'SMTP_USER': process.env.SMTP_USER,
-  'SMTP_PASS': process.env.SMTP_PASS,
+  'RESEND_API_KEY': process.env.RESEND_API_KEY,
 };
 
 let hasErrors = false;
@@ -35,18 +32,25 @@ for (const [key, value] of Object.entries(requiredEnvVars)) {
     hasErrors = true;
   } else {
     // Ocultar valores sensibles en logs
-    const displayValue = ['JWT_SECRET', 'SMTP_PASS', 'DATABASE_URL'].includes(key) 
+    const displayValue = ['JWT_SECRET', 'RESEND_API_KEY', 'DATABASE_URL'].includes(key) 
       ? '***' 
       : value;
     console.log(`✅ ${key}: ${displayValue}`);
   }
 }
 
+// Opcional: SMTP (legacy, no requerido)
+if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+  console.log(`ℹ️ SMTP_HOST: ${process.env.SMTP_HOST} (legacy, no se usa)`);
+}
+
 if (hasErrors) {
   console.error('\n❌ ========================================');
   console.error('❌ FALTAN VARIABLES DE ENTORNO CRÍTICAS');
   console.error('❌ Los emails NO se enviarán hasta que se configuren');
-  console.error('❌ ========================================\n');
+  console.error('❌ ========================================');
+  console.error('\nConfigura RESEND_API_KEY en Railway');
+  console.error('Obtén tu API key en: https://resend.com/api-keys\n');
 } else {
   console.log('\n✅ ========================================');
   console.log('✅ TODAS LAS VARIABLES CRÍTICAS CONFIGURADAS');
