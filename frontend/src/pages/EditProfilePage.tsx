@@ -6,14 +6,19 @@ import Input from '@/components/common/Input'
 import Textarea from '@/components/common/Textarea'
 import Button from '@/components/common/Button'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
+import Modal from '@/components/common/Modal'
+import { Eye, Trash2 } from 'lucide-react'
 
 export default function EditProfilePage() {
   const navigate = useNavigate()
-  const { refreshUserData } = useAuthStore()
+  const { refreshUserData, user, logout } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
   const [userOrientation, setUserOrientation] = useState<string>('hetero')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
   const [formData, setFormData] = useState({
     title: '',
@@ -160,6 +165,33 @@ export default function EditProfilePage() {
         ? prev.filter(l => l !== language)
         : [...prev, language]
     )
+  }
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'ELIMINAR') {
+      setError('Debes escribir "ELIMINAR" para confirmar')
+      return
+    }
+
+    setIsDeleting(true)
+
+    try {
+      await api.delete('/auth/delete-account')
+      
+      // Cerrar sesión y redirigir
+      await logout()
+      navigate('/')
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Error al eliminar la cuenta')
+      setIsDeleting(false)
+    }
+  }
+
+  const handleViewProfile = () => {
+    // Redirigir a la vista del propio perfil como si fuera otro usuario
+    if (user?.profile?.id) {
+      navigate(`/app/profile/${user.profile.id}`)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -794,7 +826,111 @@ export default function EditProfilePage() {
             Guardar cambios
           </Button>
         </div>
+
+        {/* Botón para ver perfil completo */}
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleViewProfile}
+            fullWidth
+            className="flex items-center justify-center gap-2"
+          >
+            <Eye className="w-5 h-5" />
+            Ver mi perfil completo
+          </Button>
+        </div>
+
+        {/* Sección de eliminar cuenta */}
+        <div className="mt-8 pt-8 border-t border-gray-700">
+          <div className="bg-red-900 bg-opacity-20 border border-red-500 rounded-lg p-6">
+            <h3 className="text-red-500 font-bold text-lg mb-2 flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              Zona de Peligro
+            </h3>
+            <p className="text-gray-300 text-sm mb-4">
+              Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, estate seguro.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDeleteModal(true)}
+              className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Eliminar mi cuenta
+            </Button>
+          </div>
+        </div>
       </form>
+
+      {/* Modal de confirmación de eliminación */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setDeleteConfirmText('')
+          setError('')
+        }}
+        title="¿Estás seguro de eliminar tu cuenta?"
+        maxWidth="md"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-900 bg-opacity-20 border border-red-500 rounded-lg p-4">
+            <p className="text-red-500 font-semibold mb-2">⚠️ Esta acción es irreversible</p>
+            <ul className="text-gray-300 text-sm space-y-1">
+              <li>• Se eliminarán todos tus datos personales</li>
+              <li>• Se eliminarán todas tus fotos</li>
+              <li>• Se eliminarán todos tus mensajes</li>
+              <li>• Se cancelará tu suscripción si tienes una activa</li>
+              <li>• Perderás todos tus matches y likes</li>
+            </ul>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Para confirmar, escribe <span className="text-red-500 font-bold">ELIMINAR</span> en el campo de abajo:
+            </label>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Escribe ELIMINAR"
+              className="input-field"
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDeleteModal(false)
+                setDeleteConfirmText('')
+                setError('')
+              }}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleDeleteAccount}
+              isLoading={isDeleting}
+              disabled={deleteConfirmText !== 'ELIMINAR'}
+              className="flex-1 bg-red-500 hover:bg-red-600"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Eliminar cuenta
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

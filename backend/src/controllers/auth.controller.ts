@@ -531,6 +531,51 @@ export const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
+// Eliminar cuenta de usuario
+export const deleteAccount = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId!;
+
+    // Verificar que el usuario existe
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
+        subscription: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Si tiene suscripción activa en Stripe, cancelarla
+    if (user.subscription?.stripeSubscriptionId) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(user.subscription.stripeSubscriptionId);
+      } catch (stripeError) {
+        console.error('Error al cancelar suscripción en Stripe:', stripeError);
+        // Continuar con la eliminación aunque falle la cancelación en Stripe
+      }
+    }
+
+    // Eliminar usuario (Prisma se encargará de eliminar todo lo relacionado gracias a onDelete: Cascade)
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    // Limpiar cookies y tokens
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    res.json({ message: 'Cuenta eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar cuenta:', error);
+    res.status(500).json({ error: 'Error al eliminar cuenta' });
+  }
+};
+
 // Obtener usuario actual
 export const getCurrentUser = async (req: AuthRequest, res: Response) => {
   try {

@@ -48,6 +48,9 @@ router.post('/forgot-password', authController.forgotPassword);
 // Restablecer contraseña
 router.post('/reset-password', authController.resetPassword);
 
+// Eliminar cuenta (requiere autenticación)
+router.delete('/delete-account', authenticateToken, authController.deleteAccount);
+
 // Obtener usuario actual
 router.get('/me', authenticateToken, authController.getCurrentUser);
 
