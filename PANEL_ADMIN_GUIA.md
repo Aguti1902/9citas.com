@@ -61,14 +61,30 @@ https://9citas.com/admin/login
 
 ## 📊 Funcionalidades
 
-### Dashboard Principal
-- ✅ Estadísticas en tiempo real
-- ✅ Total de usuarios (verificados / sin verificar)
-- ✅ Usuarios online y nuevos registros (últimos 7 días)
-- ✅ Total de mensajes, likes, favoritos
-- ✅ Denuncias y bloqueos
-- ✅ Suscripciones activas (9Plus)
-- ✅ Perfiles más reportados
+### Dashboard Principal (Actualizado)
+- ✅ **Actualización automática cada 30 segundos**
+- ✅ **Logo 9CITAS** en el header
+- ✅ **Métricas principales con diseño mejorado:**
+  - Total de usuarios (verificados/sin verificar/nuevos últimos 7 días)
+  - Usuarios online y activos en las últimas 24h
+  - Total de mensajes (con actividad últimas 24h)
+  - Matches totales (likes mutuos)
+- ✅ **Métricas secundarias:**
+  - Suscripciones 9Plus activas con tasa de conversión
+  - Conversaciones activas (últimos 7 días)
+  - Tasa de verificación de email
+  - Denuncias y bloqueos totales
+- ✅ **Gráfico de registros** (últimos 7 días)
+- ✅ **Estadísticas de perfiles:**
+  - Perfiles reales vs falsos (con barras de progreso)
+  - Distribución por orientación (hetero/gay)
+- ✅ **Tasas de conversión:**
+  - Verificación de email
+  - Completado de perfil
+  - Conversión a 9Plus
+- ✅ **Top 5 usuarios más activos** (por mensajes)
+- ✅ **Top 5 perfiles más reportados**
+- ✅ **Integración con Google Analytics** (enlace directo)
 
 ### Gestión de Denuncias
 - ✅ Ver todas las denuncias ordenadas por fecha
@@ -95,7 +111,16 @@ https://9citas.com/admin/login
 
 ## 📈 Uso del Dashboard
 
-### Estadísticas Principales
+### Navegación Mejorada
+
+El panel ahora cuenta con:
+- **Header consistente** con logo 9CITAS y botón de cerrar sesión
+- **Barra de navegación** con indicadores visuales de página activa
+- **Diseño responsive** optimizado para desktop y móvil
+
+### Estadísticas en Tiempo Real
+
+El dashboard se actualiza automáticamente cada 30 segundos, mostrando:
 
 **Usuarios:**
 ```
@@ -271,6 +296,63 @@ El token JWT expira en **24 horas**. Después de ese tiempo:
 1. Serás redirigido automáticamente a `/admin/login`
 2. Vuelve a ingresar la contraseña
 3. Obtendrás un nuevo token por 24 horas
+
+---
+
+## 📊 Google Analytics Integration
+
+### Configuración de Google Analytics
+
+Para habilitar el tracking de Google Analytics en 9citas.com:
+
+1. **Obtén tu ID de Google Analytics 4:**
+   - Ve a https://analytics.google.com
+   - Crea una propiedad GA4 si no tienes una
+   - Copia el ID (formato: `G-XXXXXXXXXX`)
+
+2. **Configura la variable de entorno en Vercel:**
+   - Ve a tu proyecto en Vercel
+   - Settings → Environment Variables
+   - Agrega: `VITE_GA_TRACKING_ID` = `G-XXXXXXXXXX`
+   - Redeploy el frontend
+
+3. **Accede a Google Analytics desde el Dashboard:**
+   - En el dashboard de admin, encontrarás un botón directo a Google Analytics
+   - Ahí podrás ver métricas avanzadas en tiempo real
+
+### Métricas que se trackean automáticamente:
+
+**Autenticación:**
+- Registros (sign_up)
+- Logins (login)
+
+**Perfil:**
+- Visualizaciones de perfil (view_profile)
+- Ediciones de perfil (edit_profile)
+
+**Interacciones:**
+- Mensajes enviados (send_message)
+- Likes enviados (send_like)
+- Favoritos agregados (add_favorite)
+- Swipes (swipe)
+- Matches (match)
+
+**Premium:**
+- Visualización de features premium (view_premium_features)
+- Inicio de checkout (begin_checkout)
+- Compras completadas (purchase)
+
+**Moderación:**
+- Reportes de usuarios (report_user)
+- Bloqueos (block_user)
+
+### Dashboards recomendados en Google Analytics:
+
+1. **Realtime Overview:** Ver usuarios activos en este momento
+2. **User Acquisition:** De dónde vienen tus usuarios
+3. **Engagement:** Tiempo en sitio, páginas por sesión
+4. **Conversions:** Seguimiento de registros y compras
+5. **Events:** Todos los eventos personalizados listados arriba
 
 ---
 

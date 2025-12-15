@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
-  Shield,
-  LogOut,
   User,
   Check,
   X,
 } from 'lucide-react';
-import { getAllReports, deleteReport, deleteUser, logoutAdmin } from '../services/admin.api';
+import { getAllReports, deleteReport, deleteUser } from '../services/admin.api';
+import AdminHeader from '../components/admin/AdminHeader';
+import AdminNav from '../components/admin/AdminNav';
 
 interface Report {
   id: string;
@@ -41,7 +40,6 @@ export default function AdminReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadReports();
@@ -90,11 +88,6 @@ export default function AdminReportsPage() {
     }
   };
 
-  const handleLogout = () => {
-    logoutAdmin();
-    navigate('/admin/login');
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center">
@@ -105,50 +98,8 @@ export default function AdminReportsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-      {/* Header */}
-      <header className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Shield className="w-8 h-8 text-purple-500" />
-              <h1 className="text-2xl font-bold text-white">Panel de Administración</h1>
-            </div>
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
-            >
-              <LogOut className="w-5 h-5" />
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Navigation */}
-      <nav className="bg-gray-800/30 backdrop-blur-sm border-b border-gray-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-4">
-            <button
-              onClick={() => navigate('/admin/dashboard')}
-              className="px-4 py-3 font-medium text-gray-400 hover:text-white transition"
-            >
-              Dashboard
-            </button>
-            <button
-              className="px-4 py-3 font-medium text-purple-400 border-b-2 border-purple-400"
-            >
-              Denuncias
-            </button>
-            <button
-              onClick={() => navigate('/admin/users')}
-              className="px-4 py-3 font-medium text-gray-400 hover:text-white transition"
-            >
-              Usuarios
-            </button>
-          </div>
-        </div>
-      </nav>
+      <AdminHeader />
+      <AdminNav />
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

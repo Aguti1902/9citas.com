@@ -215,6 +215,11 @@ export const deleteFakeProfiles = async (req: Request, res: Response) => {
 // Obtener estadísticas
 export const getStats = async (req: Request, res: Response) => {
   try {
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
     const [
       totalUsers,
       totalProfiles,
@@ -231,6 +236,11 @@ export const getStats = async (req: Request, res: Response) => {
       totalBlocks,
       activeSubscriptions,
       onlineUsers,
+      usersLast24h,
+      usersLast7days,
+      usersLast30days,
+      messagesLast24h,
+      likesLast24h,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.profile.count(),
@@ -247,19 +257,67 @@ export const getStats = async (req: Request, res: Response) => {
       prisma.block.count(),
       prisma.subscription.count({ where: { isActive: true } }),
       prisma.profile.count({ where: { isOnline: true } }),
+      prisma.profile.count({ where: { lastSeen: { gte: oneDayAgo } } }),
+      prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+      prisma.user.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      prisma.message.count({ where: { createdAt: { gte: oneDayAgo } } }),
+      prisma.like.count({ where: { createdAt: { gte: oneDayAgo } } }),
     ]);
 
-    // Obtener registros recientes (últimos 7 días)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    // Calcular matches (likes mutuos)
+    const allLikes = await prisma.like.findMany({
+      select: {
+        likerId: true,
+        likedId: true,
+      },
+    });
 
-    const recentUsers = await prisma.user.count({
+    const matches = allLikes.filter((like) =>
+      allLikes.some((l) => l.likerId === like.likedId && l.likedId === like.likerId)
+    ).length / 2;
+
+    // Obtener conversaciones activas (con al menos 1 mensaje en los últimos 7 días)
+    const activeConversations = await prisma.message.groupBy({
+      by: ['senderId', 'receiverId'],
       where: {
         createdAt: {
           gte: sevenDaysAgo,
         },
       },
     });
+
+    // Obtener registros por día (últimos 7 días)
+    const registrationsByDay = await Promise.all(
+      Array.from({ length: 7 }).map(async (_, i) => {
+        const dayStart = new Date(now);
+        dayStart.setDate(dayStart.getDate() - i);
+        dayStart.setHours(0, 0, 0, 0);
+        
+        const dayEnd = new Date(dayStart);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const count = await prisma.user.count({
+          where: {
+            createdAt: {
+              gte: dayStart,
+              lte: dayEnd,
+            },
+          },
+        });
+
+        return {
+          date: dayStart.toISOString().split('T')[0],
+          count,
+        };
+      })
+    );
+
+    // Calcular tasas de conversión
+    const conversionRate = totalUsers > 0 ? (verifiedUsers / totalUsers) * 100 : 0;
+    const profileCompletionRate = totalUsers > 0 ? (totalProfiles / totalUsers) * 100 : 0;
+
+    // Calcular promedio de mensajes por usuario
+    const avgMessagesPerUser = totalProfiles > 0 ? totalMessages / totalProfiles : 0;
 
     // Obtener usuarios más reportados
     const mostReportedProfiles = await prisma.profile.findMany({
@@ -292,13 +350,45 @@ export const getStats = async (req: Request, res: Response) => {
       },
     });
 
+    // Obtener usuarios más activos (por mensajes enviados)
+    const mostActiveUsers = await prisma.profile.findMany({
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+        photos: {
+          where: { type: 'cover' },
+          take: 1,
+        },
+        _count: {
+          select: {
+            sentMessages: true,
+            receivedMessages: true,
+          },
+        },
+      },
+      orderBy: {
+        sentMessages: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+      where: {
+        isFake: false,
+      },
+    });
+
     res.json({
       users: {
         total: totalUsers,
         verified: verifiedUsers,
         unverified: unverifiedUsers,
-        recent: recentUsers,
         online: onlineUsers,
+        activeLast24h: usersLast24h,
+        newLast7days: usersLast7days,
+        newLast30days: usersLast30days,
       },
       profiles: {
         total: totalProfiles,
@@ -309,15 +399,27 @@ export const getStats = async (req: Request, res: Response) => {
       },
       activity: {
         messages: totalMessages,
+        messagesLast24h,
         likes: totalLikes,
+        likesLast24h,
+        matches: Math.floor(matches),
         favorites: totalFavorites,
         reports: totalReports,
         blocks: totalBlocks,
+        activeConversations: activeConversations.length,
+        avgMessagesPerUser: avgMessagesPerUser.toFixed(2),
       },
       subscriptions: {
         active: activeSubscriptions,
+        conversionRate: conversionRate.toFixed(2),
       },
+      conversion: {
+        emailVerificationRate: conversionRate.toFixed(2),
+        profileCompletionRate: profileCompletionRate.toFixed(2),
+      },
+      registrationsByDay: registrationsByDay.reverse(),
       mostReportedProfiles,
+      mostActiveUsers,
     });
   } catch (error) {
     console.error('Error al obtener estadísticas:', error);
