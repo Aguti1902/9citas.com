@@ -24,6 +24,11 @@ import VerifyEmailPage from './pages/VerifyEmailPage'
 import EmailSentPage from './pages/EmailSentPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import AdminLoginPage from './pages/AdminLoginPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminReportsPage from './pages/AdminReportsPage'
+import AdminUsersPage from './pages/AdminUsersPage'
+import AdminRoute from './components/admin/AdminRoute'
 
 function App() {
   const { isAuthenticated, hasProfile, initAuth } = useAuthStore()
@@ -84,8 +89,34 @@ function App() {
         <Route path="private-photo-requests" element={<PrivatePhotoRequestsPage />} />
       </Route>
 
-      {/* Ruta de admin (oculta) */}
-      <Route path="/admin" element={<AdminPage />} />
+      {/* Rutas de admin */}
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminRoute>
+            <AdminDashboardPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/reports"
+        element={
+          <AdminRoute>
+            <AdminReportsPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <AdminUsersPage />
+          </AdminRoute>
+        }
+      />
+      {/* Ruta de admin legacy */}
+      <Route path="/admin" element={<Navigate to="/admin/login" />} />
 
       {/* Redirección por defecto */}
       <Route path="*" element={<Navigate to="/" />} />

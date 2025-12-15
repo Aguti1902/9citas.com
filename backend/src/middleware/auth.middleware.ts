@@ -114,7 +114,7 @@ export const require9Plus = async (
   }
 };
 
-// Middleware para verificar contraseña de admin
+// Middleware para verificar contraseña de admin (legacy)
 export const authenticateAdmin = (
   req: Request,
   res: Response,
@@ -127,5 +127,37 @@ export const authenticateAdmin = (
   }
   
   next();
+};
+
+// Middleware para verificar token JWT de admin
+export const authenticateAdminToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Token de admin requerido' });
+    }
+
+    // Verificar token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      role: string;
+    };
+
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ error: 'Acceso denegado: se requiere rol de admin' });
+    }
+
+    next();
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ error: 'Token expirado' });
+    }
+    return res.status(403).json({ error: 'Token inválido' });
+  }
 };
 

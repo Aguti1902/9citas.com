@@ -1,31 +1,11 @@
-import { Router } from 'express';
-import { authenticateAdminToken } from '../middleware/auth.middleware';
-import * as adminController from '../controllers/admin.controller';
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
 
-const router = Router();
 const prisma = new PrismaClient();
 
-// Login de admin (sin autenticación)
-router.post('/login', adminController.login);
-
-// Rutas protegidas con JWT
-router.get('/profiles', authenticateAdminToken, adminController.getAllProfiles);
-router.get('/reports', authenticateAdminToken, adminController.getAllReports);
-router.get('/stats', authenticateAdminToken, adminController.getStats);
-
-// Acciones de administración
-router.delete('/users/:userId', authenticateAdminToken, adminController.deleteUser);
-router.delete('/reports/:reportId', authenticateAdminToken, adminController.deleteReport);
-router.post('/regenerate-fakes', authenticateAdminToken, adminController.regenerateFakeProfiles);
-router.post('/delete-fakes', authenticateAdminToken, adminController.deleteFakeProfiles);
-
-// ENDPOINT TEMPORAL PARA LIMPIAR BASE DE DATOS
-// ⚠️ SIN AUTENTICACIÓN - ELIMINAR DESPUÉS DE USAR ⚠️
-router.post('/clear-all-data', async (req, res) => {
+async function clearDatabase() {
   try {
     console.log('🗑️  ========================================');
-    console.log('🗑️  LIMPIANDO BASE DE DATOS DE PRODUCCIÓN');
+    console.log('🗑️  LIMPIANDO BASE DE DATOS');
     console.log('🗑️  ========================================\n');
 
     // Contar registros antes de eliminar
@@ -46,21 +26,9 @@ router.post('/clear-all-data', async (req, res) => {
     console.log(`   - Mensajes: ${messageCount}`);
     console.log(`   - Suscripciones: ${subscriptionCount}\n`);
 
-    if (userCount === 0 && profileCount === 0) {
+    if (userCount === 0) {
       console.log('✅ La base de datos ya está vacía\n');
-      return res.json({
-        success: true,
-        message: 'La base de datos ya está vacía',
-        counts: {
-          users: userCount,
-          profiles: profileCount,
-          photos: photoCount,
-          likes: likeCount,
-          favorites: favoriteCount,
-          messages: messageCount,
-          subscriptions: subscriptionCount
-        }
-      });
+      return;
     }
 
     console.log('⏳ Eliminando todos los registros...\n');
@@ -120,39 +88,17 @@ router.post('/clear-all-data', async (req, res) => {
     console.log('✅ BASE DE DATOS LIMPIADA EXITOSAMENTE');
     console.log('✅ ========================================\n');
 
-    res.json({
-      success: true,
-      message: 'Base de datos limpiada exitosamente',
-      deleted: {
-        users: deletedUsers.count,
-        profiles: deletedProfiles.count,
-        photos: deletedPhotos.count,
-        likes: deletedLikes.count,
-        favorites: deletedFavorites.count,
-        messages: deletedMessages.count,
-        subscriptions: deletedSubscriptions.count,
-        emailTokens: deletedEmailTokens.count,
-        passwordTokens: deletedPasswordTokens.count,
-        reports: deletedReports.count,
-        blocks: deletedBlocks.count,
-        photoAccess: deletedPhotoAccess.count,
-        roamSessions: deletedRoamSessions.count,
-        roamPurchases: deletedRoamPurchases.count
-      }
-    });
-
   } catch (error) {
     console.error('\n❌ ========================================');
     console.error('❌ ERROR AL LIMPIAR BASE DE DATOS');
     console.error('❌ ========================================');
     console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Error al limpiar base de datos',
-      error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
-});
+}
 
-export default router;
+// Ejecutar
+clearDatabase();
+
