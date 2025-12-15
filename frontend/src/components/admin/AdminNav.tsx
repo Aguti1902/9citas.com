@@ -8,51 +8,51 @@ export default function AdminNav() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="bg-gray-800/30 backdrop-blur-sm border-b border-gray-700/50">
+    <nav className="bg-black/80 backdrop-blur-sm border-b border-[#fc4d5c]/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex gap-1">
           <button
             onClick={() => navigate('/admin/dashboard')}
-            className={`flex items-center gap-2 px-4 py-3 font-medium transition relative ${
+            className={`flex items-center gap-2 px-5 py-3 font-semibold transition relative ${
               isActive('/admin/dashboard')
-                ? 'text-purple-400'
+                ? 'text-[#fc4d5c]'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-5 h-5" />
             Dashboard
             {isActive('/admin/dashboard') && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-400"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/50 rounded-t-full"></div>
             )}
           </button>
           
           <button
             onClick={() => navigate('/admin/reports')}
-            className={`flex items-center gap-2 px-4 py-3 font-medium transition relative ${
+            className={`flex items-center gap-2 px-5 py-3 font-semibold transition relative ${
               isActive('/admin/reports')
-                ? 'text-purple-400'
+                ? 'text-[#fc4d5c]'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <AlertTriangle className="w-4 h-4" />
+            <AlertTriangle className="w-5 h-5" />
             Denuncias
             {isActive('/admin/reports') && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-400"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/50 rounded-t-full"></div>
             )}
           </button>
           
           <button
             onClick={() => navigate('/admin/users')}
-            className={`flex items-center gap-2 px-4 py-3 font-medium transition relative ${
+            className={`flex items-center gap-2 px-5 py-3 font-semibold transition relative ${
               isActive('/admin/users')
-                ? 'text-purple-400'
+                ? 'text-[#fc4d5c]'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-5 h-5" />
             Usuarios
             {isActive('/admin/users') && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-400"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/50 rounded-t-full"></div>
             )}
           </button>
         </div>

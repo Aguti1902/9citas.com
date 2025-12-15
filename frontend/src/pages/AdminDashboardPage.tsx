@@ -84,78 +84,85 @@ export default function AdminDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="text-5xl font-bold">
+          <div className="text-6xl font-black tracking-tight">
             <span className="text-white">9</span>
-            <span className="text-purple-500">CITAS</span>
+            <span className="text-[#fc4d5c]">citas</span>
+            <span className="text-white text-4xl">.com</span>
           </div>
-          <div className="text-white text-xl">Cargando estadísticas...</div>
+          <div className="text-white text-xl font-semibold">Cargando estadísticas...</div>
+          <div className="w-16 h-16 border-4 border-[#fc4d5c]/20 border-t-[#fc4d5c] rounded-full animate-spin"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
+    <div className="min-h-screen bg-black">
       <AdminHeader />
       <AdminNav />
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Última actualización */}
-        <div className="mb-6 text-right">
-          <span className="text-sm text-gray-400">
-            Última actualización: {new Date().toLocaleTimeString('es-ES')}
-          </span>
-          <span className="ml-2 inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+        <div className="mb-6 flex items-center justify-between">
+          <div className="text-3xl font-black text-white">
+            📊 Dashboard
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-[#fc4d5c]/10 border border-[#fc4d5c]/30 rounded-lg">
+            <span className="text-sm text-gray-300 font-medium">
+              Última actualización: {new Date().toLocaleTimeString('es-ES')}
+            </span>
+            <span className="inline-block w-2.5 h-2.5 bg-[#01cc00] rounded-full animate-pulse shadow-lg shadow-[#01cc00]/50"></span>
+          </div>
         </div>
 
         {/* Métricas Principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Users */}
-          <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-sm rounded-xl p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all">
+          <div className="bg-gradient-to-br from-[#fc4d5c]/20 via-[#fc4d5c]/10 to-transparent backdrop-blur-sm rounded-xl p-6 border border-[#fc4d5c]/30 hover:border-[#fc4d5c]/50 hover:shadow-lg hover:shadow-[#fc4d5c]/20 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-500/20 rounded-lg">
-                <Users className="w-6 h-6 text-blue-400" />
+              <div className="p-3 bg-[#fc4d5c]/30 rounded-xl shadow-lg">
+                <Users className="w-6 h-6 text-white" />
               </div>
-              <span className="text-3xl font-bold text-white">{stats?.users.total}</span>
+              <span className="text-4xl font-black text-white">{stats?.users.total}</span>
             </div>
-            <h3 className="text-gray-300 font-semibold mb-2">Total Usuarios</h3>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Verificados</span>
-                <span className="text-green-400 font-semibold">{stats?.users.verified}</span>
+            <h3 className="text-white font-bold mb-3 text-lg">Total Usuarios</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Verificados</span>
+                <span className="text-[#01cc00] font-bold">{stats?.users.verified}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Nuevos (7d)</span>
-                <span className="text-blue-400 font-semibold">+{stats?.users.newLast7days}</span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Nuevos (7d)</span>
+                <span className="text-[#fc4d5c] font-bold">+{stats?.users.newLast7days}</span>
               </div>
             </div>
           </div>
 
           {/* Online Users */}
-          <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 backdrop-blur-sm rounded-xl p-6 border border-green-500/20 hover:border-green-500/40 transition-all">
+          <div className="bg-gradient-to-br from-[#01cc00]/20 via-[#01cc00]/10 to-transparent backdrop-blur-sm rounded-xl p-6 border border-[#01cc00]/30 hover:border-[#01cc00]/50 hover:shadow-lg hover:shadow-[#01cc00]/20 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-500/20 rounded-lg">
-                <Activity className="w-6 h-6 text-green-400" />
+              <div className="p-3 bg-[#01cc00]/30 rounded-xl shadow-lg">
+                <Activity className="w-6 h-6 text-white" />
               </div>
-              <span className="text-3xl font-bold text-white">{stats?.users.online}</span>
+              <span className="text-4xl font-black text-white">{stats?.users.online}</span>
             </div>
-            <h3 className="text-gray-300 font-semibold mb-2">Usuarios Online</h3>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Activos (24h)</span>
-                <span className="text-green-400 font-semibold">{stats?.users.activeLast24h}</span>
+            <h3 className="text-white font-bold mb-3 text-lg">Usuarios Online</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Activos (24h)</span>
+                <span className="text-[#01cc00] font-bold">{stats?.users.activeLast24h}</span>
               </div>
-              <div className="flex items-center gap-1 text-xs">
-                <div className="flex-1 bg-gray-700 rounded-full h-1.5">
+              <div className="flex items-center gap-2 text-sm">
+                <div className="flex-1 bg-gray-800 rounded-full h-2">
                   <div 
-                    className="bg-green-500 h-1.5 rounded-full transition-all"
+                    className="bg-gradient-to-r from-[#01cc00] to-[#01cc00]/70 h-2 rounded-full transition-all shadow-lg shadow-[#01cc00]/50"
                     style={{ width: `${((stats?.users.online || 0) / (stats?.users.total || 1) * 100)}%` }}
                   ></div>
                 </div>
-                <span className="text-gray-400">
+                <span className="text-[#01cc00] font-bold min-w-[45px]">
                   {(((stats?.users.online || 0) / (stats?.users.total || 1) * 100)).toFixed(1)}%
                 </span>
               </div>
@@ -163,43 +170,43 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Messages & Engagement */}
-          <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-sm rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+          <div className="bg-gradient-to-br from-[#00a3e8]/20 via-[#00a3e8]/10 to-transparent backdrop-blur-sm rounded-xl p-6 border border-[#00a3e8]/30 hover:border-[#00a3e8]/50 hover:shadow-lg hover:shadow-[#00a3e8]/20 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-500/20 rounded-lg">
-                <MessageSquare className="w-6 h-6 text-purple-400" />
+              <div className="p-3 bg-[#00a3e8]/30 rounded-xl shadow-lg">
+                <MessageSquare className="w-6 h-6 text-white" />
               </div>
-              <span className="text-3xl font-bold text-white">{stats?.activity.messages.toLocaleString()}</span>
+              <span className="text-4xl font-black text-white">{stats?.activity.messages.toLocaleString()}</span>
             </div>
-            <h3 className="text-gray-300 font-semibold mb-2">Total Mensajes</h3>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Últimas 24h</span>
-                <span className="text-purple-400 font-semibold">+{stats?.activity.messagesLast24h}</span>
+            <h3 className="text-white font-bold mb-3 text-lg">Total Mensajes</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Últimas 24h</span>
+                <span className="text-[#00a3e8] font-bold">+{stats?.activity.messagesLast24h}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Promedio/Usuario</span>
-                <span className="text-purple-400 font-semibold">{stats?.activity.avgMessagesPerUser}</span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Promedio/Usuario</span>
+                <span className="text-[#00a3e8] font-bold">{stats?.activity.avgMessagesPerUser}</span>
               </div>
             </div>
           </div>
 
           {/* Matches */}
-          <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/5 backdrop-blur-sm rounded-xl p-6 border border-pink-500/20 hover:border-pink-500/40 transition-all">
+          <div className="bg-gradient-to-br from-[#fc4d5c]/20 via-[#fc4d5c]/10 to-transparent backdrop-blur-sm rounded-xl p-6 border border-[#fc4d5c]/30 hover:border-[#fc4d5c]/50 hover:shadow-lg hover:shadow-[#fc4d5c]/20 transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-pink-500/20 rounded-lg">
-                <Heart className="w-6 h-6 text-pink-400" />
+              <div className="p-3 bg-[#fc4d5c]/30 rounded-xl shadow-lg">
+                <Heart className="w-6 h-6 text-white" />
               </div>
-              <span className="text-3xl font-bold text-white">{stats?.activity.matches}</span>
+              <span className="text-4xl font-black text-white">{stats?.activity.matches}</span>
             </div>
-            <h3 className="text-gray-300 font-semibold mb-2">Matches</h3>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Likes (24h)</span>
-                <span className="text-pink-400 font-semibold">+{stats?.activity.likesLast24h}</span>
+            <h3 className="text-white font-bold mb-3 text-lg">Matches</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Likes (24h)</span>
+                <span className="text-[#fc4d5c] font-bold">+{stats?.activity.likesLast24h}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-400">Total Likes</span>
-                <span className="text-pink-400 font-semibold">{stats?.activity.likes}</span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Total Likes</span>
+                <span className="text-[#fc4d5c] font-bold">{stats?.activity.likes}</span>
               </div>
             </div>
           </div>
@@ -208,75 +215,76 @@ export default function AdminDashboardPage() {
         {/* Métricas Secundarias */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Suscripciones */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-500/20">
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#ffcc00]/30 hover:border-[#ffcc00]/50 transition-all">
             <div className="flex items-center gap-3 mb-3">
-              <Crown className="w-5 h-5 text-yellow-500" />
-              <h3 className="text-gray-300 font-semibold">9Plus Activos</h3>
+              <Crown className="w-6 h-6 text-[#ffcc00]" />
+              <h3 className="text-white font-bold">9Plus Activos</h3>
             </div>
-            <div className="text-2xl font-bold text-white mb-2">{stats?.subscriptions.active}</div>
-            <div className="text-xs text-gray-400">
-              Tasa de conversión: <span className="text-yellow-500 font-semibold">{stats?.subscriptions.conversionRate}%</span>
+            <div className="text-3xl font-black text-white mb-2">{stats?.subscriptions.active}</div>
+            <div className="text-sm text-gray-300">
+              Conversión: <span className="text-[#ffcc00] font-bold">{stats?.subscriptions.conversionRate}%</span>
             </div>
           </div>
 
           {/* Conversaciones */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-indigo-500/20">
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#00a3e8]/30 hover:border-[#00a3e8]/50 transition-all">
             <div className="flex items-center gap-3 mb-3">
-              <Zap className="w-5 h-5 text-indigo-500" />
-              <h3 className="text-gray-300 font-semibold">Conversaciones</h3>
+              <Zap className="w-6 h-6 text-[#00a3e8]" />
+              <h3 className="text-white font-bold">Conversaciones</h3>
             </div>
-            <div className="text-2xl font-bold text-white mb-2">{stats?.activity.activeConversations}</div>
-            <div className="text-xs text-gray-400">Activas en 7 días</div>
+            <div className="text-3xl font-black text-white mb-2">{stats?.activity.activeConversations}</div>
+            <div className="text-sm text-gray-300">Activas en 7 días</div>
           </div>
 
           {/* Email Verification */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-cyan-500/20">
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#01cc00]/30 hover:border-[#01cc00]/50 transition-all">
             <div className="flex items-center gap-3 mb-3">
-              <Mail className="w-5 h-5 text-cyan-500" />
-              <h3 className="text-gray-300 font-semibold">Verificación</h3>
+              <Mail className="w-6 h-6 text-[#01cc00]" />
+              <h3 className="text-white font-bold">Verificación</h3>
             </div>
-            <div className="text-2xl font-bold text-white mb-2">{stats?.conversion.emailVerificationRate}%</div>
-            <div className="text-xs text-gray-400">Tasa de verificación</div>
+            <div className="text-3xl font-black text-white mb-2">{stats?.conversion.emailVerificationRate}%</div>
+            <div className="text-sm text-gray-300">Tasa de verificación</div>
           </div>
 
           {/* Denuncias */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20">
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#fc4d5c]/30 hover:border-[#fc4d5c]/50 transition-all">
             <div className="flex items-center gap-3 mb-3">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              <h3 className="text-gray-300 font-semibold">Denuncias</h3>
+              <AlertTriangle className="w-6 h-6 text-[#fc4d5c]" />
+              <h3 className="text-white font-bold">Denuncias</h3>
             </div>
-            <div className="text-2xl font-bold text-white mb-2">{stats?.activity.reports}</div>
-            <div className="text-xs text-gray-400">{stats?.activity.blocks} bloqueos totales</div>
+            <div className="text-3xl font-black text-white mb-2">{stats?.activity.reports}</div>
+            <div className="text-sm text-gray-300">{stats?.activity.blocks} bloqueos totales</div>
           </div>
         </div>
 
         {/* Gráfico de Registros */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
+        <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#fc4d5c]/30 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <UserPlus className="w-6 h-6 text-blue-500" />
-              <h3 className="text-xl font-bold text-white">Registros (Últimos 7 días)</h3>
+              <UserPlus className="w-7 h-7 text-[#fc4d5c]" />
+              <h3 className="text-2xl font-black text-white">Registros (Últimos 7 días)</h3>
             </div>
-            <div className="text-sm text-gray-400">
-              Total: <span className="text-white font-semibold">{stats?.users.newLast7days}</span>
+            <div className="px-4 py-2 bg-[#fc4d5c]/20 border border-[#fc4d5c]/40 rounded-lg">
+              <span className="text-sm text-gray-300">Total: </span>
+              <span className="text-lg font-black text-[#fc4d5c]">{stats?.users.newLast7days}</span>
             </div>
           </div>
-          <div className="flex items-end gap-2 h-48">
+          <div className="flex items-end gap-3 h-48 px-2">
             {stats?.registrationsByDay.map((day, idx) => {
               const maxCount = Math.max(...(stats?.registrationsByDay.map(d => d.count) || [1]));
               const height = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
               return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                <div key={idx} className="flex-1 flex flex-col items-center gap-3">
                   <div className="relative w-full group">
                     <div 
-                      className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all hover:from-blue-400 hover:to-blue-300"
-                      style={{ height: `${height}%`, minHeight: day.count > 0 ? '8px' : '0px' }}
+                      className="w-full bg-gradient-to-t from-[#fc4d5c] via-[#fc4d5c]/90 to-[#fc4d5c]/70 rounded-t-xl transition-all hover:from-[#fc4d5c] hover:to-[#fc4d5c] shadow-lg hover:shadow-[#fc4d5c]/50"
+                      style={{ height: `${height}%`, minHeight: day.count > 0 ? '12px' : '0px' }}
                     ></div>
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 px-2 py-1 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      {day.count} registros
+                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black border border-[#fc4d5c]/50 px-3 py-1.5 rounded-lg text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl z-10">
+                      <span className="font-bold text-[#fc4d5c]">{day.count}</span> registros
                     </div>
                   </div>
-                  <div className="text-xs text-gray-400 text-center">
+                  <div className="text-xs text-gray-400 text-center font-medium uppercase">
                     {new Date(day.date).toLocaleDateString('es-ES', { weekday: 'short' })}
                   </div>
                 </div>
@@ -288,88 +296,88 @@ export default function AdminDashboardPage() {
         {/* Additional Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Profiles Stats */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-            <div className="flex items-center gap-3 mb-4">
-              <Target className="w-6 h-6 text-purple-500" />
-              <h3 className="text-xl font-bold text-white">Estadísticas de Perfiles</h3>
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#fc4d5c]/30">
+            <div className="flex items-center gap-3 mb-6">
+              <Target className="w-7 h-7 text-[#fc4d5c]" />
+              <h3 className="text-2xl font-black text-white">Estadísticas de Perfiles</h3>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-400">Perfiles Reales</span>
-                  <span className="text-white font-semibold">{stats?.profiles.real}</span>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-gray-300 font-semibold">Perfiles Reales</span>
+                  <span className="text-white font-black text-lg">{stats?.profiles.real}</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-800 rounded-full h-3">
                   <div 
-                    className="bg-green-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-[#01cc00] to-[#01cc00]/70 h-3 rounded-full transition-all shadow-lg shadow-[#01cc00]/50"
                     style={{ width: `${((stats?.profiles.real || 0) / (stats?.profiles.total || 1) * 100)}%` }}
                   ></div>
                 </div>
               </div>
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-400">Perfiles Falsos</span>
-                  <span className="text-white font-semibold">{stats?.profiles.fake}</span>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-gray-300 font-semibold">Perfiles Falsos</span>
+                  <span className="text-white font-black text-lg">{stats?.profiles.fake}</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-800 rounded-full h-3">
                   <div 
-                    className="bg-gray-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-gray-600 to-gray-500 h-3 rounded-full transition-all"
                     style={{ width: `${((stats?.profiles.fake || 0) / (stats?.profiles.total || 1) * 100)}%` }}
                   ></div>
                 </div>
               </div>
-              <div className="pt-4 border-t border-gray-700">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Orientación Hetero</span>
-                  <span className="text-white font-semibold">{stats?.profiles.hetero}</span>
+              <div className="pt-4 border-t border-[#fc4d5c]/20">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-300 font-semibold">👫 Orientación Hetero</span>
+                  <span className="text-[#fc4d5c] font-black text-lg">{stats?.profiles.hetero}</span>
                 </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-gray-400">Orientación Gay</span>
-                  <span className="text-white font-semibold">{stats?.profiles.gay}</span>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-300 font-semibold">🏳️‍🌈 Orientación Gay</span>
+                  <span className="text-[#fc4d5c] font-black text-lg">{stats?.profiles.gay}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Conversion & Engagement */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-            <div className="flex items-center gap-3 mb-4">
-              <TrendingUp className="w-6 h-6 text-green-500" />
-              <h3 className="text-xl font-bold text-white">Conversión & Engagement</h3>
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#01cc00]/30">
+            <div className="flex items-center gap-3 mb-6">
+              <TrendingUp className="w-7 h-7 text-[#01cc00]" />
+              <h3 className="text-2xl font-black text-white">Conversión & Engagement</h3>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-400">Verificación Email</span>
-                  <span className="text-green-400 font-bold">{stats?.conversion.emailVerificationRate}%</span>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-gray-300 font-semibold">Verificación Email</span>
+                  <span className="text-[#01cc00] font-black text-xl">{stats?.conversion.emailVerificationRate}%</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-800 rounded-full h-3">
                   <div 
-                    className="bg-green-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-[#01cc00] to-[#01cc00]/70 h-3 rounded-full transition-all shadow-lg shadow-[#01cc00]/50"
                     style={{ width: `${stats?.conversion.emailVerificationRate}%` }}
                   ></div>
                 </div>
               </div>
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-400">Perfiles Completados</span>
-                  <span className="text-blue-400 font-bold">{stats?.conversion.profileCompletionRate}%</span>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-gray-300 font-semibold">Perfiles Completados</span>
+                  <span className="text-[#00a3e8] font-black text-xl">{stats?.conversion.profileCompletionRate}%</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-800 rounded-full h-3">
                   <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-[#00a3e8] to-[#00a3e8]/70 h-3 rounded-full transition-all shadow-lg shadow-[#00a3e8]/50"
                     style={{ width: `${stats?.conversion.profileCompletionRate}%` }}
                   ></div>
                 </div>
               </div>
-              <div className="pt-4 border-t border-gray-700 space-y-2">
+              <div className="pt-4 border-t border-[#01cc00]/20 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Favoritos Totales</span>
-                  <span className="text-white font-semibold">{stats?.activity.favorites}</span>
+                  <span className="text-gray-300 font-semibold">Favoritos Totales</span>
+                  <span className="text-[#fc4d5c] font-black text-lg">{stats?.activity.favorites}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Conversión a 9Plus</span>
-                  <span className="text-yellow-400 font-semibold">{stats?.subscriptions.conversionRate}%</span>
+                  <span className="text-gray-300 font-semibold">Conversión a 9Plus</span>
+                  <span className="text-[#ffcc00] font-black text-lg">{stats?.subscriptions.conversionRate}%</span>
                 </div>
               </div>
             </div>
@@ -380,33 +388,33 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Most Active Users */}
           {stats?.mostActiveUsers && stats.mostActiveUsers.length > 0 && (
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-              <div className="flex items-center gap-3 mb-4">
-                <Activity className="w-6 h-6 text-green-500" />
-                <h3 className="text-xl font-bold text-white">Usuarios Más Activos</h3>
+            <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#01cc00]/30">
+              <div className="flex items-center gap-3 mb-6">
+                <Activity className="w-7 h-7 text-[#01cc00]" />
+                <h3 className="text-2xl font-black text-white">Top 5 Más Activos</h3>
               </div>
               <div className="space-y-3">
                 {stats.mostActiveUsers.map((profile, idx) => (
                   <div
                     key={profile.id}
-                    className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-all"
+                    className="flex items-center gap-4 p-4 bg-black/40 rounded-xl hover:bg-black/60 transition-all border border-[#01cc00]/20 hover:border-[#01cc00]/40"
                   >
-                    <div className="flex items-center justify-center w-8 h-8 bg-green-500/20 rounded-full text-green-400 font-bold text-sm">
+                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#01cc00] to-[#01cc00]/70 rounded-full text-white font-black text-lg shadow-lg shadow-[#01cc00]/30">
                       {idx + 1}
                     </div>
                     {profile.photos[0] && (
                       <img
                         src={profile.photos[0].url}
                         alt={profile.title}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-green-500/30"
+                        className="w-14 h-14 rounded-full object-cover border-3 border-[#01cc00]/50 shadow-lg"
                       />
                     )}
                     <div className="flex-1">
-                      <p className="text-white font-medium">{profile.title}</p>
+                      <p className="text-white font-bold text-base">{profile.title}</p>
                       <p className="text-gray-400 text-xs">{profile.user?.email}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-white font-semibold">
+                      <div className="text-[#01cc00] font-black text-xl">
                         {profile._count.sentMessages + profile._count.receivedMessages}
                       </div>
                       <div className="text-xs text-gray-400">mensajes</div>
@@ -419,33 +427,33 @@ export default function AdminDashboardPage() {
 
           {/* Most Reported Profiles */}
           {stats?.mostReportedProfiles && stats.mostReportedProfiles.length > 0 && (
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-              <div className="flex items-center gap-3 mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-500" />
-                <h3 className="text-xl font-bold text-white">Perfiles Más Reportados</h3>
+            <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-[#fc4d5c]/30">
+              <div className="flex items-center gap-3 mb-6">
+                <AlertTriangle className="w-7 h-7 text-[#fc4d5c]" />
+                <h3 className="text-2xl font-black text-white">Top 5 Más Reportados</h3>
               </div>
               <div className="space-y-3">
                 {stats.mostReportedProfiles.map((profile, idx) => (
                   <div
                     key={profile.id}
-                    className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-all"
+                    className="flex items-center gap-4 p-4 bg-black/40 rounded-xl hover:bg-black/60 transition-all border border-[#fc4d5c]/20 hover:border-[#fc4d5c]/40"
                   >
-                    <div className="flex items-center justify-center w-8 h-8 bg-red-500/20 rounded-full text-red-400 font-bold text-sm">
+                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#fc4d5c] to-[#fc4d5c]/70 rounded-full text-white font-black text-lg shadow-lg shadow-[#fc4d5c]/30">
                       {idx + 1}
                     </div>
                     {profile.photos[0] && (
                       <img
                         src={profile.photos[0].url}
                         alt={profile.title}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-red-500/30"
+                        className="w-14 h-14 rounded-full object-cover border-3 border-[#fc4d5c]/50 shadow-lg"
                       />
                     )}
                     <div className="flex-1">
-                      <p className="text-white font-medium">{profile.title}</p>
+                      <p className="text-white font-bold text-base">{profile.title}</p>
                       <p className="text-gray-400 text-xs">{profile.user?.email}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-red-400 font-semibold">
+                      <div className="text-[#fc4d5c] font-black text-xl">
                         {profile._count.reportsReceived}
                       </div>
                       <div className="text-xs text-gray-400">denuncias</div>
@@ -458,27 +466,27 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Google Analytics Info */}
-        <div className="mt-8 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-xl p-6 border border-indigo-500/20">
+        <div className="mt-8 bg-gradient-to-br from-[#00a3e8]/20 via-[#00a3e8]/10 to-transparent backdrop-blur-sm rounded-xl p-6 border border-[#00a3e8]/30">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-indigo-500/20 rounded-lg">
-              <DollarSign className="w-6 h-6 text-indigo-400" />
+            <div className="p-4 bg-[#00a3e8]/30 rounded-xl shadow-lg">
+              <TrendingUp className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-white mb-2">
-                Google Analytics Integration
+              <h3 className="text-2xl font-black text-white mb-3">
+                📊 Google Analytics
               </h3>
-              <p className="text-gray-300 text-sm mb-3">
-                Para ver métricas detalladas de usuarios activos, páginas vistas, tiempo en sitio y más, 
-                accede directamente a Google Analytics.
+              <p className="text-gray-300 text-base mb-4 leading-relaxed">
+                Accede a métricas avanzadas: usuarios activos en tiempo real, páginas vistas, 
+                tiempo de sesión, fuentes de tráfico y conversiones detalladas.
               </p>
               <a
                 href="https://analytics.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition text-sm font-medium"
+                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#00a3e8] to-[#00a3e8]/80 hover:from-[#00a3e8]/90 hover:to-[#00a3e8]/70 text-white rounded-xl transition-all font-bold text-base shadow-lg shadow-[#00a3e8]/30"
               >
                 Abrir Google Analytics
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUp className="w-5 h-5" />
               </a>
             </div>
           </div>
