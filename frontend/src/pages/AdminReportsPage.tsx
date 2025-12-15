@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   Shield,
   LogOut,
-  Trash2,
   User,
   Check,
   X,

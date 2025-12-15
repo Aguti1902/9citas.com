@@ -6,12 +6,9 @@ import {
   MessageSquare,
   AlertTriangle,
   Shield,
-  Star,
   TrendingUp,
   UserCheck,
-  UserX,
   LogOut,
-  Menu,
 } from 'lucide-react';
 import { getStats, logoutAdmin } from '../services/admin.api';
 

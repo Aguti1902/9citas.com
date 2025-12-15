@@ -8,7 +8,6 @@ import {
   Trash2,
   CheckCircle,
   XCircle,
-  Crown,
   MessageSquare,
   Heart,
 } from 'lucide-react';
