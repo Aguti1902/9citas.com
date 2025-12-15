@@ -257,7 +257,7 @@ export const getStats = async (req: Request, res: Response) => {
       prisma.block.count(),
       prisma.subscription.count({ where: { isActive: true } }),
       prisma.profile.count({ where: { isOnline: true } }),
-      prisma.profile.count({ where: { lastSeen: { gte: oneDayAgo } } }),
+      prisma.profile.count({ where: { lastSeenAt: { gte: oneDayAgo } } }),
       prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
       prisma.user.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
       prisma.message.count({ where: { createdAt: { gte: oneDayAgo } } }),
@@ -267,24 +267,30 @@ export const getStats = async (req: Request, res: Response) => {
     // Calcular matches (likes mutuos)
     const allLikes = await prisma.like.findMany({
       select: {
-        likerId: true,
-        likedId: true,
+        fromProfileId: true,
+        toProfileId: true,
       },
     });
 
     const matches = allLikes.filter((like) =>
-      allLikes.some((l) => l.likerId === like.likedId && l.likedId === like.likerId)
+      allLikes.some((l) => l.fromProfileId === like.toProfileId && l.toProfileId === like.fromProfileId)
     ).length / 2;
 
     // Obtener conversaciones activas (con al menos 1 mensaje en los últimos 7 días)
-    const activeConversations = await prisma.message.groupBy({
-      by: ['senderId', 'receiverId'],
+    const recentMessages = await prisma.message.findMany({
       where: {
         createdAt: {
           gte: sevenDaysAgo,
         },
       },
+      select: {
+        senderId: true,
+        receiverId: true,
+      },
+      distinct: ['senderId', 'receiverId'],
     });
+
+    const activeConversations = recentMessages.length;
 
     // Obtener registros por día (últimos 7 días)
     const registrationsByDay = await Promise.all(

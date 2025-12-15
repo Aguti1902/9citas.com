@@ -5,7 +5,6 @@ import {
   MessageSquare,
   AlertTriangle,
   TrendingUp,
-  UserCheck,
   Target,
   Activity,
   Zap,
@@ -153,11 +152,11 @@ export default function AdminDashboardPage() {
                 <div className="flex-1 bg-gray-700 rounded-full h-1.5">
                   <div 
                     className="bg-green-500 h-1.5 rounded-full transition-all"
-                    style={{ width: `${(stats?.users.online / stats?.users.total * 100) || 0}%` }}
+                    style={{ width: `${((stats?.users.online || 0) / (stats?.users.total || 1) * 100)}%` }}
                   ></div>
                 </div>
                 <span className="text-gray-400">
-                  {((stats?.users.online / stats?.users.total * 100) || 0).toFixed(1)}%
+                  {(((stats?.users.online || 0) / (stats?.users.total || 1) * 100)).toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -303,7 +302,7 @@ export default function AdminDashboardPage() {
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div 
                     className="bg-green-500 h-2 rounded-full transition-all"
-                    style={{ width: `${(stats?.profiles.real / stats?.profiles.total * 100) || 0}%` }}
+                    style={{ width: `${((stats?.profiles.real || 0) / (stats?.profiles.total || 1) * 100)}%` }}
                   ></div>
                 </div>
               </div>
@@ -315,7 +314,7 @@ export default function AdminDashboardPage() {
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div 
                     className="bg-gray-500 h-2 rounded-full transition-all"
-                    style={{ width: `${(stats?.profiles.fake / stats?.profiles.total * 100) || 0}%` }}
+                    style={{ width: `${((stats?.profiles.fake || 0) / (stats?.profiles.total || 1) * 100)}%` }}
                   ></div>
                 </div>
               </div>
