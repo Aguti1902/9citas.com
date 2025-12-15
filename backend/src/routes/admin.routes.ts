@@ -1,11 +1,19 @@
 import { Router } from 'express';
+import { authenticateAdmin } from '../middleware/auth.middleware';
+import * as adminController from '../controllers/admin.controller';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
 
+// Rutas existentes (requieren autenticación de admin)
+router.post('/profiles', authenticateAdmin, adminController.getAllProfiles);
+router.post('/regenerate-fakes', authenticateAdmin, adminController.regenerateFakeProfiles);
+router.post('/delete-fakes', authenticateAdmin, adminController.deleteFakeProfiles);
+router.post('/stats', authenticateAdmin, adminController.getStats);
+
 // ENDPOINT TEMPORAL PARA LIMPIAR BASE DE DATOS
-// ⚠️ ELIMINAR DESPUÉS DE USAR ⚠️
+// ⚠️ SIN AUTENTICACIÓN - ELIMINAR DESPUÉS DE USAR ⚠️
 router.post('/clear-all-data', async (req, res) => {
   try {
     console.log('🗑️  ========================================');
