@@ -284,13 +284,18 @@ export const getStats = async (req: Request, res: Response) => {
         },
       },
       select: {
-        senderId: true,
-        receiverId: true,
+        fromProfileId: true,
+        toProfileId: true,
       },
-      distinct: ['senderId', 'receiverId'],
     });
 
-    const activeConversations = recentMessages.length;
+    // Contar pares únicos de conversaciones
+    const conversationPairs = new Set<string>();
+    recentMessages.forEach((msg) => {
+      const pair = [msg.fromProfileId, msg.toProfileId].sort().join('-');
+      conversationPairs.add(pair);
+    });
+    const activeConversations = conversationPairs.size;
 
     // Obtener registros por día (últimos 7 días)
     const registrationsByDay = await Promise.all(
@@ -412,7 +417,7 @@ export const getStats = async (req: Request, res: Response) => {
         favorites: totalFavorites,
         reports: totalReports,
         blocks: totalBlocks,
-        activeConversations: activeConversations.length,
+        activeConversations: activeConversations,
         avgMessagesPerUser: avgMessagesPerUser.toFixed(2),
       },
       subscriptions: {
