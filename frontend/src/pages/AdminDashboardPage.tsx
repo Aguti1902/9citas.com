@@ -8,7 +8,6 @@ import {
   Target,
   Activity,
   Zap,
-  DollarSign,
   UserPlus,
   Crown,
   Mail,
