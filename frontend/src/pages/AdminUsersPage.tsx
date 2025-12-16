@@ -108,14 +108,14 @@ export default function AdminUsersPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xl">Cargando usuarios...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
+    <div className="min-h-screen bg-black">
       <AdminHeader />
       <AdminNav />
 
@@ -132,7 +132,7 @@ export default function AdminUsersPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nombre, email o ciudad..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full pl-10 pr-4 py-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#fc4d5c]"
               />
             </div>
 
@@ -140,9 +140,9 @@ export default function AdminUsersPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setFilterType('all')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-4 py-2 rounded-lg font-bold transition shadow-lg ${
                   filterType === 'all'
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/80 text-white shadow-[#fc4d5c]/30'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
@@ -150,9 +150,9 @@ export default function AdminUsersPage() {
               </button>
               <button
                 onClick={() => setFilterType('real')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-4 py-2 rounded-lg font-bold transition shadow-lg ${
                   filterType === 'real'
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/80 text-white shadow-[#fc4d5c]/30'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
@@ -160,9 +160,9 @@ export default function AdminUsersPage() {
               </button>
               <button
                 onClick={() => setFilterType('fake')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-4 py-2 rounded-lg font-bold transition shadow-lg ${
                   filterType === 'fake'
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/80 text-white shadow-[#fc4d5c]/30'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
