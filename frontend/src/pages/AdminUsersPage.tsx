@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
       <AdminNav />
 
       {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10 mb-8">
         {/* Filters */}
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50 mb-6">
           <div className="flex flex-col md:flex-row gap-4">

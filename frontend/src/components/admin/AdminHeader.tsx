@@ -11,22 +11,22 @@ export default function AdminHeader() {
   };
 
   return (
-    <header className="bg-black border-b border-[#fc4d5c]/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <header className="bg-black border-b border-[#fc4d5c]/30 shadow-lg shadow-[#fc4d5c]/10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {/* Logo 9CITAS - Corporativo */}
-            <div className="flex items-center gap-2">
-              <div className="text-5xl font-black tracking-tight">
-                <span className="text-white">9</span>
-                <span className="text-[#fc4d5c]">citas</span>
-                <span className="text-white text-3xl">.com</span>
-              </div>
+          <div className="flex items-center gap-6">
+            {/* Logo 9CITAS - Imagen */}
+            <div className="flex items-center">
+              <img 
+                src="/logo4.png" 
+                alt="9citas.com" 
+                className="h-14 w-auto object-contain"
+              />
             </div>
             
-            <div className="h-10 w-px bg-[#fc4d5c]/30"></div>
+            <div className="h-12 w-px bg-[#fc4d5c]/30"></div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Shield className="w-7 h-7 text-[#fc4d5c]" />
               <span className="text-xl font-bold text-white">
                 Panel Admin

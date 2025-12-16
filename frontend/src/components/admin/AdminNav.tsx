@@ -9,8 +9,8 @@ export default function AdminNav() {
 
   return (
     <nav className="bg-black/80 backdrop-blur-sm border-b border-[#fc4d5c]/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-1">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="flex gap-2">
           <button
             onClick={() => navigate('/admin/dashboard')}
             className={`flex items-center gap-2 px-5 py-3 font-semibold transition relative ${
