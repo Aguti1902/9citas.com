@@ -478,32 +478,6 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        {/* Google Analytics Info */}
-        <div className="mt-8 bg-gradient-to-br from-[#00a3e8]/20 via-[#00a3e8]/10 to-transparent backdrop-blur-sm rounded-xl p-6 border border-[#00a3e8]/30">
-          <div className="flex items-start gap-4">
-            <div className="p-4 bg-[#00a3e8]/30 rounded-xl shadow-lg">
-              <TrendingUp className="w-8 h-8 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-2xl font-black text-white mb-3">
-                📊 Google Analytics
-              </h3>
-              <p className="text-gray-300 text-base mb-4 leading-relaxed">
-                Accede a métricas avanzadas: usuarios activos en tiempo real, páginas vistas, 
-                tiempo de sesión, fuentes de tráfico y conversiones detalladas.
-              </p>
-              <a
-                href="https://analytics.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#00a3e8] to-[#00a3e8]/80 hover:from-[#00a3e8]/90 hover:to-[#00a3e8]/70 text-white rounded-xl transition-all font-bold text-base shadow-lg shadow-[#00a3e8]/30"
-              >
-                Abrir Google Analytics
-                <TrendingUp className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );
