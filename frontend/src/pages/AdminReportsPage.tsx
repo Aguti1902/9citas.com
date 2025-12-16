@@ -102,7 +102,7 @@ export default function AdminReportsPage() {
       <AdminNav />
 
       {/* Content */}
-      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-16">
+      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-32 pb-20">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white">
             Denuncias ({reports.length})

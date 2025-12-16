@@ -117,7 +117,7 @@ export default function AdminDashboardPage() {
       <AdminNav />
 
       {/* Content */}
-      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-16">
+      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-32 pb-20">
         {/* Última actualización */}
         <div className="mb-8 flex items-center justify-between">
           <div className="text-3xl font-black text-white">
