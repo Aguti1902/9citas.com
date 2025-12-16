@@ -84,14 +84,28 @@ export default function AdminDashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="text-6xl font-black tracking-tight">
-            <span className="text-white">9</span>
-            <span className="text-[#fc4d5c]">citas</span>
-            <span className="text-white text-4xl">.com</span>
+        <div className="flex flex-col items-center gap-6">
+          {/* Logo oficial */}
+          <div className="mb-4">
+            <img 
+              src="/logo4.png" 
+              alt="9citas.com" 
+              className="h-32 w-auto object-contain animate-pulse"
+            />
           </div>
-          <div className="text-white text-xl font-semibold">Cargando estadísticas...</div>
-          <div className="w-16 h-16 border-4 border-[#fc4d5c]/20 border-t-[#fc4d5c] rounded-full animate-spin"></div>
+          {/* Texto de carga */}
+          <div className="text-white text-2xl font-bold">Cargando estadísticas...</div>
+          {/* Spinner */}
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-[#fc4d5c]/20 border-t-[#fc4d5c] rounded-full animate-spin"></div>
+            <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-b-[#00a3e8] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+          </div>
+          {/* Indicador */}
+          <div className="flex gap-2 mt-4">
+            <div className="w-3 h-3 bg-[#fc4d5c] rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-[#00a3e8] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-3 h-3 bg-[#01cc00] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          </div>
         </div>
       </div>
     );

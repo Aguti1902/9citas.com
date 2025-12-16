@@ -25,26 +25,33 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mb-4">
+        {/* Logo 9CITAS */}
+        <div className="text-center mb-10">
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/logo4.png" 
+              alt="9citas.com" 
+              className="h-24 w-auto object-contain"
+            />
+          </div>
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/80 rounded-full mb-6 shadow-lg shadow-[#fc4d5c]/30">
             <Lock className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-black text-white mb-3">
             Panel de Administración
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-400 text-lg">
             Ingresa la contraseña de administrador
           </p>
         </div>
 
         {/* Formulario */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50">
+        <div className="bg-gray-900/80 backdrop-blur-sm rounded-2xl p-8 border border-[#fc4d5c]/30 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-bold text-white mb-2">
                 Contraseña
               </label>
               <input
@@ -52,7 +59,7 @@ export default function AdminLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-black border border-[#fc4d5c]/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#fc4d5c] focus:border-[#fc4d5c] transition"
                 placeholder="Ingresa la contraseña de admin"
                 required
                 autoFocus
@@ -60,7 +67,7 @@ export default function AdminLoginPage() {
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-[#fc4d5c]/10 border border-[#fc4d5c]/50 text-[#fc4d5c] px-4 py-3 rounded-xl text-sm font-semibold">
                 {error}
               </div>
             )}
@@ -68,7 +75,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#fc4d5c] to-[#fc4d5c]/80 text-white py-3 rounded-xl font-bold hover:from-[#fc4d5c]/90 hover:to-[#fc4d5c]/70 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#fc4d5c]/30"
             >
               {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
@@ -76,10 +83,10 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Volver al sitio */}
-        <div className="text-center mt-6">
+        <div className="text-center mt-8">
           <button
             onClick={() => navigate('/')}
-            className="text-gray-400 hover:text-white transition text-sm"
+            className="text-gray-400 hover:text-[#fc4d5c] transition text-sm font-semibold"
           >
             ← Volver al sitio
           </button>
